@@ -1,0 +1,167 @@
+﻿using System;
+using System.Collections.Generic;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
+using StudioSB.Rendering.Shapes;
+using StudioSB.Rendering;
+using SFGraphics.Cameras;
+
+namespace StudioSB.Scenes
+{
+    /// <summary>
+    /// A very generic implementation of a skeleton
+    /// Can be easily shared between many scene types
+    /// </summary>
+    public class SBSkeleton : ISBSkeleton
+    {
+        private List<SBBone> RootBones = new List<SBBone>();
+
+        private Dictionary<string, SBBone> BoneNameToBone = new Dictionary<string, SBBone>();
+
+        public SBBone this[string i]
+        {
+            get
+            {
+                if (BoneNameToBone == null || !BoneNameToBone.ContainsKey(i) || BoneNameToBone[i].Name != i)
+                {
+                    BoneNameToBone.Clear();
+                    foreach (var bone in Bones)
+                    {
+                        if (!BoneNameToBone.ContainsKey(bone.Name))
+                            BoneNameToBone.Add(bone.Name, bone);
+                    }
+                }
+                if (!BoneNameToBone.ContainsKey(i))
+                    return null;
+                return BoneNameToBone[i];
+            }
+        }
+
+        public SBBone[] Bones
+        {
+            get
+            {
+                return GetBones().ToArray();
+            }
+        }
+
+        private List<SBBone> GetBones()
+        {
+            List<SBBone> Bones = new List<SBBone>();
+            foreach (var bone in RootBones)
+            {
+                QueueBones(bone, Bones);
+            }
+            return Bones;
+        }
+
+        private void QueueBones(SBBone Bone, List<SBBone> Bones)
+        {
+            Bones.Add(Bone);
+            foreach (var child in Bone.Children)
+                QueueBones(child, Bones);
+        }
+
+        public void AddRoot(SBBone bone)
+        {
+            RootBones.Add(bone);
+        }
+
+        public bool ContainsBone(string Name)
+        {
+            return this[Name] != null;
+        }
+
+        #region Rendering
+        
+        //Rendering
+        private static BonePrism bonePrism;
+        private static Matrix4 prismRotation = Matrix4.CreateFromAxisAngle(new Vector3(0, 0, 1), 1.5708f);
+
+        public void RenderLegacy()
+        {
+            GL.LineWidth(2f);
+            GL.PointSize(5f);
+            foreach (var bone in Bones)
+            {
+                if (bone.Parent != null)
+                {
+                    GL.Begin(PrimitiveType.Lines);
+                    GL.Color3(0f, 1f, 0f);
+                    GL.Vertex3(Vector3.TransformPosition(Vector3.Zero, bone.AnimatedWorldTransform));
+                    GL.Color3(0f, 0f, 1f);
+                    GL.Vertex3(Vector3.TransformPosition(Vector3.Zero, bone.Parent.AnimatedWorldTransform));
+                    GL.End();
+                }
+                GL.Color3(1f, 0.25f, 0.25f);
+                GL.Begin(PrimitiveType.Points);
+                GL.Vertex3(Vector3.TransformPosition(Vector3.Zero, bone.WorldTransform));
+                GL.End();
+            }
+        }
+
+        public void RenderShader(Camera camera)
+        {
+            GL.LineWidth(1f);
+
+            if (bonePrism == null)
+                bonePrism = new BonePrism();
+
+            var boneShader = ShaderManager.GetShader("Bone");
+
+            boneShader.UseProgram();
+
+            boneShader.SetVector4("boneColor", new Vector4(ApplicationSettings.BoneColor.R / 255f, ApplicationSettings.BoneColor.G / 255f, ApplicationSettings.BoneColor.B / 255f, ApplicationSettings.BoneColor.A / 255f));
+            
+            boneShader.SetMatrix4x4("rotation", ref prismRotation);
+
+            foreach (var b in Bones)
+            {
+                Matrix4 transform = b.AnimatedWorldTransform;
+                boneShader.SetMatrix4x4("bone", ref transform);
+                boneShader.SetInt("hasParent", b.Parent != null ? 1 : 0);
+                if (b.Parent != null)
+                {
+                    Matrix4 parenttransform = b.Parent.AnimatedWorldTransform;
+                    boneShader.SetMatrix4x4("parent", ref parenttransform);
+                }
+                bonePrism.Draw(boneShader, camera);
+
+                // leaf node
+                boneShader.SetInt("hasParent", 0);
+                bonePrism.Draw(boneShader, null);
+            }
+
+            if(ApplicationSettings.RenderBoneNames)
+            foreach (var b in Bones)
+            {
+                TextRenderer.Draw(camera, b.Name, b.AnimatedWorldTransform);
+            }
+        }
+
+        public int IndexOfBone(SBBone bone)
+        {
+            int index = 0;
+            foreach(var b in Bones)
+            {
+                if (b == bone)
+                    return index;
+                index++;
+            }
+            return -1;
+        }
+
+        public Matrix4[] GetBindTransforms()
+        {
+            List<Matrix4> transforms = new List<Matrix4>();
+            foreach(var bone in Bones)
+            {
+                transforms.Add(bone.AnimatedBindMatrix);
+            }
+            return transforms.ToArray();
+        }
+        #endregion
+    }
+
+    
+}
