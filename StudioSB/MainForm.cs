@@ -653,7 +653,7 @@ namespace StudioSB
 
             //Create filter
             Dictionary<string, IImportableModelType> extensionToExporter = new Dictionary<string, IImportableModelType>();
-            foreach (IImportableModelType exporter in ModelExporters)
+            foreach (IImportableModelType exporter in ModelImporters)
             {
                 string Extension = exporter.Extension;
                 Filter += $"*{Extension};";
