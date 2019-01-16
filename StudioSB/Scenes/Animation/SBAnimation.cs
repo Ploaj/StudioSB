@@ -33,7 +33,7 @@ namespace StudioSB.Scenes.Animation
                 foreach (var mesh in scene.GetMeshObjects())
                 {
                     // names match with start ignoreing the _VIS tags
-                    if (mesh.Name.StartsWith(a.MeshName))
+                    if (a.MeshName != null && mesh.Name.StartsWith(a.MeshName))
                     {
                         mesh.Visible = a.Visibility.GetValue(Frame);
                     }

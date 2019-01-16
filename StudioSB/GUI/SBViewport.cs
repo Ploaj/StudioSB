@@ -17,6 +17,9 @@ namespace StudioSB.GUI
     /// </summary>
     public class SBViewport : GLViewport
     {
+        /// <summary>
+        /// Scene to be rendered within the viewport
+        /// </summary>
         public SBScene Scene
         {
             get => _scene;
@@ -33,32 +36,44 @@ namespace StudioSB.GUI
         }
         private SBScene _scene;
 
+        /// <summary>
+        /// Displays texture over screen
+        /// </summary>
         public Texture ScreenTexture { get; set; }
 
+        /// <summary>
+        /// Sets the current frame of the animation and updates scene
+        /// </summary>
         public float Frame
         {
-            get
-            {
-                // TODO: What even is this?
-                return 0;
-            }
             set
             {
                 if (Animation != null)
                     Animation.UpdateScene(value, Scene);
             }
+            get
+            {
+                // so yeah this is needed in order to bind this property to
+                // the track bar...
+                return 0;
+            }
         }
 
+        /// <summary>
+        /// The animation to be used by the scene
+        /// Animations and scenes are not directly linked
+        /// </summary>
         public SBAnimation Animation { get; set; }
 
         // cache information
         private int polyCount;
         private int vertexCount;
-
+        
+        //Rendering
         private bool readyToRender = false;
 
         public bool Updated { get; set; } = true;
-
+        
         public Camera Camera { get; set; } = new Camera() { FarClipPlane = 500000 };
 
         private Vector2 mousePosition = new Vector2();
@@ -66,6 +81,7 @@ namespace StudioSB.GUI
 
         public SBViewport()
         {
+            // Do I even need to skin this?
             ApplicationSettings.SkinControl(this);
         }
 
@@ -103,6 +119,11 @@ namespace StudioSB.GUI
             }
         }
 
+        /// <summary>
+        /// Renders the viewport
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void RenderViewport(object sender, EventArgs args)
         {
             OnUpdateFrame();
@@ -175,7 +196,7 @@ namespace StudioSB.GUI
             GL.PopAttrib();
 
             if(ScreenTexture != null)
-            StudioSB.Rendering.Shapes.ScreenTriangle.RenderTexture(ScreenTexture, false);
+                StudioSB.Rendering.Shapes.ScreenTriangle.RenderTexture(ScreenTexture, false);
 
             // Cleanup unused gl objects
             GLObjectManager.DeleteUnusedGLObjects();
