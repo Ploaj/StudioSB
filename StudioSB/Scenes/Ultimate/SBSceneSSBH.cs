@@ -235,13 +235,20 @@ namespace StudioSB.Scenes.Ultimate
             Skeleton = iomodel.Skeleton;
 
             // make temp material
-            UltimateMaterial material = new UltimateMaterial();
-            material.Name = "SFX_PBS_0100080008008269_opaque";
-            material.Label = "skin_sonic_001";
+            UltimateMaterial material;
 
-            //TODO more elegant material management
-            Materials.Add(material);
+            if (Materials.Count == 0)
+            {
+                material = new UltimateMaterial();
+                material.Name = "SFX_PBS";
+                material.Label = "new_material";
 
+                //TODO more elegant material management
+                Materials.Add(material);
+            }
+            else
+                material = (UltimateMaterial)Materials[0];
+            
             // convert meshes
             SBUltimateModel model = new SBUltimateModel();
 
