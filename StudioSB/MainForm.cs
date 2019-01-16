@@ -208,7 +208,7 @@ namespace StudioSB
 
             RenderTimer = new Timer();
             RenderTimer.Interval = 1000 / 120;
-            RenderTimer.Tick += new EventHandler(InvalidateRender);
+            RenderTimer.Tick += new EventHandler(TriggerViewportRender);
             RenderTimer.Start();
 
             FormClosing += MainForm_FormClosing;
@@ -410,17 +410,17 @@ namespace StudioSB
         }
 
         /// <summary>
-        /// Invalidates the viewport telling it to update
+        /// Raises a render frame event for the viewport.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void InvalidateRender(object sender, EventArgs e)
+        void TriggerViewportRender(object sender, EventArgs e)
         {
             if (Viewport.IsIdle)
             {
                 if (ApplicationSettingsEditor.Visible || animationBar.Visible)
                     Viewport.Updated = true;
-                Viewport.Invalidate();
+                Viewport.RenderFrame();
                 animationBar.Process();
             }
         }

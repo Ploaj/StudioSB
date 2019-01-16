@@ -91,11 +91,9 @@ namespace StudioSB.GUI
 
             ReadyToRender = true;
 
-            Paint += ViewportPaint;
+            ShaderManager.SetUpShaders();
 
-            Rendering.ShaderManager.SetUpShaders();
-
-            OnRenderFrame += Render;
+            OnRenderFrame += RenderViewport;
 
             camera.RenderWidth = Width;
             camera.RenderHeight = Height;
@@ -118,13 +116,14 @@ namespace StudioSB.GUI
             }
         }
 
-        private void ViewportPaint(object sender, EventArgs args)
+        private void RenderViewport(object sender, EventArgs args)
         {
             OnUpdateFrame();
 
             // Only render when something in the scene has been updated
-            if (Updated)
-                RenderFrame();
+            // TODO: This conditional causes flickering.
+            //if (Updated)
+                Render();
             Updated = false;
         }
 
@@ -136,8 +135,6 @@ namespace StudioSB.GUI
         {
             if (ReadyToRender)
             {
-                GL.Viewport(0, 0, Width, Height);
-
                 camera.RenderWidth = Width;
                 camera.RenderHeight = Height;
 
@@ -155,7 +152,7 @@ namespace StudioSB.GUI
         /// <summary>
         /// 
         /// </summary>
-        protected void Render(object sender, EventArgs args)
+        protected void Render()
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -198,7 +195,7 @@ namespace StudioSB.GUI
         }
 
         /// <summary>
-        /// Rendes the background gradient
+        /// Renders the background gradient
         /// TODO: use shader
         /// </summary>
         private void RenderBackground()
@@ -237,7 +234,8 @@ namespace StudioSB.GUI
         /// </summary>
         private void UpdateCamera()
         {
-            if (Mouse.GetState() == null) return;
+            if (Mouse.GetState() == null)
+                return;
 
             Vector2 newMousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             float newMouseScrollWheel = Mouse.GetState().Wheel;
