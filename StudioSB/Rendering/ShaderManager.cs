@@ -1,7 +1,8 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using OpenTK.Graphics.OpenGL;
 using SFGraphics.GLObjects.Shaders;
-using OpenTK.Graphics.OpenGL;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace StudioSB.Rendering
 {
@@ -58,62 +59,73 @@ namespace StudioSB.Rendering
         private static Shader CreateTextShader()
         {
             Shader textShader = new Shader();
-            textShader.LoadShader(File.ReadAllText("Shaders/Text.frag"), ShaderType.FragmentShader);
-            textShader.LoadShader(File.ReadAllText("Shaders/Text.vert"), ShaderType.VertexShader);
+            textShader.LoadShaders(File.ReadAllText("Shaders/Text.vert"), File.ReadAllText("Shaders/Text.frag"));
             return textShader;
         }
 
         private static Shader CreateBoneShader()
         {
             Shader boneShader = new Shader();
-            boneShader.LoadShader(File.ReadAllText("Shaders/Bone.frag"), ShaderType.FragmentShader);
-            boneShader.LoadShader(File.ReadAllText("Shaders/Bone.vert"), ShaderType.VertexShader);
+            boneShader.LoadShaders(File.ReadAllText("Shaders/Bone.vert"), File.ReadAllText("Shaders/Bone.frag"));
             return boneShader;
         }
 
         private static Shader CreateTextureShader()
         {
             Shader textureShader = new Shader();
-            textureShader.LoadShader(File.ReadAllText("Shaders/Texture.frag"), ShaderType.FragmentShader);
-            textureShader.LoadShader(File.ReadAllText("Shaders/Texture.vert"), ShaderType.VertexShader);
-            textureShader.LoadShader(File.ReadAllText("Shaders/Gamma.frag"), ShaderType.FragmentShader);
+            textureShader.LoadShaders(new List<Tuple<string, ShaderType, string>>()
+            {
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/Texture.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/Texture.vert"), ShaderType.VertexShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/Gamma.frag"), ShaderType.FragmentShader, ""),
+            });
             return textureShader;
         }
 
         private static Shader CreateRModelDebugShader()
         {
             Shader rModelDebug = new Shader();
-            rModelDebug.LoadShader(File.ReadAllText("Shaders/UltimateModelDebug.frag"), ShaderType.FragmentShader);
-            rModelDebug.LoadShader(File.ReadAllText("Shaders/UltimateModel.geom"), ShaderType.GeometryShader);
-            rModelDebug.LoadShader(File.ReadAllText("Shaders/NormalMap.frag"), ShaderType.FragmentShader);
-            rModelDebug.LoadShader(File.ReadAllText("Shaders/UltimateModel.vert"), ShaderType.VertexShader);
-            rModelDebug.LoadShader(File.ReadAllText("Shaders/Gamma.frag"), ShaderType.FragmentShader);
-            rModelDebug.LoadShader(File.ReadAllText("Shaders/Wireframe.frag"), ShaderType.FragmentShader);
-            rModelDebug.LoadShader(File.ReadAllText("Shaders/TextureLayers.frag"), ShaderType.FragmentShader);
+            rModelDebug.LoadShaders(new List<Tuple<string, ShaderType, string>>()
+            {
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/UltimateModelDebug.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/UltimateModel.geom"), ShaderType.GeometryShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/NormalMap.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/UltimateModel.vert"), ShaderType.VertexShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/Gamma.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/Wireframe.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/TextureLayers.frag"), ShaderType.FragmentShader, "")
+            });
+
             return rModelDebug;
         }
 
         private static Shader CreateRModelUvShader()
         {
             Shader rModelUv = new Shader();
-            rModelUv.LoadShader(File.ReadAllText("Shaders/UltimateModelUV.vert"), ShaderType.VertexShader);
-            rModelUv.LoadShader(File.ReadAllText("Shaders/UltimateModel.geom"), ShaderType.GeometryShader);
-            rModelUv.LoadShader(File.ReadAllText("Shaders/UltimateModelUV.frag"), ShaderType.FragmentShader);
-            rModelUv.LoadShader(File.ReadAllText("Shaders/NormalMap.frag"), ShaderType.FragmentShader);
-            rModelUv.LoadShader(File.ReadAllText("Shaders/Wireframe.frag"), ShaderType.FragmentShader);
+            rModelUv.LoadShaders(new List<Tuple<string, ShaderType, string>>()
+            {
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/UltimateModelUV.vert"), ShaderType.VertexShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/UltimateModel.geom"), ShaderType.GeometryShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/UltimateModelUV.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/NormalMap.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/Wireframe.frag"), ShaderType.FragmentShader, ""),
+            });
             return rModelUv;
         }
 
         private static Shader CreateRModelShader()
         {
             Shader rModel = new Shader();
-            rModel.LoadShader(File.ReadAllText("Shaders/UltimateModel.vert"), ShaderType.VertexShader);
-            rModel.LoadShader(File.ReadAllText("Shaders/UltimateModel.geom"), ShaderType.GeometryShader);
-            rModel.LoadShader(File.ReadAllText("Shaders/UltimateModel.frag"), ShaderType.FragmentShader);
-            rModel.LoadShader(File.ReadAllText("Shaders/Gamma.frag"), ShaderType.FragmentShader);
-            rModel.LoadShader(File.ReadAllText("Shaders/NormalMap.frag"), ShaderType.FragmentShader);
-            rModel.LoadShader(File.ReadAllText("Shaders/Wireframe.frag"), ShaderType.FragmentShader);
-            rModel.LoadShader(File.ReadAllText("Shaders/TextureLayers.frag"), ShaderType.FragmentShader);
+            rModel.LoadShaders(new List<Tuple<string, ShaderType, string>>()
+            {
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/UltimateModel.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/UltimateModel.geom"), ShaderType.GeometryShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/NormalMap.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/UltimateModel.vert"), ShaderType.VertexShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/Gamma.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/Wireframe.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/TextureLayers.frag"), ShaderType.FragmentShader, "")
+            });
             return rModel;
         }
     }
