@@ -252,7 +252,7 @@ namespace StudioSB.Scenes.Ultimate
             // convert meshes
             SBUltimateModel model = new SBUltimateModel();
 
-            foreach(var iomesh in iomodel.Meshes)
+            foreach (var iomesh in iomodel.Meshes)
             {
                 SBUltimateMesh<UltimateVertex> mesh = new SBUltimateMesh<UltimateVertex>();
                 mesh.Name = iomesh.Name;
@@ -265,8 +265,30 @@ namespace StudioSB.Scenes.Ultimate
 
                 iomesh.GenerateTangentsAndBitangents();
 
-                foreach(var vertex in iomesh.Vertices)
-                    mesh.Vertices.Add(IOToUltimateVertex(vertex));
+                //optimization single bind
+                bool isSingleBound = true;
+                int bone = iomesh.Vertices.Count > 0 ? (int)iomesh.Vertices[0].BoneIndices.X : -1;
+                foreach (var vertex in iomesh.Vertices)
+                {
+                    if (vertex.BoneWeights.X != 1 || vertex.BoneIndices.X != bone)
+                    {
+                        isSingleBound = false;
+                        break;
+                    }
+                }
+                SBBone parentBone = null;
+                if(isSingleBound)
+                    parentBone = iomodel.Skeleton.Bones[bone];
+
+                // because the vertex cannot be changed after creation, and we don't know if we need to single bind,
+                // we have to go through the vertices again after determining if this mesh is single bound
+                foreach (var vertex in iomesh.Vertices)
+                {
+                    mesh.Vertices.Add(IOToUltimateVertex(vertex, isSingleBound, parentBone == null ? Matrix4.Identity : parentBone.InvWorldTransform));
+                }
+
+                if (isSingleBound)
+                    mesh.ParentBone = parentBone.Name;
 
                 //TODO: make more customizable through import settings
                 mesh.ExportAttributes.Add(SSBHLib.Tools.MESHAttribute.Position0);
@@ -274,19 +296,23 @@ namespace StudioSB.Scenes.Ultimate
                 mesh.ExportAttributes.Add(SSBHLib.Tools.MESHAttribute.Tangent0);
                 mesh.ExportAttributes.Add(SSBHLib.Tools.MESHAttribute.map1);
                 mesh.ExportAttributes.Add(SSBHLib.Tools.MESHAttribute.colorSet1);
+
             }
 
             Model = model;
         }
 
-        private static UltimateVertex IOToUltimateVertex(IOVertex iov)
+        private static UltimateVertex IOToUltimateVertex(IOVertex iov, bool singleBound, Matrix4 parentBoneInverse)
         {
-            return new UltimateVertex(iov.Position, iov.Normal, iov.Tangent, Vector3.Zero, iov.UV0, iov.UV1,
-                iov.UV2, new IVec4() { X = (int)iov.BoneIndices.X,
+            return new UltimateVertex(
+                singleBound ? Vector3.TransformPosition(iov.Position, parentBoneInverse) : iov.Position,
+                singleBound ? Vector3.TransformNormal(iov.Normal, parentBoneInverse) : iov.Normal, 
+                iov.Tangent, Vector3.Zero, iov.UV0, iov.UV1,
+                iov.UV2, singleBound ? new IVec4() : new IVec4() { X = (int)iov.BoneIndices.X,
                     Y = (int)iov.BoneIndices.Y,
                     Z = (int)iov.BoneIndices.Z,
-                    W = (int)iov.BoneIndices.W }, 
-                iov.BoneWeights, Vector2.Zero, Vector4.One, Vector4.One);
+                    W = (int)iov.BoneIndices.W },
+                 singleBound ? Vector4.Zero : iov.BoneWeights, Vector2.Zero, Vector4.One, Vector4.One);
         }
 
         /// <summary>

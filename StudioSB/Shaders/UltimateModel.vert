@@ -43,8 +43,10 @@ uniform Bones
 void main()
 {
     // Single bind transform
-    vec4 position = transform * vec4(Position0, 1);
+    vec4 transformedPosition = transform * vec4(Position0, 1);
     vec4 transformedNormal = transform * vec4(Normal0, 0);
+
+	vec4 position = transformedPosition;
 
     // Vertex skinning
     if (boneWeights.x != 0) {
@@ -53,7 +55,7 @@ void main()
 
         for (int i = 0; i < 4; i++)
         {
-            position += bones.transforms[boneIndices[i]] * vec4(Position0, 1) * boneWeights[i];
+            position += bones.transforms[boneIndices[i]] * vec4(transformedPosition.xyz, 1) * boneWeights[i];
             transformedNormal.xyz += (inverse(transpose(bones.transforms[boneIndices[i]])) * vec4(Normal0, 1) * boneWeights[i]).xyz;
         }
     }

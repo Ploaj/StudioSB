@@ -257,7 +257,7 @@ namespace StudioSB.IO.Formats
                         case "nodes":
                             var bone = new SBBone();
                             bone.Name = args[1].Replace("\"", "");
-                            Console.WriteLine(bone.Name + " " + args[2]);
+                            //Console.WriteLine(bone.Name + " " + args[2]);
                             boneParents.Add(int.Parse(args[2]));
                             PostProcessBones.Add(bone);
                             indexToBone.Add(int.Parse(args[0]), bone);
@@ -438,8 +438,8 @@ namespace StudioSB.IO.Formats
             smdvertex.Weights = new float[weightCount];
             for(int i = 0;i < weightCount; i++)
             {
-                smdvertex.Bones[0] = (int)iovertex.BoneIndices[i];
-                smdvertex.Weights[0] = iovertex.BoneWeights[i];
+                smdvertex.Bones[i] = (int)iovertex.BoneIndices[i];
+                smdvertex.Weights[i] = iovertex.BoneWeights[i];
             }
 
             return smdvertex;
