@@ -17,10 +17,9 @@ namespace StudioSB.GUI
     /// </summary>
     public class SBViewport : GLViewport
     {
-        public SBScene Scene { get
-            {
-                return _scene;
-            }
+        public SBScene Scene
+        {
+            get => _scene;
             set
             {
                 _scene = value;
@@ -34,48 +33,36 @@ namespace StudioSB.GUI
         }
         private SBScene _scene;
 
-        public Texture ScreenTexture;
+        public Texture ScreenTexture { get; set; }
 
         public float Frame
         {
-            set
-            {
-                if (_animation != null)
-                    _animation.UpdateScene(value, Scene);
-            }
             get
             {
+                // TODO: What even is this?
                 return 0;
             }
-        }
-
-        public SBAnimation Animation
-        {
-            get
-            {
-                return _animation;
-            }
             set
             {
-                _animation = value;
+                if (Animation != null)
+                    Animation.UpdateScene(value, Scene);
             }
         }
-        private SBAnimation _animation;
+
+        public SBAnimation Animation { get; set; }
 
         // cache information
-        private int PolyCount { get; set; }
-        private int VertexCount { get; set; }
+        private int polyCount;
+        private int vertexCount;
 
-        private bool ReadyToRender { get; set; } = false;
+        private bool readyToRender = false;
+
         public bool Updated { get; set; } = true;
 
-        #region Camera Controls
+        public Camera Camera { get; set; } = new Camera() { FarClipPlane = 500000 };
 
-        public Camera camera = new Camera() { FarClipPlane = 500000 };
         private Vector2 mousePosition = new Vector2();
         private float mouseScrollWheel = 0;
-
-        #endregion
 
         public SBViewport()
         {
@@ -89,14 +76,14 @@ namespace StudioSB.GUI
         {
             base.OnLoad(e);
 
-            ReadyToRender = true;
+            readyToRender = true;
 
             ShaderManager.SetUpShaders();
 
             OnRenderFrame += RenderViewport;
 
-            camera.RenderWidth = Width;
-            camera.RenderHeight = Height;
+            Camera.RenderWidth = Width;
+            Camera.RenderHeight = Height;
         }
 
         /// <summary>
@@ -104,14 +91,14 @@ namespace StudioSB.GUI
         /// </summary>
         private void UpdateSceneInformation()
         {
-            PolyCount = 0;
-            VertexCount = 0;
+            polyCount = 0;
+            vertexCount = 0;
             if (_scene != null)
             {
                 foreach (var mesh in _scene.GetMeshObjects())
                 {
-                    PolyCount += mesh.PolyCount;
-                    VertexCount += mesh.VertexCount;
+                    polyCount += mesh.PolyCount;
+                    vertexCount += mesh.VertexCount;
                 }
             }
         }
@@ -133,10 +120,10 @@ namespace StudioSB.GUI
         /// <param name="e"></param>
         protected override void OnResize(EventArgs e)
         {
-            if (ReadyToRender)
+            if (readyToRender)
             {
-                camera.RenderWidth = Width;
-                camera.RenderHeight = Height;
+                Camera.RenderWidth = Width;
+                Camera.RenderHeight = Height;
 
                 Updated = true;
             }
@@ -168,7 +155,7 @@ namespace StudioSB.GUI
             GL.Enable(EnableCap.DepthTest);
 
             GL.MatrixMode(MatrixMode.Modelview);
-            Matrix4 modelViewMatrix = camera.MvpMatrix;
+            Matrix4 modelViewMatrix = Camera.MvpMatrix;
             GL.LoadMatrix(ref modelViewMatrix);
             
             if(ApplicationSettings.EnableGridDisplay)
@@ -176,13 +163,13 @@ namespace StudioSB.GUI
 
             if(Scene != null)
             {
-                Scene.Render(camera);
+                Scene.Render(Camera);
             }
 
             if (ApplicationSettings.RenderSceneInformation)
             {
-                TextRenderer.DrawOrtho(camera, "Polygon Count: " + PolyCount.ToString(), new Vector2(0, 30));
-                TextRenderer.DrawOrtho(camera, "Vertex  Count: " + VertexCount.ToString(), new Vector2(0, 46));
+                TextRenderer.DrawOrtho(Camera, "Polygon Count: " + polyCount.ToString(), new Vector2(0, 30));
+                TextRenderer.DrawOrtho(Camera, "Vertex  Count: " + vertexCount.ToString(), new Vector2(0, 46));
             }
 
             GL.PopAttrib();
@@ -243,27 +230,27 @@ namespace StudioSB.GUI
             {
                 if (Mouse.GetState().IsButtonDown(MouseButton.Left))
                 {
-                    camera.RotationXRadians += ((newMousePosition.Y - mousePosition.Y) / 300f);
-                    camera.RotationYRadians += (newMousePosition.X - mousePosition.X) / 300f;
+                    Camera.RotationXRadians += ((newMousePosition.Y - mousePosition.Y) / 300f);
+                    Camera.RotationYRadians += (newMousePosition.X - mousePosition.X) / 300f;
                     Updated = true;
                 }
                 if (Mouse.GetState().IsButtonDown(MouseButton.Right))
                 {
-                    camera.Pan((newMousePosition.X - mousePosition.X), (newMousePosition.Y - mousePosition.Y));
+                    Camera.Pan((newMousePosition.X - mousePosition.X), (newMousePosition.Y - mousePosition.Y));
                     Updated = true;
                 }
                 if (Keyboard.GetState().IsKeyDown(Key.W))
                 {
-                    camera.Zoom(0.25f);
+                    Camera.Zoom(0.25f);
                     Updated = true;
                 }
                 if (Keyboard.GetState().IsKeyDown(Key.S))
                 {
-                    camera.Zoom(-0.25f);
+                    Camera.Zoom(-0.25f);
                     Updated = true;
                 }
 
-                camera.Zoom((newMouseScrollWheel - mouseScrollWheel) * 0.1f);
+                Camera.Zoom((newMouseScrollWheel - mouseScrollWheel) * 0.1f);
                 if ((newMouseScrollWheel - mouseScrollWheel) != 0)
                     Updated = true;
             }

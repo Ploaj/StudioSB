@@ -58,7 +58,7 @@ namespace StudioSB.Scenes.Ultimate
         [MATLLoaderAttributeName("CustomVector44")]
         public SBMatAttrib<Vector4> param153 { get; } = new SBMatAttrib<Vector4>("CustomVector44", new Vector4(0), description: "Wii Fit trainer stage color.");
 
-        public bool hasParam153 { get { return param153.Used; } }
+        public bool hasParam153 { get => param153.Used; }
 
         [MATLLoaderAttributeName("CustomVector45")]
         public SBMatAttrib<Vector4> param154 { get; } = new SBMatAttrib<Vector4>("CustomVector45", new Vector4(0), description: "Wii Fit trainer stage color.");
@@ -66,7 +66,7 @@ namespace StudioSB.Scenes.Ultimate
         [MATLLoaderAttributeName("CustomVector47")]
         public SBMatAttrib<Vector4> param156 { get; } = new SBMatAttrib<Vector4>("CustomVector47", new Vector4(0), description: "");
 
-        public bool hasParam156 { get { return param156.Used; } }
+        public bool hasParam156 { get => param156.Used; }
 
         #endregion
 
@@ -100,28 +100,28 @@ namespace StudioSB.Scenes.Ultimate
         [MATLLoaderAttributeName("Texture0"), DefaultTextureName("defaultBlack")]
         public SBMatAttrib<string> colMap { get; } = new SBMatAttrib<string>("Texture0", "");
 
-        public bool hasColMap { get { return colMap.Used; } }
+        public bool hasColMap { get => colMap.Used; }
         
         [MATLLoaderAttributeName("Texture1"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> col2Map { get; } = new SBMatAttrib<string>("Texture1", "");
 
-        public bool hasCol2Map { get { return col2Map.Used; } }
+        public bool hasCol2Map { get => col2Map.Used; }
         
         [MATLLoaderAttributeName("Texture6"), DefaultTextureName("defaultPrm")]
         public SBMatAttrib<string> prmMap { get; } = new SBMatAttrib<string>("Texture6", "");
 
-        public bool hasPrmMap { get { return prmMap.Used; } }
+        public bool hasPrmMap { get => prmMap.Used; }
         
         [MATLLoaderAttributeName("Texture4"), DefaultTextureName("defaultNormal")]
         public SBMatAttrib<string> norMap { get; } = new SBMatAttrib<string>("Texture4", "");
 
         [MATLLoaderAttributeName("Texture5"), DefaultTextureName("defaultBlack")]
         public SBMatAttrib<string> emiMap { get; } = new SBMatAttrib<string>("Texture5", "");
-        public bool hasEmi { get { return emiMap != null; } }
+        public bool hasEmi { get => emiMap != null; }
     
         [MATLLoaderAttributeName("Texture14"), DefaultTextureName("defaultBlack")]
         public SBMatAttrib<string> emi2Map { get; } = new SBMatAttrib<string>("Texture14", "");
-        public bool hasEmi2 { get { return emi2Map!= null; } }
+        public bool hasEmi2 { get => emi2Map!= null; }
         
         [MATLLoaderAttributeName("Texture9"), DefaultTextureName("defaultBlack")]
         public SBMatAttrib<string> bakeLitMap { get; } = new SBMatAttrib<string>("Texture9", "");
@@ -131,23 +131,23 @@ namespace StudioSB.Scenes.Ultimate
 
         [MATLLoaderAttributeName("Texture16"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> inkNorMap { get; } = new SBMatAttrib<string>("Texture16", "");
-        public bool hasInkNorMap { get { return inkNorMap.Used; } }
+        public bool hasInkNorMap { get => inkNorMap.Used; }
         
         [MATLLoaderAttributeName("Texture8"), DefaultTextureName("defaultBlack")]
         public SBMatAttrib<string> difCubemap { get; } = new SBMatAttrib<string>("Texture8", "");
-        public bool hasDifCubemap { get { return difCubemap.Used; } }
+        public bool hasDifCubemap { get => difCubemap.Used; }
         
         [MATLLoaderAttributeName("Texture10"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> difMap { get; } = new SBMatAttrib<string>("Texture10", "");
-        public bool hasDiffuse { get { return difMap.Used; } }
+        public bool hasDiffuse { get => difMap.Used; }
         
         [MATLLoaderAttributeName("Texture11"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> dif2Map { get; } = new SBMatAttrib<string>("Texture11", "");
-        public bool hasDiffuse2 { get { return dif2Map.Used; } }
+        public bool hasDiffuse2 { get => dif2Map.Used; }
         
         [MATLLoaderAttributeName("Texture12"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> dif3Map { get; } = new SBMatAttrib<string>("Texture12", "");
-        public bool hasDiffuse3 { get { return dif3Map.Used; } }
+        public bool hasDiffuse3 { get => dif3Map.Used; }
 
         [MATLLoaderAttributeName("Texture13"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> projMap { get; } = new SBMatAttrib<string>("Texture13", "");

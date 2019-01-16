@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using SFGraphics.GLObjects.Shaders;
+﻿using SFGraphics.GLObjects.Shaders;
+using System;
 
 namespace StudioSB.Scenes
 {
@@ -41,11 +40,12 @@ namespace StudioSB.Scenes
     public class SBMatAttrib<T>
     {
         public string Name { get; set; }
+
         public T DefaultValue { get; set; }
-        public T Value { get
-            {
-                return _value;
-            }
+
+        public T Value
+        {
+            get => _value;
             set
             {
                 Used = true;
@@ -53,8 +53,9 @@ namespace StudioSB.Scenes
                 AnimatedValue = value;
             }
         }
-        public T AnimatedValue { get; set; }
         private T _value;
+
+        public T AnimatedValue { get; set; }
         public string Description { get; set; }
         public bool IsColor { get; set; }
 

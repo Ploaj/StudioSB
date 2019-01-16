@@ -275,7 +275,7 @@ namespace StudioSB
         /// </summary>
         public void ResetViewportCamera()
         {
-            Viewport.camera.ResetToDefaultPosition();
+            Viewport.Camera.ResetToDefaultPosition();
             Viewport.Updated = true;
         }
 
