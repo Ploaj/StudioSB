@@ -676,26 +676,26 @@ namespace StudioSB
 
         private void InitializeImportTypes()
         {
-            // initialize model importers
-            Type[] ExportableModelTypes =
-    (from assemblyType in AppDomain.CurrentDomain.GetAssemblies()
-     from type in assemblyType.GetTypes()
-     where typeof(IExportableModelType).IsAssignableFrom(type)
-     select type).ToArray();
+            var assemblyTypes = new List<Type>();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                assemblyTypes.AddRange(assembly.GetTypes());
+            }
 
-            foreach (var type in ExportableModelTypes)
+            // initialize model importers
+            var exportableModelTypes = from type in assemblyTypes
+                where typeof(IExportableModelType).IsAssignableFrom(type) select type;
+
+            foreach (var type in exportableModelTypes)
             {
                 if (type != typeof(IExportableModelType))
                     ModelExporters.Add((IExportableModelType)Activator.CreateInstance(type));
             }
 
-            Type[] ImportableModelTypes =
-    (from assemblyType in AppDomain.CurrentDomain.GetAssemblies()
-     from type in assemblyType.GetTypes()
-     where typeof(IImportableModelType).IsAssignableFrom(type)
-     select type).ToArray();
+            var importableModelTypes = from type in assemblyTypes
+                where typeof(IImportableModelType).IsAssignableFrom(type) select type;
 
-            foreach (var type in ImportableModelTypes)
+            foreach (var type in importableModelTypes)
             {
                 if (type != typeof(IImportableModelType))
                     ModelImporters.Add((IImportableModelType)Activator.CreateInstance(type));
@@ -703,25 +703,19 @@ namespace StudioSB
 
 
             // initialize model importers
-            Type[] ExportableAnimation =
-    (from assemblyType in AppDomain.CurrentDomain.GetAssemblies()
-     from type in assemblyType.GetTypes()
-     where typeof(IExportableAnimation).IsAssignableFrom(type)
-     select type).ToArray();
+            var exportableAnimationTypes = from type in assemblyTypes
+                 where typeof(IExportableAnimation).IsAssignableFrom(type) select type;
 
-            foreach (var type in ExportableAnimation)
+            foreach (var type in exportableAnimationTypes)
             {
                 if (type != typeof(IExportableAnimation))
                     AnimationExporters.Add((IExportableAnimation)Activator.CreateInstance(type));
             }
 
-            Type[] ImportableAnimation =
-    (from assemblyType in AppDomain.CurrentDomain.GetAssemblies()
-     from type in assemblyType.GetTypes()
-     where typeof(IImportableAnimation).IsAssignableFrom(type)
-     select type).ToArray();
+            var importableAnimationTypes = from type in assemblyTypes
+                where typeof(IImportableAnimation).IsAssignableFrom(type) select type;
 
-            foreach (var type in ImportableAnimation)
+            foreach (var type in importableAnimationTypes)
             {
                 if (type != typeof(IImportableAnimation))
                 {
@@ -731,9 +725,9 @@ namespace StudioSB
                 }
             }
 
-            foreach (Type t in SceneTypes)
+            foreach (var type in SceneTypes)
             {
-                foreach (var attr in t.GetCustomAttributes(false))
+                foreach (var attr in type.GetCustomAttributes(false))
                 {
                     if (attr is SceneFileInformation info)
                     {
