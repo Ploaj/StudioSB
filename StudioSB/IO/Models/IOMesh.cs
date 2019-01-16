@@ -10,6 +10,7 @@ namespace StudioSB.IO.Models
         public Vector3 Position;
         public Vector3 Normal;
         public Vector3 Tangent;
+        public Vector3 Bitangent;
         public Vector2 UV0;
         public Vector2 UV1;
         public Vector2 UV2;
@@ -41,31 +42,19 @@ namespace StudioSB.IO.Models
         /// </summary>
         public void GenerateTangentsAndBitangents()
         {
-            for(int i = 0; i < Indices.Count; i+=3)
+            var positions = GetPositions();
+            var normals = GetNormals();
+            var uvs = GetUvs();
+            var signedIndices = GetSignedIndices();
+            TriangleListUtils.CalculateTangentsBitangents(positions, normals, uvs, signedIndices,
+                out Vector3[] tangents, out Vector3[] bitangents);
+
+            for (int i = 0; i < Vertices.Count; i++)
             {
-                var vert1 = Vertices[(int)Indices[i]];
-                var vert2 = Vertices[(int)Indices[i+1]];
-                var vert3 = Vertices[(int)Indices[i+2]];
-
-                Vector3 tan = Vector3.Zero;
-                Vector3 bitan = Vector3.Zero;
-                VectorUtils.GenerateTangentBitangent(vert1.Position, vert2.Position, vert3.Position, 
-                    vert1.UV0, vert2.UV0, vert3.UV0, out tan, out bitan);
-
-                vert1.Tangent += tan;
-                vert2.Tangent += tan;
-                vert3.Tangent += tan;
-
-                Vertices[(int)Indices[i]] = vert1;
-                Vertices[(int)Indices[i+1]] = vert2;
-                Vertices[(int)Indices[i+2]] = vert3;
-            }
-            //normalize
-            for(int i = 0; i < Vertices.Count; i++)
-            {
-                var vert1 = Vertices[i];
-                vert1.Tangent.Normalize();
-                Vertices[i] = vert1;
+                var vertex = Vertices[i];
+                vertex.Tangent = tangents[i];
+                vertex.Bitangent = bitangents[i];
+                Vertices[i] = vertex;
             }
         }
 
@@ -93,6 +82,46 @@ namespace StudioSB.IO.Models
 
             Vertices.Clear();
             Vertices.AddRange(NewVertices);
+        }
+
+        private List<Vector3> GetPositions()
+        {
+            var values = new List<Vector3>();
+            foreach (var vertex in Vertices)
+            {
+                values.Add(vertex.Position);
+            }
+            return values;
+        }
+
+        private List<Vector3> GetNormals()
+        {
+            var values = new List<Vector3>();
+            foreach (var vertex in Vertices)
+            {
+                values.Add(vertex.Normal);
+            }
+            return values;
+        }
+
+        private List<Vector2> GetUvs()
+        {
+            var values = new List<Vector2>();
+            foreach (var vertex in Vertices)
+            {
+                values.Add(vertex.UV0);
+            }
+            return values;
+        }
+
+        private List<int> GetSignedIndices()
+        {
+            var values = new List<int>();
+            foreach (var index in Indices)
+            {
+                values.Add((int)index);
+            }
+            return values;
         }
     }
 }

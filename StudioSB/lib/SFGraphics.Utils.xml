@@ -23,7 +23,7 @@
             Contains methods to generate a bounding sphere for a collection of vertices.
             </summary>
         </member>
-        <member name="M:SFGraphics.Utils.BoundingSphereGenerator.GenerateBoundingSphere(System.Collections.Generic.List{OpenTK.Vector3})">
+        <member name="M:SFGraphics.Utils.BoundingSphereGenerator.GenerateBoundingSphere(System.Collections.Generic.IEnumerable{OpenTK.Vector3})">
             <summary>
             Generates a close to optimal sphere that contains all of the given points
             within the sphere.
@@ -32,7 +32,7 @@
             <param name="points">The points that should be contained within the bounding sphere</param>
             <returns>Vector4(center.Xyz, radius)</returns>
         </member>
-        <member name="M:SFGraphics.Utils.BoundingSphereGenerator.GenerateBoundingSphere(System.Collections.Generic.List{OpenTK.Vector4})">
+        <member name="M:SFGraphics.Utils.BoundingSphereGenerator.GenerateBoundingSphere(System.Collections.Generic.IEnumerable{OpenTK.Vector4})">
             <summary>
             Generates a single bounding sphere that contains all the given
             bounding spheres.
@@ -135,6 +135,22 @@
             </summary>
             <param name="color">The color used to calculate the inverted color</param>
             <returns>A color with inverted RGB but identical alpha as color</returns>
+        </member>
+        <member name="T:SFGraphics.Utils.TriangleListUtils">
+            <summary>
+            Contains methods for calculating vertex properties for PrimitiveType.Triangles.
+            </summary>
+        </member>
+        <member name="M:SFGraphics.Utils.TriangleListUtils.CalculateTangentsBitangents(System.Collections.Generic.IList{OpenTK.Vector3},System.Collections.Generic.IList{OpenTK.Vector3},System.Collections.Generic.IList{OpenTK.Vector2},System.Collections.Generic.IList{System.Int32},OpenTK.Vector3[]@,OpenTK.Vector3[]@)">
+            <summary>
+            
+            </summary>
+            <param name="positions"></param>
+            <param name="normals"></param>
+            <param name="uvs"></param>
+            <param name="indices"></param>
+            <param name="tangents"></param>
+            <param name="bitangents"></param>
         </member>
         <member name="T:SFGraphics.Utils.VectorUtils">
             <summary>
