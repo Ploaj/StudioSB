@@ -11,6 +11,8 @@ in vec4 colorSet5;
 
 in vec2 bake1;
 in vec2 map1;
+in vec2 uvSet;
+in vec2 uvSet1;
 
 in ivec4 boneIndices;
 in vec4 boneWeights;
@@ -19,6 +21,8 @@ out vec3 geomN;
 out vec3 geomTangent;
 out vec3 geomBitangent;
 out vec2 geomMap1;
+out vec2 geomUvSet;
+out vec2 geomUvSet1;
 out vec4 geomColorSet1;
 out vec4 geomColorSet5;
 out vec2 geomBake1;
@@ -52,6 +56,8 @@ void main()
     geomMap1 = map1;
     if (paramF1 == 1)
         geomMap1 /= paramAA.xy;
+    geomUvSet = uvSet;
+    geomUvSet1 = uvSet1;
 
     geomTangent = Tangent0;
     geomBitangent = Bitangent0;

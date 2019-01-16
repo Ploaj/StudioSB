@@ -57,7 +57,6 @@ uniform int renderVertexColor;
 uniform int renderNormalMaps;
 
 uniform vec4 paramA6;
-uniform vec4 paramA3;
 uniform vec4 paramA5;
 uniform vec4 paramA0;
 uniform vec4 param98;

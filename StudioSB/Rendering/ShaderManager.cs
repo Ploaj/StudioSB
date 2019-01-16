@@ -44,6 +44,15 @@ namespace StudioSB.Rendering
 
             Shader textShader = CreateTextShader();
             shaderByName.Add("Text", textShader);
+
+            foreach (var pair in shaderByName)
+            {
+                if (!pair.Value.LinkStatusIsOk)
+                {
+                    System.Diagnostics.Debug.WriteLine(pair.Key);
+                    System.Diagnostics.Debug.WriteLine(pair.Value.GetErrorLog());
+                }
+            }
         }
 
         private static Shader CreateTextShader()
