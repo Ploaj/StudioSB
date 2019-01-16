@@ -223,6 +223,7 @@ namespace StudioSB.Scenes.Ultimate
                 List<SSBHVertexAttribute> Normal0 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> Tangent0 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> Map1 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> UvSet = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> colorSet1 = new List<SSBHVertexAttribute>();
 
                 List<SSBHVertexInfluence> Influences = new List<SSBHVertexInfluence>();
@@ -234,8 +235,9 @@ namespace StudioSB.Scenes.Ultimate
                     Normal0.Add(vectorToAttribute(vertex.Normal0));
                     Tangent0.Add(vectorToAttribute(vertex.Tangent0));
                     Map1.Add(vectorToAttribute(vertex.Map1));
+                    UvSet.Add(vectorToAttribute(vertex.UvSet));
                     colorSet1.Add(vectorToAttribute(new Vector4(128, 128, 128, 128)));
-
+                    
                     if(vertex.BoneWeights.X > 0)
                         Influences.Add(CreateInfluence((ushort)VertexIndex, BoneNames[vertex.BoneIndices.X], vertex.BoneWeights.X));
 
@@ -258,13 +260,20 @@ namespace StudioSB.Scenes.Ultimate
                 maker.StartMeshObject(mesh.Name, Indices, Position0.ToArray(), mesh.ParentBone);
 
                 // Add attributes
-                maker.AddAttributeToMeshObject(MESHAttribute.Normal0, Normal0.ToArray());
-                maker.AddAttributeToMeshObject(MESHAttribute.Tangent0, Tangent0.ToArray());
-                maker.AddAttributeToMeshObject(MESHAttribute.map1, Map1.ToArray());
-                maker.AddAttributeToMeshObject(MESHAttribute.colorSet1, colorSet1.ToArray());
+                if(mesh.ExportAttributes.Contains(MESHAttribute.Normal0))
+                    maker.AddAttributeToMeshObject(MESHAttribute.Normal0, Normal0.ToArray());
+                if (mesh.ExportAttributes.Contains(MESHAttribute.Tangent0))
+                    maker.AddAttributeToMeshObject(MESHAttribute.Tangent0, Tangent0.ToArray());
+                if (mesh.ExportAttributes.Contains(MESHAttribute.map1))
+                    maker.AddAttributeToMeshObject(MESHAttribute.map1, Map1.ToArray());
+                if (mesh.ExportAttributes.Contains(MESHAttribute.uvSet))
+                    maker.AddAttributeToMeshObject(MESHAttribute.uvSet, UvSet.ToArray());
+                if (mesh.ExportAttributes.Contains(MESHAttribute.colorSet1))
+                    maker.AddAttributeToMeshObject(MESHAttribute.colorSet1, colorSet1.ToArray());
 
                 // Add rigging
-                maker.AttachRiggingToMeshObject(Influences.ToArray());
+                if(mesh.ParentBone == "")
+                    maker.AttachRiggingToMeshObject(Influences.ToArray());
             }
             
             return maker.GetMeshFile();
