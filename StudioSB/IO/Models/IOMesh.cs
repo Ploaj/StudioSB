@@ -60,6 +60,13 @@ namespace StudioSB.IO.Models
                 Vertices[(int)Indices[i+1]] = vert2;
                 Vertices[(int)Indices[i+2]] = vert3;
             }
+            //normalize
+            for(int i = 0; i < Vertices.Count; i++)
+            {
+                var vert1 = Vertices[i];
+                vert1.Tangent.Normalize();
+                Vertices[i] = vert1;
+            }
         }
 
         /// <summary>

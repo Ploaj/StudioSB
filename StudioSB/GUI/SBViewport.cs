@@ -189,7 +189,7 @@ namespace StudioSB.GUI
 
             if (ApplicationSettings.RenderSceneInformation)
             {
-                TextRenderer.DrawOrtho(Camera, "Polygon Count: " + polyCount.ToString(), new Vector2(0, 30));
+                TextRenderer.DrawOrtho(Camera, "Polygon Count: " + (polyCount/3).ToString(), new Vector2(0, 30));
                 TextRenderer.DrawOrtho(Camera, "Vertex  Count: " + vertexCount.ToString(), new Vector2(0, 46));
             }
 
