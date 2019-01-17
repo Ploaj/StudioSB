@@ -307,7 +307,7 @@ namespace StudioSB.Scenes.Ultimate
             return new UltimateVertex(
                 singleBound ? Vector3.TransformPosition(iov.Position, parentBoneInverse) : iov.Position,
                 singleBound ? Vector3.TransformNormal(iov.Normal, parentBoneInverse) : iov.Normal, 
-                iov.Tangent, Vector3.Zero, iov.UV0, iov.UV1,
+                iov.Tangent, iov.Bitangent, iov.UV0, iov.UV1,
                 iov.UV2, singleBound ? new IVec4() : new IVec4() { X = (int)iov.BoneIndices.X,
                     Y = (int)iov.BoneIndices.Y,
                     Z = (int)iov.BoneIndices.Z,
