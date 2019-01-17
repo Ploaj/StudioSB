@@ -194,7 +194,7 @@ namespace StudioSB
 
             animationBar = new SBAnimationBar();
             animationBar.Dock = DockStyle.Bottom;
-            animationBar.Frame.Bind(Viewport, "Frame");
+            animationBar.BindFrame(Viewport, "Frame");
             animationBar.Visible = false;
 
             ResetControls();

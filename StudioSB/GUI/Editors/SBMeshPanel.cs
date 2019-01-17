@@ -75,9 +75,9 @@ namespace StudioSB.GUI.Editors
             meshName.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
 
             Controls.Add(parentBoneSelector);
-            Controls.Add(new Label() { Text = "Parent Bone:", Dock = DockStyle.Top, TextAlign = System.Drawing.ContentAlignment.BottomCenter });
+            Controls.Add(new Label() { Text = "Parent Bone:", Dock = DockStyle.Top, TextAlign = System.Drawing.ContentAlignment.BottomLeft });
             Controls.Add(materialSelector);
-            Controls.Add(new Label() { Text = "Material:", Dock = DockStyle.Top, TextAlign = System.Drawing.ContentAlignment.BottomCenter });
+            Controls.Add(new Label() { Text = "Material:", Dock = DockStyle.Top, TextAlign = System.Drawing.ContentAlignment.BottomLeft });
             Controls.Add(meshName);
         }
 
