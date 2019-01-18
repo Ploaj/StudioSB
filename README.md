@@ -1,7 +1,13 @@
 # StudioSB
+
 A model application for Super Smash Bros Ultimate
 
-This application is a massive work-in-progress so expect incomplete features and bugs.
+This application is a work-in-progress, so expect incomplete features and bugs.
+
+[![Build status](https://ci.appveyor.com/api/projects/status/s6dbvi66y40q3tl2/branch/master?svg=true)](https://ci.appveyor.com/project/Ploaj/studiosb/branch/master)
+
+[Request a Feature / Report bug](https://github.com/Ploaj/StudioSB/issues)
+
 
 ## Building (Windows)
 * Compile in Visual Studio 2017 on Windows. Requires .NET Framework 4.6.1. The recommended OpenGL version is 4.20. Version 3.30 or higher may still work.
