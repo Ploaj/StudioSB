@@ -38,7 +38,7 @@ namespace StudioSB.Scenes.Ultimate
 
                     ((SBSceneSSBH)Scene).Model = model;
 
-                    using (SSBHVertexAccessor accessor = new SSBHVertexAccessor(mesh))
+                    SSBHVertexAccessor accessor = new SSBHVertexAccessor(mesh);
                     {
                         foreach (var meshObject in mesh.Objects)
                         {
@@ -47,8 +47,8 @@ namespace StudioSB.Scenes.Ultimate
                             {
                                 foreach (var atstring in attr.AttributeStrings)
                                 {
-                                    MESHAttribute at;
-                                    if(Enum.TryParse<MESHAttribute>(atstring.Name, out at))
+                                    UltimateVertexAttribute at;
+                                    if(Enum.TryParse<UltimateVertexAttribute>(atstring.Name, out at))
                                     {
                                         //SBConsole.WriteLine("\tLoaded:" + at.ToString());
                                         sbMesh.ExportAttributes.Add(at);
@@ -260,16 +260,16 @@ namespace StudioSB.Scenes.Ultimate
                 maker.StartMeshObject(mesh.Name, Indices, Position0.ToArray(), mesh.ParentBone);
 
                 // Add attributes
-                if(mesh.ExportAttributes.Contains(MESHAttribute.Normal0))
-                    maker.AddAttributeToMeshObject(MESHAttribute.Normal0, Normal0.ToArray());
-                if (mesh.ExportAttributes.Contains(MESHAttribute.Tangent0))
-                    maker.AddAttributeToMeshObject(MESHAttribute.Tangent0, Tangent0.ToArray());
-                if (mesh.ExportAttributes.Contains(MESHAttribute.map1))
-                    maker.AddAttributeToMeshObject(MESHAttribute.map1, Map1.ToArray());
-                if (mesh.ExportAttributes.Contains(MESHAttribute.uvSet))
-                    maker.AddAttributeToMeshObject(MESHAttribute.uvSet, UvSet.ToArray());
-                if (mesh.ExportAttributes.Contains(MESHAttribute.colorSet1))
-                    maker.AddAttributeToMeshObject(MESHAttribute.colorSet1, colorSet1.ToArray());
+                if(mesh.ExportAttributes.Contains(UltimateVertexAttribute.Normal0))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.Normal0, Normal0.ToArray());
+                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.Tangent0))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.Tangent0, Tangent0.ToArray());
+                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.map1))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.map1, Map1.ToArray());
+                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.uvSet))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet, UvSet.ToArray());
+                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.colorSet1))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet1, colorSet1.ToArray());
 
                 // Add rigging
                 if(mesh.ParentBone == "")

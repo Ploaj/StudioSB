@@ -180,13 +180,13 @@ namespace StudioSB.Scenes.Ultimate
                 iomesh.Name = mesh.Name;
                 iomodel.Meshes.Add(iomesh);
 
-                iomesh.HasPositions = mesh.ExportAttributes.Contains(SSBHLib.Tools.MESHAttribute.Position0);
-                iomesh.HasNormals = mesh.ExportAttributes.Contains(SSBHLib.Tools.MESHAttribute.Normal0);
-                iomesh.HasUV0 = mesh.ExportAttributes.Contains(SSBHLib.Tools.MESHAttribute.map1);
-                iomesh.HasUV1 = mesh.ExportAttributes.Contains(SSBHLib.Tools.MESHAttribute.uvSet);
-                iomesh.HasUV2 = mesh.ExportAttributes.Contains(SSBHLib.Tools.MESHAttribute.uvSet1);
-                iomesh.HasUV3 = mesh.ExportAttributes.Contains(SSBHLib.Tools.MESHAttribute.uvSet2);
-                iomesh.HasColor = mesh.ExportAttributes.Contains(SSBHLib.Tools.MESHAttribute.colorSet1);
+                iomesh.HasPositions = mesh.ExportAttributes.Contains(UltimateVertexAttribute.Position0);
+                iomesh.HasNormals = mesh.ExportAttributes.Contains(UltimateVertexAttribute.Normal0);
+                iomesh.HasUV0 = mesh.ExportAttributes.Contains(UltimateVertexAttribute.map1);
+                iomesh.HasUV1 = mesh.ExportAttributes.Contains(UltimateVertexAttribute.uvSet);
+                iomesh.HasUV2 = mesh.ExportAttributes.Contains(UltimateVertexAttribute.uvSet1);
+                iomesh.HasUV3 = mesh.ExportAttributes.Contains(UltimateVertexAttribute.uvSet2);
+                iomesh.HasColor = mesh.ExportAttributes.Contains(UltimateVertexAttribute.colorSet1);
 
                 iomesh.HasBoneWeights = true;
 
@@ -291,11 +291,11 @@ namespace StudioSB.Scenes.Ultimate
                     mesh.ParentBone = parentBone.Name;
 
                 //TODO: make more customizable through import settings
-                mesh.ExportAttributes.Add(SSBHLib.Tools.MESHAttribute.Position0);
-                mesh.ExportAttributes.Add(SSBHLib.Tools.MESHAttribute.Normal0);
-                mesh.ExportAttributes.Add(SSBHLib.Tools.MESHAttribute.Tangent0);
-                mesh.ExportAttributes.Add(SSBHLib.Tools.MESHAttribute.map1);
-                mesh.ExportAttributes.Add(SSBHLib.Tools.MESHAttribute.colorSet1);
+                mesh.ExportAttributes.Add(UltimateVertexAttribute.Position0);
+                mesh.ExportAttributes.Add(UltimateVertexAttribute.Normal0);
+                mesh.ExportAttributes.Add(UltimateVertexAttribute.Tangent0);
+                mesh.ExportAttributes.Add(UltimateVertexAttribute.map1);
+                mesh.ExportAttributes.Add(UltimateVertexAttribute.colorSet1);
 
             }
 

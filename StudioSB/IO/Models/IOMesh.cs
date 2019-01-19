@@ -53,6 +53,7 @@ namespace StudioSB.IO.Models
             {
                 var vertex = Vertices[i];
                 vertex.Tangent = tangents[i];
+                vertex.Tangent.Normalize();
                 vertex.Bitangent = bitangents[i];
                 Vertices[i] = vertex;
             }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using OpenTK;
-using SSBHLib.Tools;
+using SSBHLib;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -15,7 +15,7 @@ namespace StudioSB.Scenes.Ultimate
         public List<uint> Indices = new List<uint>();
 
         // for saving
-        public List<MESHAttribute> ExportAttributes = new List<MESHAttribute>();
+        public List<UltimateVertexAttribute> ExportAttributes = new List<UltimateVertexAttribute>();
 
         public SBUltimateMesh()
         {
