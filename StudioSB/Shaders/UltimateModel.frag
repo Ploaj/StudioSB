@@ -56,7 +56,6 @@ uniform int renderWireframe;
 uniform int renderVertexColor;
 uniform int renderNormalMaps;
 
-uniform vec4 paramA3;
 uniform vec4 paramA6;
 uniform vec4 paramA5;
 uniform vec4 paramA0;
@@ -309,7 +308,6 @@ void main()
     vec3 diffuseTerm = DiffuseTerm(albedoColor, diffuseIbl, newNormal, V, kDiffuse);
 
 	// skin diffuse
-	diffuseTerm += paramA3.rgb * (1-kDiffuse);
     fragColor.rgb += diffuseTerm * renderDiffuse;
 
     vec3 rimTerm = RimLightingTerm(newNormal, V, specularIbl);

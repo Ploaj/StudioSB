@@ -34,9 +34,6 @@ uniform int paramEE;
 uniform int paramED;
 uniform float currentFrame;
 
-// col layer1 offset
-uniform vec3 paramA3;
-
 uniform int emissionOverride;
 
 vec3 Blend(vec4 a, vec4 b)
