@@ -210,6 +210,9 @@ namespace StudioSB.Scenes
 
         public Matrix4 AnimatedTransform { get; set; }
 
+        public float AnimatedCompensateScale { get; set; }
+        public bool EnableAnimatedCompensateScale { get; set; } = false;
+
         public Matrix4 AnimatedBindMatrix
         {
             get
@@ -222,7 +225,10 @@ namespace StudioSB.Scenes
         {
             get
             {
-                return _parent == null ? AnimatedTransform : AnimatedTransform * _parent.AnimatedWorldTransform;
+                if(EnableAnimatedCompensateScale)
+                    return Matrix4.CreateScale(AnimatedCompensateScale-1) * (_parent == null ? AnimatedTransform : AnimatedTransform * _parent.AnimatedWorldTransform).ClearScale();
+                else
+                    return _parent == null ? AnimatedTransform : AnimatedTransform * _parent.AnimatedWorldTransform;
             }
         }
 

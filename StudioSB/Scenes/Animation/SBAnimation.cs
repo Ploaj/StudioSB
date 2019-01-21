@@ -44,7 +44,18 @@ namespace StudioSB.Scenes.Animation
             {
                 var bone = scene.Skeleton[a.Name];
                 if (bone != null)
+                {
                     bone.AnimatedTransform = a.Transform.GetValue(Frame);
+                    if (a.Transform.GetKey(Frame).CompensateScale != 1)
+                    {
+                        bone.EnableAnimatedCompensateScale = true;
+                        bone.AnimatedCompensateScale = a.Transform.GetKey(Frame).CompensateScale;
+                    }
+                    else
+                    {
+                        bone.EnableAnimatedCompensateScale = false;
+                    }
+                }
             }
         }
     }

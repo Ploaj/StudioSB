@@ -234,6 +234,8 @@ namespace StudioSB.IO.Formats
                 }
                 if (node == null) continue;
 
+                //TODO: bake scale for compensate scale...
+
                 AddAnimData(animBone, node.Transform, ControlType.translate, TrackType.translateX);
                 AddAnimData(animBone, node.Transform, ControlType.translate, TrackType.translateY);
                 AddAnimData(animBone, node.Transform, ControlType.translate, TrackType.translateZ);

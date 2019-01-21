@@ -12,5 +12,8 @@
         public float Frame;
         public T Value;
         public InterpolationType InterpolationType { get; set; }
+
+        public bool EnableCopensateScale { get; set; }
+        public float CompensateScale { get; set; } = 0;
     }
 }
