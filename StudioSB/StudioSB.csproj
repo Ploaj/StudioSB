@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Fbx, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Fbx.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
     </Reference>
@@ -137,6 +141,7 @@
     </Compile>
     <Compile Include="IO\Formats\DAE_Writer.cs" />
     <Compile Include="IO\Formats\IO_DAE.cs" />
+    <Compile Include="IO\Formats\IO_FBX.cs" />
     <Compile Include="IO\Formats\IO_MayaAnim.cs" />
     <Compile Include="IO\Formats\IO_NUANMB.cs" />
     <Compile Include="IO\Formats\IO_OBJ.cs" />
@@ -518,6 +523,7 @@
     <Content Include="DefaultTextures\UVPattern.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="lib\Fbx.dll" />
     <Content Include="lib\OpenTK.dll" />
     <Content Include="lib\OpenTK.GLControl.dll" />
     <Content Include="lib\SELib.dll">

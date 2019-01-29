@@ -416,7 +416,7 @@ namespace StudioSB
         /// <param name="e"></param>
         void TriggerViewportRender(object sender, EventArgs e)
         {
-            if (Viewport.IsIdle)
+            if (!Viewport.IsDisposed && Viewport.IsIdle)
             {
                 if (ApplicationSettingsEditor.Visible || animationBar.Visible)
                     Viewport.Updated = true;

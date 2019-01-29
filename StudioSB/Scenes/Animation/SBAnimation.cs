@@ -46,7 +46,7 @@ namespace StudioSB.Scenes.Animation
                 if (bone != null)
                 {
                     bone.AnimatedTransform = a.Transform.GetValue(Frame);
-                    if (a.Transform.GetKey(Frame).CompensateScale != 1)
+                    if (a.Transform.GetKey(Frame).CompensateScale > 0)
                     {
                         bone.EnableAnimatedCompensateScale = true;
                         bone.AnimatedCompensateScale = a.Transform.GetKey(Frame).CompensateScale;
