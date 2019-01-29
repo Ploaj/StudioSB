@@ -58,6 +58,9 @@ namespace StudioSB.IO.Formats
                 Vector4[] BoneWeights = new Vector4[geom.Vertices.Length];
                 foreach (var deformer in geom.Deformers)
                 {
+                    //TODO: this shouldn't happen...
+                    if (!BoneNameToIndex.ContainsKey(deformer.Name))
+                        continue;
                     int index = BoneNameToIndex[deformer.Name];
 
                     for (int i = 0; i < deformer.Indices.Length; i++)
@@ -105,8 +108,6 @@ namespace StudioSB.IO.Formats
                             break;
                     }
                 }
-                
-                //mesh.Optimize();
             }
 
             return model;
