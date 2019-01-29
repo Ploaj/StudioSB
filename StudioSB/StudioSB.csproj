@@ -523,7 +523,9 @@
     <Content Include="DefaultTextures\UVPattern.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="lib\Fbx.dll" />
+    <Content Include="lib\Fbx.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="lib\OpenTK.dll" />
     <Content Include="lib\OpenTK.GLControl.dll" />
     <Content Include="lib\SELib.dll">
