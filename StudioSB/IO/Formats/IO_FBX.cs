@@ -52,7 +52,7 @@ namespace StudioSB.IO.Formats
             {
                 // rotation 90
                 Matrix4 transform = (YupAxis == 2 ? Matrix4.CreateRotationX(-90 * DegToRag) : Matrix4.Identity) * GetModelTransform(mod);
-
+                
                 foreach (var geom in mod.Geometries)
                 {
                     IOMesh mesh = new IOMesh();
@@ -116,7 +116,6 @@ namespace StudioSB.IO.Formats
                     }
                 }
             }
-            
 
             //PostProcessNormals(model);
 
@@ -194,6 +193,9 @@ namespace StudioSB.IO.Formats
             bone.RotationEuler = new Vector3((float)model.LclRotation.X * DegToRag, (float)model.LclRotation.Y * DegToRag, (float)model.LclRotation.Z * DegToRag);
             bone.Scale = new Vector3((float)model.LclScaling.X, (float)model.LclScaling.Y, (float)model.LclScaling.Z);
 
+            if (bone.Scale == new Vector3(100))
+                bone.Scale /= 100;
+
             return bone.Transform;
         }
 
@@ -214,6 +216,9 @@ namespace StudioSB.IO.Formats
             bone.Translation = new Vector3((float)limb.LclTranslation.X, (float)limb.LclTranslation.Y, (float)limb.LclTranslation.Z);
             bone.RotationEuler = new Vector3((float)limb.LclRotation.X*DegToRag, (float)limb.LclRotation.Y * DegToRag, (float)limb.LclRotation.Z * DegToRag);
             bone.Scale = new Vector3((float)limb.LclScaling.X, (float)limb.LclScaling.Y, (float)limb.LclScaling.Z);
+
+            if (bone.Scale == new Vector3(100))
+                bone.Scale /= 100;
 
             if (parent != null)
                 bone.Parent = parent;

@@ -435,7 +435,7 @@ namespace StudioSB
             animationBar.Visible = false;
             foreach (var openableAnimation in AnimationImporters)
             {
-                if (FilePath.EndsWith(openableAnimation.Extension))
+                if (FilePath.ToLower().EndsWith(openableAnimation.Extension))
                 {
                     if (Viewport.Scene == null) // most animation formats need the base skeleton, so a scene needs to be loaded
                         return;
@@ -454,7 +454,7 @@ namespace StudioSB
                 {
                     if (attr is SceneFileInformation info)
                     {
-                        if (FilePath.EndsWith(info.Extension))
+                        if (FilePath.ToLower().EndsWith(info.Extension))
                         {
                             object ob = Activator.CreateInstance(type);
 
