@@ -5,7 +5,7 @@ using SFGraphics.Utils;
 
 namespace StudioSB.IO.Models
 {
-    public struct IOVertex
+    public class IOVertex
     {
         public Vector3 Position;
         public Vector3 Normal;

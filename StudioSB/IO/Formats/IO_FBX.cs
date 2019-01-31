@@ -45,70 +45,80 @@ namespace StudioSB.IO.Formats
 
             // Mesh
 
-            var geometries = accessor.GetGeometries();
+            var models = accessor.GetModels();
 
-            foreach (var geom in geometries)
+            int YupAxis = accessor.GetOriginalXAxis();
+            foreach (var mod in models)
             {
-                IOMesh mesh = new IOMesh();
-                mesh.Name = geom.Name;
-                model.Meshes.Add(mesh);
+                // rotation 90
+                Matrix4 transform = (YupAxis == 2 ? Matrix4.CreateRotationX(-90 * DegToRag) : Matrix4.Identity) * GetModelTransform(mod);
 
-                // Create Rigging information
-                Vector4[] BoneIndices = new Vector4[geom.Vertices.Length];
-                Vector4[] BoneWeights = new Vector4[geom.Vertices.Length];
-                foreach (var deformer in geom.Deformers)
+                foreach (var geom in mod.Geometries)
                 {
-                    //TODO: this shouldn't happen...
-                    if (!BoneNameToIndex.ContainsKey(deformer.Name))
-                        continue;
-                    int index = BoneNameToIndex[deformer.Name];
+                    IOMesh mesh = new IOMesh();
+                    mesh.Name = geom.Name;
+                    model.Meshes.Add(mesh);
 
-                    for (int i = 0; i < deformer.Indices.Length; i++)
+                    // Create Rigging information
+                    Vector4[] BoneIndices = new Vector4[geom.Vertices.Length];
+                    Vector4[] BoneWeights = new Vector4[geom.Vertices.Length];
+                    foreach (var deformer in geom.Deformers)
                     {
-                        int vertexIndex = deformer.Indices[i];
-                        for (int j = 0; j < 4; j++)
+                        //TODO: this shouldn't happen...
+                        if (!BoneNameToIndex.ContainsKey(deformer.Name))
+                            continue;
+                        int index = BoneNameToIndex[deformer.Name];
+
+                        for (int i = 0; i < deformer.Indices.Length; i++)
                         {
-                            if (BoneWeights[vertexIndex][j] == 0)
+                            int vertexIndex = deformer.Indices[i];
+                            for (int j = 0; j < 4; j++)
                             {
-                                BoneIndices[vertexIndex][j] = index;
-                                BoneWeights[vertexIndex][j] = (float)deformer.Weights[i];
-                                break;
+                                if (BoneWeights[vertexIndex][j] == 0)
+                                {
+                                    BoneIndices[vertexIndex][j] = index;
+                                    BoneWeights[vertexIndex][j] = (float)deformer.Weights[i];
+                                    break;
+                                }
                             }
                         }
+                        //SBConsole.WriteLine(deformer.Name + " " + deformer.Weights.Length + " " + deformer.Indices.Length + " " + index);
                     }
-                    //SBConsole.WriteLine(deformer.Name + " " + deformer.Weights.Length + " " + deformer.Indices.Length + " " + index);
-                }
 
-                // Explanation:
-                // negative values are used to indicate a stopping point for the face
-                // so every 3rd index needed to be adjusted
-                for (int i = 0; i < geom.Indices.Length; i += 3)
-                {
-                    mesh.Indices.Add((uint)i);
-                    mesh.Indices.Add((uint)i + 1);
-                    mesh.Indices.Add((uint)i + 2);
-                    mesh.Vertices.Add(CreateVertex(geom, i, BoneIndices, BoneWeights));
-                    mesh.Vertices.Add(CreateVertex(geom, i + 1, BoneIndices, BoneWeights));
-                    mesh.Vertices.Add(CreateVertex(geom, i + 2, BoneIndices, BoneWeights));
-                }
-
-                mesh.HasPositions = true;
-
-                //SBConsole.WriteLine(geom.Vertices.Length);
-                foreach (var layer in geom.Layers)
-                {
-                    switch (layer.Name)
+                    // Explanation:
+                    // negative values are used to indicate a stopping point for the face
+                    // so every 3rd index needed to be adjusted
+                    for (int i = 0; i < geom.Indices.Length; i += 3)
                     {
-                        case "LayerElementNormal":
-                        case "LayerElementUV":
-                        case "LayerElementColor":
-                            break;
-                        default:
-                            SBConsole.WriteLine(layer.Name + " " + layer.ReferenceInformationType + " " + layer.Data.Length + " " + (layer.ReferenceInformationType.Equals("IndexToDirect") ? layer.Indices.Length.ToString() : ""));
-                            break;
+                        mesh.Indices.Add((uint)i);
+                        mesh.Indices.Add((uint)i + 1);
+                        mesh.Indices.Add((uint)i + 2);
+                        mesh.Vertices.Add(CreateVertex(transform, geom, i, BoneIndices, BoneWeights));
+                        mesh.Vertices.Add(CreateVertex(transform, geom, i + 1, BoneIndices, BoneWeights));
+                        mesh.Vertices.Add(CreateVertex(transform, geom, i + 2, BoneIndices, BoneWeights));
+                    }
+
+                    mesh.HasPositions = true;
+
+                    //SBConsole.WriteLine(geom.Vertices.Length);
+                    foreach (var layer in geom.Layers)
+                    {
+                        switch (layer.Name)
+                        {
+                            case "LayerElementNormal":
+                            case "LayerElementUV":
+                            case "LayerElementColor":
+                                break;
+                            default:
+                                SBConsole.WriteLine(layer.Name + " " + layer.ReferenceInformationType + " " + layer.Data.Length + " " + (layer.ReferenceInformationType.Equals("IndexToDirect") ? layer.Indices.Length.ToString() : ""));
+                                break;
+                        }
                     }
                 }
             }
+            
+
+            //PostProcessNormals(model);
 
             return model;
         }
@@ -119,16 +129,19 @@ namespace StudioSB.IO.Formats
         /// <param name="geometry"></param>
         /// <param name="Index"></param>
         /// <returns></returns>
-        private static IOVertex CreateVertex(FbxGeometry geometry, int Index, Vector4[] boneIndices, Vector4[] boneWeights)
+        private static IOVertex CreateVertex(Matrix4 transform, FbxGeometry geometry, int Index, Vector4[] boneIndices, Vector4[] boneWeights)
         {
             int VertexIndex = geometry.Indices[Index];
             if((Index + 1) % 3 == 0)
                 VertexIndex = (geometry.Indices[Index] + 1) * -1;
 
             IOVertex vertex = new IOVertex(){
-                Position = new Vector3((float)geometry.Vertices[VertexIndex * 3],
-                (float)geometry.Vertices[VertexIndex * 3 + 1], 
-                (float)geometry.Vertices[VertexIndex * 3 + 2]),
+                Position = Vector3.TransformPosition(
+                    new Vector3(
+                        (float)geometry.Vertices[VertexIndex * 3],
+                        (float)geometry.Vertices[VertexIndex * 3 + 1], 
+                        (float)geometry.Vertices[VertexIndex * 3 + 2]), 
+                    transform),
                 BoneIndices = boneIndices[VertexIndex],
                 BoneWeights = boneWeights[VertexIndex]
             };
@@ -146,6 +159,7 @@ namespace StudioSB.IO.Formats
                 {
                     case "LayerElementNormal":
                         vertex.Normal = new Vector3((float)layer.Data[layerIndex * 3], (float)layer.Data[layerIndex * 3 + 1], (float)layer.Data[layerIndex * 3 + 2]);
+                        vertex.Normal = Vector3.TransformNormal(vertex.Normal, transform);
                         break;
                     case "LayerElementColor":
                         vertex.Color = new Vector4((float)layer.Data[layerIndex * 4], (float)layer.Data[layerIndex * 4 + 1], (float)layer.Data[layerIndex * 4 + 2], (float)layer.Data[layerIndex * 4 + 3]);
@@ -164,7 +178,25 @@ namespace StudioSB.IO.Formats
         }
 
         private static float DegToRag = (float)Math.PI / 180;
-        
+
+        /// <summary>
+        /// Gets matrix4 transform for model node
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private static Matrix4 GetModelTransform(FbxModel model)
+        {
+            SBBone bone = new SBBone();
+
+            bone.Transform = Matrix4.Identity;
+            
+            bone.Translation = new Vector3((float)model.LclTranslation.X, (float)model.LclTranslation.Y, (float)model.LclTranslation.Z);
+            bone.RotationEuler = new Vector3((float)model.LclRotation.X * DegToRag, (float)model.LclRotation.Y * DegToRag, (float)model.LclRotation.Z * DegToRag);
+            bone.Scale = new Vector3((float)model.LclScaling.X, (float)model.LclScaling.Y, (float)model.LclScaling.Z);
+
+            return bone.Transform;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -194,5 +226,76 @@ namespace StudioSB.IO.Formats
 
             return bone;
         }
+
+        /// <summary>
+        /// Does some smoothing on normals to fix seams
+        /// </summary>
+        private void PostProcessNormals(IOModel model)
+        {
+            float e = 0.0001f;
+
+            Dictionary<Vector3, IOVertex> positionToVertex = new Dictionary<Vector3, IOVertex>();
+            Dictionary<IOVertex, List<IOVertex>> VertexGroups = new Dictionary<IOVertex, List<IOVertex>>();
+
+            foreach(var mesh in model.Meshes)
+            {
+                foreach(var vert in mesh.Vertices)
+                {
+                    bool matched = false;
+                    // perfect match
+                    if(positionToVertex.ContainsKey(vert.Position))
+                    {
+                        matched = true;
+                        if (!VertexGroups.ContainsKey(positionToVertex[vert.Position]))
+                        {
+                            VertexGroups.Add(positionToVertex[vert.Position], new List<IOVertex>());
+                            VertexGroups[positionToVertex[vert.Position]].Add(positionToVertex[vert.Position]);
+                        }
+                        VertexGroups[positionToVertex[vert.Position]].Add(vert);
+                    }
+
+                    // distance less than epsilon
+                    /*if (!matched)
+                        foreach (var pos in positionToVertex.Keys)
+                        {
+                            if ((pos.X - vert.Position.X) * (pos.X - vert.Position.X)
+                                + (pos.Y - vert.Position.Y) * (pos.Y - vert.Position.Y)
+                                + (pos.Z - vert.Position.Z) * (pos.Z - vert.Position.Z)
+                                < e * e)
+                            {
+                                matched = true;
+                                if (!VertexGroups.ContainsKey(positionToVertex[pos]))
+                                {
+                                    VertexGroups.Add(positionToVertex[pos], new List<IOVertex>());
+                                    VertexGroups[positionToVertex[pos]].Add(positionToVertex[pos]);
+                                }
+                                VertexGroups[positionToVertex[pos]].Add(vert);
+                                break;
+                            }
+                        }*/
+
+                    // new position
+                    if(!matched)
+                        positionToVertex.Add(vert.Position, vert);
+                }
+            }
+
+            SBConsole.WriteLine("Smoothing groups " + VertexGroups.Count);
+            foreach(var v in VertexGroups)
+            {
+                Vector3 newNormal = Vector3.Zero;
+                foreach(var normal in v.Value)
+                {
+                    newNormal += normal.Normal;
+                }
+                newNormal = newNormal / v.Value.Count;
+                newNormal.Normalize();
+                foreach (var normal in v.Value)
+                {
+                    normal.Normal = newNormal;
+                }
+            }
+        }
+
     }
 }

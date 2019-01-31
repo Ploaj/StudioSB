@@ -296,7 +296,6 @@ namespace StudioSB.Scenes.Ultimate
                 mesh.ExportAttributes.Add(UltimateVertexAttribute.Tangent0);
                 mesh.ExportAttributes.Add(UltimateVertexAttribute.map1);
                 mesh.ExportAttributes.Add(UltimateVertexAttribute.colorSet1);
-
             }
 
             Model = model;
