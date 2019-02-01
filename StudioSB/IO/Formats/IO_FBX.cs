@@ -56,7 +56,7 @@ namespace StudioSB.IO.Formats
                 foreach (var geom in mod.Geometries)
                 {
                     IOMesh mesh = new IOMesh();
-                    mesh.Name = geom.Name;
+                    mesh.Name = mod.Name;
                     model.Meshes.Add(mesh);
 
                     // Create Rigging information
