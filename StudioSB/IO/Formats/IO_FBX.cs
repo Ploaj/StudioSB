@@ -48,6 +48,7 @@ namespace StudioSB.IO.Formats
             var models = accessor.GetModels();
 
             int YupAxis = accessor.GetOriginalXAxis();
+            SBConsole.WriteLine("Yup: " + YupAxis);
             foreach (var mod in models)
             {
                 // rotation 90
