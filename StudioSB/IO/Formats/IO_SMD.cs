@@ -256,9 +256,11 @@ namespace StudioSB.IO.Formats
                     {
                         case "nodes":
                             var bone = new SBBone();
-                            bone.Name = args[1].Replace("\"", "");
-                            //Console.WriteLine(bone.Name + " " + args[2]);
-                            boneParents.Add(int.Parse(args[2]));
+                            string bname = "";
+                            for(int k = 0; k < args.Length - 2; k++)
+                                bname += args[1+k];
+                            bone.Name = bname.Replace("\"", "");
+                            boneParents.Add(int.Parse(args[args.Length - 1]));
                             PostProcessBones.Add(bone);
                             indexToBone.Add(int.Parse(args[0]), bone);
                             break;
