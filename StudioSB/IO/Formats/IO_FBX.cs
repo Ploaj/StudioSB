@@ -164,7 +164,7 @@ namespace StudioSB.IO.Formats
                         vertex.Color = new Vector4((float)layer.Data[layerIndex * 4], (float)layer.Data[layerIndex * 4 + 1], (float)layer.Data[layerIndex * 4 + 2], (float)layer.Data[layerIndex * 4 + 3]);
                         break;
                     case "LayerElementUV":
-                        Vector2 uv = new Vector2((float)layer.Data[layerIndex * 2], (float)layer.Data[layerIndex * 2 + 1]);
+                        Vector2 uv = new Vector2((float)layer.Data[layerIndex * 2], 1-(float)layer.Data[layerIndex * 2 + 1]);
                         if (layer.Layer == 0)
                             vertex.UV0 = uv;
                         if (layer.Layer == 1)

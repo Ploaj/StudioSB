@@ -341,7 +341,7 @@ namespace StudioSB.IO.Formats
             {
                 Position = new Vector3(float.Parse(args[1]), float.Parse(args[2]), float.Parse(args[3])),
                 Normal = new Vector3(float.Parse(args[4]), float.Parse(args[5]), float.Parse(args[6])),
-                UV0 = new Vector2(float.Parse(args[7]), float.Parse(args[8])),
+                UV0 = new Vector2(float.Parse(args[7]), 1-float.Parse(args[8])),
             };
 
             int InfluenceCount = int.Parse(args[9]);
