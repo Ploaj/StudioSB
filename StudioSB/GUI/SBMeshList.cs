@@ -52,7 +52,8 @@ namespace StudioSB.GUI
         private void listview_AfterLabelEdit(object sender, LabelEditEventArgs e)
         {
             if (Items[e.Item].Tag is ISBMesh mesh)
-                mesh.Name = e.Label;
+                if(e.Label != null)
+                    mesh.Name = e.Label;
         }
 
         /// <summary>

@@ -390,13 +390,13 @@ namespace StudioSB
             if (scene.HasBones)
             {
                 RightPane.Contents.Add(BoneEditor);
-                RightPane.Contents.Add(new Splitter() { Dock = DockStyle.Top });
             }
             if (scene.HasMesh)
             {
                 RightPane.Contents.Add(MeshPanel);
-                RightPane.Contents.Add(new Splitter() { Dock = DockStyle.Top });
             }
+            if(scene.HasBones || scene.HasMesh)
+                RightPane.Contents.Add(new Splitter() { Dock = DockStyle.Top });
             if (scene.HasMesh)
             {
                 RightPane.Contents.Add(MeshList);
