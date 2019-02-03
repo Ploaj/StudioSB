@@ -560,10 +560,12 @@ namespace StudioSB
                     if (FileName.EndsWith(SceneExtension))
                     {
                         Viewport.Scene.ExportSceneToFile(FileName);
+                        break;
                     }else
                     if (FileName.EndsWith(extension))
                     {
                         extensionToExporter[extension].ExportIOModel(FileName, Viewport.Scene.GetIOModel());
+                        break;
                     }
                 }
             }

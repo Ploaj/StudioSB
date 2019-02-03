@@ -5,7 +5,7 @@
     /// </summary>
     public class ISBMesh
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         public string ParentBone { get; set; }
         
