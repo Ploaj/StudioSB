@@ -154,6 +154,7 @@
     <Compile Include="IO\Models\IOMesh.cs" />
     <Compile Include="IO\Models\IOModel.cs" />
     <Compile Include="Rendering\DefaultTextures.cs" />
+    <Compile Include="Rendering\Shapes\Capsule.cs" />
     <Compile Include="Rendering\Shapes\ScreenTriangle.cs" />
     <Compile Include="Rendering\Shapes\Sphere.cs" />
     <Compile Include="Rendering\TextRenderer.cs" />
@@ -444,6 +445,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\bone.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\Capsule.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\Capsule.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\Gamma.frag">

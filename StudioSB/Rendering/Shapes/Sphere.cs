@@ -6,6 +6,8 @@ namespace StudioSB.Rendering.Shapes
 {
     public class Sphere
     {
+        //private static 
+
         public static void DrawSphereLegacy(Vector3 center, float radius, float precision, bool useWireframe = false)
         {
             GL.PushAttrib(AttribMask.AllAttribBits);

@@ -5,7 +5,7 @@ using SFGraphics.Utils;
 
 namespace StudioSB.IO.Models
 {
-    public class IOVertex
+    public struct IOVertex
     {
         public Vector3 Position;
         public Vector3 Normal;
@@ -55,6 +55,7 @@ namespace StudioSB.IO.Models
                 vertex.Tangent = tangents[i];
                 vertex.Tangent.Normalize();
                 vertex.Bitangent = bitangents[i];
+                vertex.Bitangent.Normalize();
                 Vertices[i] = vertex;
             }
         }

@@ -115,10 +115,9 @@ namespace StudioSB.IO.Formats
                                 break;
                         }
                     }
+                    mesh.Optimize();
                 }
             }
-
-            //PostProcessNormals(model);
 
             return model;
         }
@@ -231,76 +230,6 @@ namespace StudioSB.IO.Formats
             }
 
             return bone;
-        }
-
-        /// <summary>
-        /// Does some smoothing on normals to fix seams
-        /// </summary>
-        private void PostProcessNormals(IOModel model)
-        {
-            float e = 0.0001f;
-
-            Dictionary<Vector3, IOVertex> positionToVertex = new Dictionary<Vector3, IOVertex>();
-            Dictionary<IOVertex, List<IOVertex>> VertexGroups = new Dictionary<IOVertex, List<IOVertex>>();
-
-            foreach(var mesh in model.Meshes)
-            {
-                foreach(var vert in mesh.Vertices)
-                {
-                    bool matched = false;
-                    // perfect match
-                    if(positionToVertex.ContainsKey(vert.Position))
-                    {
-                        matched = true;
-                        if (!VertexGroups.ContainsKey(positionToVertex[vert.Position]))
-                        {
-                            VertexGroups.Add(positionToVertex[vert.Position], new List<IOVertex>());
-                            VertexGroups[positionToVertex[vert.Position]].Add(positionToVertex[vert.Position]);
-                        }
-                        VertexGroups[positionToVertex[vert.Position]].Add(vert);
-                    }
-
-                    // distance less than epsilon
-                    /*if (!matched)
-                        foreach (var pos in positionToVertex.Keys)
-                        {
-                            if ((pos.X - vert.Position.X) * (pos.X - vert.Position.X)
-                                + (pos.Y - vert.Position.Y) * (pos.Y - vert.Position.Y)
-                                + (pos.Z - vert.Position.Z) * (pos.Z - vert.Position.Z)
-                                < e * e)
-                            {
-                                matched = true;
-                                if (!VertexGroups.ContainsKey(positionToVertex[pos]))
-                                {
-                                    VertexGroups.Add(positionToVertex[pos], new List<IOVertex>());
-                                    VertexGroups[positionToVertex[pos]].Add(positionToVertex[pos]);
-                                }
-                                VertexGroups[positionToVertex[pos]].Add(vert);
-                                break;
-                            }
-                        }*/
-
-                    // new position
-                    if(!matched)
-                        positionToVertex.Add(vert.Position, vert);
-                }
-            }
-
-            SBConsole.WriteLine("Smoothing groups " + VertexGroups.Count);
-            foreach(var v in VertexGroups)
-            {
-                Vector3 newNormal = Vector3.Zero;
-                foreach(var normal in v.Value)
-                {
-                    newNormal += normal.Normal;
-                }
-                newNormal = newNormal / v.Value.Count;
-                newNormal.Normalize();
-                foreach (var normal in v.Value)
-                {
-                    normal.Normal = newNormal;
-                }
-            }
         }
 
     }

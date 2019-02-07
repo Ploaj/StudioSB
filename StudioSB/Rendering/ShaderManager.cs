@@ -46,6 +46,9 @@ namespace StudioSB.Rendering
             Shader textShader = CreateTextShader();
             shaderByName.Add("Text", textShader);
 
+            Shader capShader = CreateCapsuleShader();
+            shaderByName.Add("Capsule", capShader);
+
             foreach (var pair in shaderByName)
             {
                 if (!pair.Value.LinkStatusIsOk)
@@ -54,6 +57,13 @@ namespace StudioSB.Rendering
                     System.Diagnostics.Debug.WriteLine(pair.Value.GetErrorLog());
                 }
             }
+        }
+
+        private static Shader CreateCapsuleShader()
+        {
+            Shader textShader = new Shader();
+            textShader.LoadShaders(File.ReadAllText("Shaders/Capsule.vert"), File.ReadAllText("Shaders/Capsule.frag"));
+            return textShader;
         }
 
         private static Shader CreateTextShader()
