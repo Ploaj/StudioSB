@@ -2,26 +2,13 @@
 using System.Collections.Generic;
 using StudioSB.Scenes;
 using System.Windows.Forms;
+using StudioSB.GUI.Attachments;
 
 namespace StudioSB.GUI
 {
-    public class SBBoneTree : SBTreeView
+    public class SBBoneTree : SBTreeView, IAttachment
     {
-        private MainForm ParentForm
-        {
-            get
-            {
-                var parent = Parent;
-                while (true)
-                {
-                    if (parent is MainForm form)
-                        return form;
-                    parent = parent.Parent;
-                    if (parent == null)
-                        return null;
-                }
-            }
-        }
+        private SBBoneEditor BoneEditor { get; set; }
 
         public SBBoneTree() : base()
         {
@@ -36,6 +23,13 @@ namespace StudioSB.GUI
             AfterSelect += SelectBone;
 
             AfterLabelEdit += treeView_AfterLabelEdit;
+            
+            Dock = DockStyle.Top;
+
+            Size = new System.Drawing.Size(400, 400);
+
+            BoneEditor = new SBBoneEditor();
+            BoneEditor.Dock = DockStyle.Fill;
         }
 
         private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
@@ -58,17 +52,19 @@ namespace StudioSB.GUI
         {
             if (SelectedNode == null)
             {
-                ParentForm.ResetControls();
+                BoneEditor.Visible = false;
                 return;
             }
-            ParentForm.SelectBone((SBBone)SelectedNode.Tag);
+
+            BoneEditor.BindBone((SBBone)SelectedNode.Tag);
+            BoneEditor.Visible = true;
         }
 
         /// <summary>
         /// loads the bone nodes from a scene
         /// </summary>
         /// <param name="Scene"></param>
-        public void LoadFromScene(SBScene Scene)
+        private void LoadFromScene(SBScene Scene)
         {
             Nodes.Clear();
             Dictionary<SBBone, SBTreeNode> boneToNode = new Dictionary<SBBone, SBTreeNode>();
@@ -84,6 +80,33 @@ namespace StudioSB.GUI
             }
             if(Nodes.Count > 0)
                 Nodes[0].ExpandAll();
+        }
+
+        public void Update(SBViewport viewport)
+        {
+            if(viewport.Scene != null)
+            LoadFromScene(viewport.Scene);
+        }
+
+        public void Step()
+        {
+            // none
+        }
+
+        public void Render(SBViewport viewport)
+        {
+            // none
+        }
+
+        public void AttachToPanel(SBViewportPanel viewportPanel)
+        {
+            Panel container = new Panel();
+            container.AutoScroll = true;
+            container.Dock = DockStyle.Fill;
+            container.Controls.Add(BoneEditor);
+            container.Controls.Add(new Splitter() { Dock = DockStyle.Top });
+            container.Controls.Add(this);
+            viewportPanel.TabPanel.AddTab("Bone", container);
         }
     }
 

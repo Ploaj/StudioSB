@@ -1,19 +1,21 @@
-﻿using StudioSB.Scenes;
+﻿using StudioSB.GUI.Attachments;
+using StudioSB.GUI.Editors;
+using StudioSB.Scenes;
 using System;
 using System.Windows.Forms;
 
 namespace StudioSB.GUI
 {
-    public class SBMeshList : SBListView
+    public class SBMeshList : SBListView, IAttachment
     {
-        private MainForm ParentForm
+        private SBViewportPanel ParentViewportPanel
         {
             get
             {
                 var parent = Parent;
                 while (true)
                 {
-                    if (parent is MainForm form)
+                    if (parent is SBViewportPanel form)
                         return form;
                     parent = parent.Parent;
                     if (parent == null)
@@ -21,6 +23,8 @@ namespace StudioSB.GUI
                 }
             }
         }
+
+        private SBMeshPanel MeshPanel { get; set; }
 
         public SBMeshList() : base()
         {
@@ -42,6 +46,13 @@ namespace StudioSB.GUI
 
             ItemChecked += CheckChanged;
             SelectedIndexChanged += SelectedChanged;
+
+            Dock = DockStyle.Top;
+
+            Size = new System.Drawing.Size(400, 400);
+
+            MeshPanel = new SBMeshPanel();
+            MeshPanel.Dock = DockStyle.Fill;
         }
 
         /// <summary>
@@ -70,7 +81,7 @@ namespace StudioSB.GUI
 
             if (SelectedItems == null || SelectedItems.Count == 0)
             {
-                ParentForm.SelectMesh(null);
+                //ParentForm.SelectMesh(null);
                 return;
             }
 
@@ -85,9 +96,17 @@ namespace StudioSB.GUI
                     mesh.Selected = true;
                 }
             }
+            SelectMesh(selected);
+        }
 
-            ParentForm.Viewport.Updated = true;
-            ParentForm.SelectMesh(selected);
+        /// <summary>
+        /// Shows the meshpanel and have it load the selected meshes
+        /// </summary>
+        /// <param name="Mesh"></param>
+        public void SelectMesh(ISBMesh[] Mesh)
+        {
+            if (ParentViewportPanel.Viewport.Scene == null) return;
+            MeshPanel.SetSelectedMeshFromScene(ParentViewportPanel.Viewport.Scene);
         }
 
         /// <summary>
@@ -111,15 +130,14 @@ namespace StudioSB.GUI
                 if (tag is ISBMesh mesh)
                     mesh.Visible = ((ListViewItem)item).Checked;
             }
-
-            ParentForm.Viewport.Updated = true;
+            
         }
 
         /// <summary>
         /// loads the bone nodes from a scene
         /// </summary>
         /// <param name="Scene"></param>
-        public void LoadFromScene(SBScene Scene)
+        private void LoadFromScene(SBScene Scene)
         {
             Items.Clear();
             var meshes = Scene.GetMeshObjects();
@@ -136,6 +154,31 @@ namespace StudioSB.GUI
                     Items.Add(item);
                 }
             }
+        }
+
+        public void AttachToPanel(SBViewportPanel viewportPanel)
+        {
+            Panel container = new Panel();
+            container.AutoScroll = true;
+            container.Dock = DockStyle.Fill;
+            container.Controls.Add(MeshPanel);
+            container.Controls.Add(new Splitter() { Dock = DockStyle.Top });
+            container.Controls.Add(this);
+            viewportPanel.TabPanel.AddTab("Objects", container);
+        }
+
+        public void Update(SBViewport viewport)
+        {
+            if(viewport.Scene != null)
+                LoadFromScene(viewport.Scene);
+        }
+
+        public void Step()
+        {
+        }
+
+        public void Render(SBViewport viewport)
+        {
         }
     }
 }

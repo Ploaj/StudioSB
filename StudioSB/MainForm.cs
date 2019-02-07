@@ -8,28 +8,19 @@ using System.Collections.Generic;
 using StudioSB.GUI.Editors;
 using StudioSB.IO;
 using StudioSB.GUI.Projects;
+using StudioSB.GUI.Attachments;
+using StudioSB.Scenes.Animation;
 
 namespace StudioSB
 {
-    //TODO: move scene specific stuff elsewhere?
     /// <summary>
     /// 
     /// </summary>
     public partial class MainForm : Form
     {
-        public SBViewport Viewport {
-            get
-            {
-                return _viewport;
-            }
-            internal set
-            {
-                _viewport = value;
-            }
-        }
-        private SBViewport _viewport;
+        private SBViewportPanel viewportPanel { get; set; }
+
         private SBMenuBar MenuBar { get; set; }
-        private Timer RenderTimer { get; set; }
 
         // constand panels
 
@@ -39,19 +30,6 @@ namespace StudioSB
 
         private SBPopoutPanel BottomPane { get; set; }
 
-        private SBPopoutPanel RightPane { get; set; }
-
-        // Model Viewport Stuff
-        private SBAnimationBar animationBar { get; set; }
-
-        private System.Drawing.Size RightBarSize = new System.Drawing.Size(500, 400);
-
-        private SBBoneTree BoneTree { get; set; }
-        private SBMeshList MeshList { get; set; }
-
-        private SBBoneEditor BoneEditor { get; set; }
-        private SBMeshPanel MeshPanel { get; set; }
-        
         // Application stuff
         private SBRenderSettingsEditor ApplicationSettingsEditor { get; set; }
         private GenericMaterialEditor MaterialEditor { get; set; }
@@ -171,61 +149,20 @@ namespace StudioSB
 
             }
             MenuBar.Dock = DockStyle.Top;
-            
-            Viewport = new SBViewport();
-            Viewport.Dock = DockStyle.Fill;
 
-            BoneTree = new SBBoneTree();
-            BoneTree.MaximumSize = RightBarSize;
-            BoneTree.Dock = DockStyle.Top;
+            viewportPanel = new SBViewportPanel();
+            viewportPanel.Dock = DockStyle.Fill;
 
-            MeshList = new SBMeshList();
-            MeshList.MaximumSize = RightBarSize;
-            MeshList.Dock = DockStyle.Top;
-            
-            BoneEditor = new SBBoneEditor();
-            BoneEditor.Dock = DockStyle.Fill;
-
-            MeshPanel = new SBMeshPanel();
-            MeshPanel.Dock = DockStyle.Fill;
-
-            RightPane = new SBPopoutPanel(PopoutSide.Right, "<", ">");
-            RightPane.Dock = DockStyle.Right;
-
-            animationBar = new SBAnimationBar();
-            animationBar.Dock = DockStyle.Bottom;
-            animationBar.BindFrame(Viewport, "Frame");
-            animationBar.Visible = false;
-
-            ResetControls();
-
-            Controls.Add(Viewport);
-            Controls.Add(animationBar);
+            Controls.Add(viewportPanel);
             Controls.Add(BottomPane);
-            Controls.Add(RightPane);
             Controls.Add(LeftPane);
             Controls.Add(MenuBar);
-
-            RenderTimer = new Timer();
-            RenderTimer.Interval = 1000 / 120;
-            RenderTimer.Tick += new EventHandler(TriggerViewportRender);
-            RenderTimer.Start();
 
             FormClosing += MainForm_FormClosing;
             InitializeImportTypes();
 
             if (ApplicationSettings.LastOpenedPath != "")
                 projectTree.SetRoot(ApplicationSettings.LastOpenedPath);
-        }
-
-        /// <summary>
-        /// Resets and hides all controls
-        /// </summary>
-        public void ResetControls()
-        {
-            BoneEditor.HideControl();
-            MeshPanel.Visible = false;
-            animationBar.Visible = false;
         }
         
         /// <summary>
@@ -275,8 +212,7 @@ namespace StudioSB
         /// </summary>
         public void ResetViewportCamera()
         {
-            Viewport.Camera.ResetToDefaultPosition();
-            Viewport.Updated = true;
+            viewportPanel.Viewport.Camera.ResetToDefaultPosition();
         }
 
         /// <summary>
@@ -287,12 +223,12 @@ namespace StudioSB
         /// <param name="args"></param>
         private void OpenMaterialEditor(object sender, EventArgs args)
         {
-            if(_viewport.Scene == null)
+            if(viewportPanel.LoadedScene == null)
             {
                 MessageBox.Show("No Scene is currently set");
                 return;
             }
-            MaterialEditor.SetMaterialsFromScene(_viewport.Scene);
+            MaterialEditor.SetMaterialsFromScene(viewportPanel.LoadedScene);
             MaterialEditor.Show();
         }
 
@@ -310,7 +246,7 @@ namespace StudioSB
         /// <returns>true if workspace is successfully cleared and false otherwise</returns>
         private bool ClearWorkspace()
         {
-            if(_viewport.Scene != null)
+            if(viewportPanel.LoadedScene != null)
             {
                 DialogResult result = MessageBox.Show("Save current scene?", "Warning",
                     MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
@@ -327,44 +263,14 @@ namespace StudioSB
                     return false;
                 }
             }
-            //TODO: save progress dialog
-
-            ResetControls();
 
             MaterialEditor.Hide();
             ApplicationSettingsEditor.Hide();
 
-            BoneTree.Nodes.Clear();
-            MeshList.Items.Clear();
-            Viewport.Scene = null;
+            viewportPanel.Clear();
 
             GC.Collect();
             return true;
-        }
-
-        /// <summary>
-        /// Selects a bone and display the bone tool strip
-        /// </summary>
-        /// <param name="bone"></param>
-        public void SelectBone(SBBone bone)
-        {
-            ResetControls();
-            BoneEditor.BindBone(bone);
-            BoneEditor.Visible = true;
-        }
-
-
-        /// <summary>
-        /// Shows the meshpanel and have it load the selected meshes
-        /// </summary>
-        /// <param name="Mesh"></param>
-        public void SelectMesh(ISBMesh[] Mesh)
-        {
-            ResetControls();
-            if (Viewport.Scene == null) return;
-            MeshPanel.SetSelectedMeshFromScene(Viewport.Scene);
-            if(Mesh != null && Mesh.Length > 0)
-                MeshPanel.Visible = true;
         }
 
         /// <summary>
@@ -372,57 +278,7 @@ namespace StudioSB
         /// </summary>
         private void MakeRender()
         {
-            Viewport.SaveRender($"Render_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.png");
-        }
-
-        /// <summary>
-        /// Sets up the controls for the scene
-        /// </summary>
-        /// <param name="scene"></param>
-        private void SetupScene(SBScene scene)
-        {
-            Viewport.Scene = scene;
-
-            BoneTree.LoadFromScene(scene);
-            MeshList.LoadFromScene(scene);
-
-            RightPane.Contents.Clear();
-            if (scene.HasBones)
-            {
-                RightPane.Contents.Add(BoneEditor);
-            }
-            if (scene.HasMesh)
-            {
-                RightPane.Contents.Add(MeshPanel);
-            }
-            if(scene.HasBones || scene.HasMesh)
-                RightPane.Contents.Add(new Splitter() { Dock = DockStyle.Top });
-            if (scene.HasMesh)
-            {
-                RightPane.Contents.Add(MeshList);
-                RightPane.Contents.Add(new Splitter() { Dock = DockStyle.Top });
-            }
-            if (scene.HasBones)
-            {
-                RightPane.Contents.Add(BoneTree);
-                RightPane.Contents.Add(new Splitter() { Dock = DockStyle.Top });
-            }
-        }
-
-        /// <summary>
-        /// Raises a render frame event for the viewport.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void TriggerViewportRender(object sender, EventArgs e)
-        {
-            if (!Viewport.IsDisposed && Viewport.IsIdle)
-            {
-                if (ApplicationSettingsEditor.Visible || animationBar.Visible)
-                    Viewport.Updated = true;
-                Viewport.RenderFrame();
-                animationBar.Process();
-            }
+            viewportPanel.Viewport.SaveRender($"Render_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.png");
         }
 
         /// <summary>
@@ -432,16 +288,14 @@ namespace StudioSB
         public void OpenFile(string FilePath)
         {
             // Animation
-            animationBar.Visible = false;
             foreach (var openableAnimation in AnimationImporters)
             {
                 if (FilePath.ToLower().EndsWith(openableAnimation.Extension))
                 {
-                    if (Viewport.Scene == null) // most animation formats need the base skeleton, so a scene needs to be loaded
-                        return;
-                    Viewport.Animation = openableAnimation.ImportSBAnimation(FilePath, (SBSkeleton)Viewport.Scene.Skeleton);
-                    animationBar.FrameCount = (int)Viewport.Animation.FrameCount;
-                    animationBar.Visible = true;
+                    if (viewportPanel.Viewport.Scene == null) continue;
+                    var animation = openableAnimation.ImportSBAnimation(FilePath, (SBSkeleton)viewportPanel.Viewport.Scene.Skeleton);
+                    var animattach = new SBAnimAttachment(animation);
+                    viewportPanel.AddAttachment(animattach);
                     return;
                 }
             }
@@ -462,7 +316,7 @@ namespace StudioSB
                             {
                                 CloseWorkspace(null, null);
                                 scene.LoadFromFile(FilePath);
-                                SetupScene(scene);
+                                viewportPanel.SetScene(scene);
                                 return;
                             }
                         }
@@ -525,7 +379,7 @@ namespace StudioSB
         /// <param name="args"></param>
         public void SaveScene(object sender, EventArgs args)
         {
-            if (Viewport.Scene == null)
+            if (viewportPanel.LoadedScene == null)
             {
                 MessageBox.Show("No scene is selected");
                 return;
@@ -533,7 +387,7 @@ namespace StudioSB
 
             string Filter = "";
             string SceneExtension = "";
-            foreach (var attr in Viewport.Scene.GetType().GetCustomAttributes(false))
+            foreach (var attr in viewportPanel.LoadedScene.GetType().GetCustomAttributes(false))
             {
                 if (attr is SceneFileInformation info)
                 {
@@ -559,12 +413,12 @@ namespace StudioSB
                 {
                     if (FileName.EndsWith(SceneExtension))
                     {
-                        Viewport.Scene.ExportSceneToFile(FileName);
+                        viewportPanel.LoadedScene.ExportSceneToFile(FileName);
                         break;
                     }else
                     if (FileName.EndsWith(extension))
                     {
-                        extensionToExporter[extension].ExportIOModel(FileName, Viewport.Scene.GetIOModel());
+                        extensionToExporter[extension].ExportIOModel(FileName, viewportPanel.LoadedScene.GetIOModel());
                         break;
                     }
                 }
@@ -573,11 +427,22 @@ namespace StudioSB
 
         private void ExportAnimationToFile(object sender, EventArgs args)
         {
-            if (Viewport.Scene == null)
+            if (viewportPanel.LoadedScene == null)
             {
                 MessageBox.Show("No scene is selected");
                 return;
             }
+
+            SBAnimAttachment anim = viewportPanel.GetAttachment<SBAnimAttachment>();
+            SBAnimation animation;
+            if (anim != null)
+                animation = anim.GetAnimation();
+            else
+            {
+                MessageBox.Show("No animation is loaded in the scene");
+                return;
+            }
+
             string Filter = "";
 
             //Create filter
@@ -596,7 +461,8 @@ namespace StudioSB
                 {
                     if (FileName.EndsWith(extension))
                     {
-                        extensionToExporter[extension].ExportSBAnimation(FileName, Viewport.Animation, (SBSkeleton)Viewport.Scene.Skeleton);
+                        
+                        extensionToExporter[extension].ExportSBAnimation(FileName, animation, (SBSkeleton)viewportPanel.LoadedScene.Skeleton);
                     }
                 }
             }
@@ -609,7 +475,7 @@ namespace StudioSB
         /// <param name="args"></param>
         public void ImportAnimationToScene(object sender, EventArgs args)
         {
-            if (Viewport.Scene == null)
+            if (viewportPanel.LoadedScene == null)
             {
                 MessageBox.Show("No scene is selected");
                 return;
@@ -645,7 +511,7 @@ namespace StudioSB
             /// <param name="args"></param>
         public void ImportToScene(object sender, EventArgs args)
         {
-            if (Viewport.Scene == null)
+            if (viewportPanel.LoadedScene == null)
             {
                 MessageBox.Show("No scene is selected");
                 return;
@@ -669,8 +535,8 @@ namespace StudioSB
                 {
                     if (FileName.EndsWith(extension))
                     {
-                        Viewport.Scene.FromIOModel(extensionToExporter[extension].ImportIOModel(FileName));
-                        SetupScene(Viewport.Scene);
+                        viewportPanel.LoadedScene.FromIOModel(extensionToExporter[extension].ImportIOModel(FileName));
+                        viewportPanel.SetScene(viewportPanel.LoadedScene);
                     }
                 }
             }

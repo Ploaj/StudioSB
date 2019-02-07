@@ -7,8 +7,9 @@ using SFGraphics.Cameras;
 using SFGraphics.GLObjects.GLObjectManagement;
 using StudioSB.Rendering;
 using SFGraphics.Controls;
-using StudioSB.Scenes.Animation;
 using SFGraphics.GLObjects.Textures;
+using StudioSB.GUI.Attachments;
+using System.Collections.Generic;
 
 namespace StudioSB.GUI
 {
@@ -17,6 +18,11 @@ namespace StudioSB.GUI
     /// </summary>
     public class SBViewport : GLViewport
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<IAttachment> Attachments = new List<IAttachment>();
+
         /// <summary>
         /// Scene to be rendered within the viewport
         /// </summary>
@@ -40,30 +46,6 @@ namespace StudioSB.GUI
         /// Displays texture over screen
         /// </summary>
         public Texture ScreenTexture { get; set; }
-
-        /// <summary>
-        /// Sets the current frame of the animation and updates scene
-        /// </summary>
-        public float Frame
-        {
-            set
-            {
-                if (Animation != null)
-                    Animation.UpdateScene(value, Scene);
-            }
-            get
-            {
-                // so yeah this is needed in order to bind this property to
-                // the track bar...
-                return 0;
-            }
-        }
-
-        /// <summary>
-        /// The animation to be used by the scene
-        /// Animations and scenes are not directly linked
-        /// </summary>
-        public SBAnimation Animation { get; set; }
 
         // cache information
         private int polyCount;
@@ -181,10 +163,15 @@ namespace StudioSB.GUI
             
             if(ApplicationSettings.EnableGridDisplay)
                 Rendering.Shapes.GridFloor3D.Draw(ApplicationSettings.GridSize, 25, ApplicationSettings.GridLineColor);
-
+            
             if(Scene != null)
             {
                 Scene.Render(Camera);
+            }
+
+            foreach(var attachment in Attachments)
+            {
+                attachment.Render(this);
             }
 
             if (ApplicationSettings.RenderSceneInformation)
