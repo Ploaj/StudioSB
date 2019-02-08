@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using StudioSB.Scenes;
-using StudioSB.GUI.Editors;
 using StudioSB.GUI.Attachments;
 
 namespace StudioSB.GUI
 {
     /// <summary>
-    /// Panel containing scene information and attachments
+    /// Panel control for viewport that contains
+    /// scene information and attachment panels
     /// </summary>
     public class SBViewportPanel : Panel
     {
@@ -84,6 +81,9 @@ namespace StudioSB.GUI
         /// </summary>
         public void Clear()
         {
+            foreach (var att in Viewport.Attachments)
+                att.RemoveFromPanel(this);
+
             Viewport.Attachments.Clear();
 
             TabPanel.ClearTabs();
@@ -105,12 +105,41 @@ namespace StudioSB.GUI
         }
 
         /// <summary>
-        /// Adds an attachment to this panel
+        /// Adds an attachment to this panel and viewport
         /// </summary>
         public void AddAttachment(IAttachment attachment)
         {
+            if (!attachment.AllowMultiple())
+            {
+                List<IAttachment> ToRemove = new List<IAttachment>();
+                foreach (var att in Viewport.Attachments)
+                {
+                    if (!attachment.AllowMultiple() && att.GetType() == attachment.GetType())
+                    {
+                        ToRemove.Add(att);
+                        continue;
+                    }
+                }
+                foreach(var att in ToRemove)
+                {
+                    RemoveAttachment(att);
+                }
+            }
+
             attachment.AttachToPanel(this);
             Viewport.Attachments.Add(attachment);
+        }
+
+        /// <summary>
+        /// Removes attachment from panel and viewport
+        /// </summary>
+        /// <param name="attachment"></param>
+        public void RemoveAttachment(IAttachment attachment)
+        {
+            if (!Viewport.Attachments.Contains(attachment))
+                return;
+            attachment.RemoveFromPanel(this);
+            Viewport.Attachments.Remove(attachment);
         }
 
         /// <summary>

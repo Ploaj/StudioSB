@@ -111,7 +111,7 @@ namespace StudioSB.Scenes
 
             boneShader.UseProgram();
 
-            boneShader.SetVector4("boneColor", new Vector4(ApplicationSettings.BoneColor.R / 255f, ApplicationSettings.BoneColor.G / 255f, ApplicationSettings.BoneColor.B / 255f, ApplicationSettings.BoneColor.A / 255f));
+            boneShader.SetVector4("color", new Vector4(ApplicationSettings.BoneColor.R / 255f, ApplicationSettings.BoneColor.G / 255f, ApplicationSettings.BoneColor.B / 255f, ApplicationSettings.BoneColor.A / 255f));
             
             boneShader.SetMatrix4x4("rotation", ref prismRotation);
 

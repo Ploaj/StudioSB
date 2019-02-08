@@ -98,15 +98,26 @@ namespace StudioSB.GUI
             // none
         }
 
+        public bool AllowMultiple()
+        {
+            return false;
+        }
+
+        Panel container = new Panel();
+
         public void AttachToPanel(SBViewportPanel viewportPanel)
         {
-            Panel container = new Panel();
             container.AutoScroll = true;
             container.Dock = DockStyle.Fill;
             container.Controls.Add(BoneEditor);
             container.Controls.Add(new Splitter() { Dock = DockStyle.Top });
             container.Controls.Add(this);
             viewportPanel.TabPanel.AddTab("Bone", container);
+        }
+
+        public void RemoveFromPanel(SBViewportPanel viewportPanel)
+        {
+
         }
     }
 

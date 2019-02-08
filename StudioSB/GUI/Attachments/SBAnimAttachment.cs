@@ -24,10 +24,21 @@ namespace StudioSB.GUI.Attachments
             return animation;
         }
 
+        public bool AllowMultiple()
+        {
+            return false;
+        }
+
         public void AttachToPanel(SBViewportPanel viewportPanel)
         {
             if(!viewportPanel.Controls.Contains(animationBar))
-            viewportPanel.Controls.Add(animationBar);
+                viewportPanel.Controls.Add(animationBar);
+        }
+
+        public void RemoveFromPanel(SBViewportPanel viewportPanel)
+        {
+            if (viewportPanel.Controls.Contains(animationBar))
+                viewportPanel.Controls.Remove(animationBar);
         }
 
         public void Render(SBViewport viewport)

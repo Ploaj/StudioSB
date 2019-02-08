@@ -46,6 +46,9 @@ namespace StudioSB.Rendering
             Shader textShader = CreateTextShader();
             shaderByName.Add("Text", textShader);
 
+            Shader sphShader = CreateSphereShader();
+            shaderByName.Add("Sphere", sphShader);
+
             Shader capShader = CreateCapsuleShader();
             shaderByName.Add("Capsule", capShader);
 
@@ -59,11 +62,18 @@ namespace StudioSB.Rendering
             }
         }
 
+        private static Shader CreateSphereShader()
+        {
+            Shader shader = new Shader();
+            shader.LoadShaders(File.ReadAllText("Shaders/Sphere.vert"), File.ReadAllText("Shaders/SolidColor.frag"));
+            return shader;
+        }
+
         private static Shader CreateCapsuleShader()
         {
-            Shader textShader = new Shader();
-            textShader.LoadShaders(File.ReadAllText("Shaders/Capsule.vert"), File.ReadAllText("Shaders/Capsule.frag"));
-            return textShader;
+            Shader shader = new Shader();
+            shader.LoadShaders(File.ReadAllText("Shaders/Capsule.vert"), File.ReadAllText("Shaders/SolidColor.frag"));
+            return shader;
         }
 
         private static Shader CreateTextShader()
@@ -76,7 +86,7 @@ namespace StudioSB.Rendering
         private static Shader CreateBoneShader()
         {
             Shader boneShader = new Shader();
-            boneShader.LoadShaders(File.ReadAllText("Shaders/Bone.vert"), File.ReadAllText("Shaders/Bone.frag"));
+            boneShader.LoadShaders(File.ReadAllText("Shaders/Bone.vert"), File.ReadAllText("Shaders/SolidColor.frag"));
             return boneShader;
         }
 

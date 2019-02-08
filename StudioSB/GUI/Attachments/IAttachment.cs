@@ -2,7 +2,11 @@
 {
     public interface IAttachment
     {
+        bool AllowMultiple();
+
         void AttachToPanel(SBViewportPanel viewportPanel);
+
+        void RemoveFromPanel(SBViewportPanel viewportPanel);
 
         void Update(SBViewport viewport);
 

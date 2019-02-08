@@ -63,10 +63,11 @@ namespace StudioSB.Scenes
         /// Gets an IO model containing the scene information
         /// </summary>
         /// <returns></returns>
-        public virtual StudioSB.IO.Models.IOModel GetIOModel()
+        public virtual IOModel GetIOModel()
         {
-            return new IO.Models.IOModel();
+            return new IOModel();
         }
+
         /// <summary>
         /// Imports an IO model into the scene
         /// </summary>

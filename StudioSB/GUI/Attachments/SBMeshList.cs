@@ -156,15 +156,21 @@ namespace StudioSB.GUI
             }
         }
 
+        Panel container = new Panel();
+
         public void AttachToPanel(SBViewportPanel viewportPanel)
         {
-            Panel container = new Panel();
             container.AutoScroll = true;
             container.Dock = DockStyle.Fill;
             container.Controls.Add(MeshPanel);
             container.Controls.Add(new Splitter() { Dock = DockStyle.Top });
             container.Controls.Add(this);
             viewportPanel.TabPanel.AddTab("Objects", container);
+        }
+
+        public void RemoveFromPanel(SBViewportPanel viewportPanel)
+        {
+
         }
 
         public void Update(SBViewport viewport)
@@ -175,6 +181,11 @@ namespace StudioSB.GUI
 
         public void Step()
         {
+        }
+
+        public bool AllowMultiple()
+        {
+            return false;
         }
 
         public void Render(SBViewport viewport)
