@@ -9,6 +9,8 @@ namespace StudioSB.GUI.Attachments
         private SBAnimationBar animationBar;
         private SBAnimation animation;
 
+        private float PreviousFrame = 0;
+
         public SBAnimAttachment(SBAnimation animation)
         {
             this.animation = animation;
@@ -46,8 +48,12 @@ namespace StudioSB.GUI.Attachments
             if (viewport.Scene == null || animation == null)
                 return;
 
-            animation.UpdateScene(animationBar.Frame, viewport.Scene);
             animationBar.Process();
+            if (animationBar.Frame != PreviousFrame)
+            {
+                animation.UpdateScene(animationBar.Frame, viewport.Scene);
+            }
+            PreviousFrame = animationBar.Frame;
         }
 
         public void Step()

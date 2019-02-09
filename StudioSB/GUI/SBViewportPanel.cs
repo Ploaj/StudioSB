@@ -163,6 +163,7 @@ namespace StudioSB.GUI
         /// <param name="scene"></param>
         public void SetScene(SBScene scene)
         {
+            Clear();
             Viewport.Scene = scene;
 
             // basic attachments

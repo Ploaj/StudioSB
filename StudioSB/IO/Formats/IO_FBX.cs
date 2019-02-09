@@ -159,6 +159,7 @@ namespace StudioSB.IO.Formats
                     case "LayerElementNormal":
                         vertex.Normal = new Vector3((float)layer.Data[layerIndex * 3], (float)layer.Data[layerIndex * 3 + 1], (float)layer.Data[layerIndex * 3 + 2]);
                         vertex.Normal = Vector3.TransformNormal(vertex.Normal, transform);
+                        vertex.Normal.Normalize();
                         break;
                     case "LayerElementColor":
                         vertex.Color = new Vector4((float)layer.Data[layerIndex * 4], (float)layer.Data[layerIndex * 4 + 1], (float)layer.Data[layerIndex * 4 + 2], (float)layer.Data[layerIndex * 4 + 3]);
