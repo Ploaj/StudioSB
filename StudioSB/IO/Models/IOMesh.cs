@@ -75,9 +75,11 @@ namespace StudioSB.IO.Models
                 if (!vertexToIndex.ContainsKey(vertex))
                 {
                     vertexToIndex.Add(vertex, (uint)NewVertices.Count);
+                    Indices.Add((uint)NewVertices.Count);
                     NewVertices.Add(vertex);
                 }
-                Indices.Add(vertexToIndex[vertex]);
+                else
+                    Indices.Add(vertexToIndex[vertex]);
             }
 
             SBConsole.WriteLine($"Optimized {Name} {Vertices.Count} -> {NewVertices.Count}");

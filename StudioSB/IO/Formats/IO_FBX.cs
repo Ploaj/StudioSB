@@ -30,6 +30,7 @@ namespace StudioSB.IO.Formats
 
             //Bones
             var limbs = accessor.GetLimbNodes();
+            SBConsole.WriteLine($"Limb Node Count: {limbs.Length}");
 
             foreach(var limb in limbs)
             {
@@ -46,6 +47,7 @@ namespace StudioSB.IO.Formats
             // Mesh
 
             var models = accessor.GetModels();
+            SBConsole.WriteLine($"Model Node Count: {models.Count}");
 
             int YupAxis = accessor.GetOriginalXAxis();
             SBConsole.WriteLine("Yup: " + YupAxis);

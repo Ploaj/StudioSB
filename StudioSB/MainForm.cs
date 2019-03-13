@@ -533,7 +533,7 @@ namespace StudioSB
             {
                 foreach (var extension in extensionToExporter.Keys)
                 {
-                    if (FileName.EndsWith(extension))
+                    if (FileName.ToLower().EndsWith(extension))
                     {
                         viewportPanel.LoadedScene.FromIOModel(extensionToExporter[extension].ImportIOModel(FileName));
                         viewportPanel.SetScene(viewportPanel.LoadedScene);
