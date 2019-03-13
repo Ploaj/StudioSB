@@ -54,7 +54,7 @@ namespace StudioSB.IO.Formats
             foreach (var mod in models)
             {
                 // rotation 90
-                Matrix4 transform = (YupAxis == 2 ? Matrix4.CreateRotationX(-90 * DegToRag) : Matrix4.Identity) * GetModelTransform(mod);
+                Matrix4 transform = ((YupAxis == -1 || YupAxis == 2) ? Matrix4.CreateRotationX(-90 * DegToRag) : Matrix4.Identity) * GetModelTransform(mod);
                 
                 foreach (var geom in mod.Geometries)
                 {
