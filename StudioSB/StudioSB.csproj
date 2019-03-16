@@ -136,6 +136,9 @@
     <Compile Include="GUI\SBAnimationBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="GUI\SBCustomDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="GUI\SBHBox.cs">
       <SubType>Component</SubType>
     </Compile>

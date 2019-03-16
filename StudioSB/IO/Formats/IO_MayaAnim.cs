@@ -9,9 +9,18 @@ namespace StudioSB.IO.Formats
 {
     public class IO_MayaANIM : IExportableAnimation
     {
+        public class ExportSettings
+        {
+            public bool Maya2015 { get; set; } = false;
+        }
+
         public string Name => "Maya ANIM";
 
         public string Extension => ".anim";
+
+        object IExportableAnimation.Settings { get { return MayaSettings; } }
+
+        private static ExportSettings MayaSettings = new ExportSettings();
 
         private enum InfinityType
         {
@@ -201,7 +210,7 @@ namespace StudioSB.IO.Formats
                 QueueBones(c, q, Skeleton);
         }
 
-        public static void ExportIOAnimationAsANIM(string fname, SBAnimation animation, SBSkeleton Skeleton, bool ordinal = false)
+        public static void ExportIOAnimationAsANIM(string fname, SBAnimation animation, SBSkeleton Skeleton)
         {
             IO_MayaANIM anim = new IO_MayaANIM();
 
@@ -209,8 +218,8 @@ namespace StudioSB.IO.Formats
 
             // get bone order
             List<SBBone> BonesInOrder = getBoneTreeOrder(Skeleton);
-
-            if (ordinal)
+            
+            if (MayaSettings.Maya2015)
             {
                 BonesInOrder = BonesInOrder.OrderBy(f => f.Name, StringComparer.Ordinal).ToList();
             }

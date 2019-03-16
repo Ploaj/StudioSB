@@ -7,6 +7,7 @@ namespace StudioSB.IO
     {
         string Name { get; }
         string Extension { get; }
+        object Settings { get; }
 
         IOModel ImportIOModel(string FileName);
     }

@@ -461,8 +461,13 @@ namespace StudioSB
                 {
                     if (FileName.EndsWith(extension))
                     {
-                        
-                        extensionToExporter[extension].ExportSBAnimation(FileName, animation, (SBSkeleton)viewportPanel.LoadedScene.Skeleton);
+                        DialogResult Result = DialogResult.OK;
+                        if(extensionToExporter[extension].Settings != null)
+                        using (var dialog = new SBCustomDialog(extensionToExporter[extension].Settings))
+                            Result = dialog.ShowDialog();
+
+                        if(Result == DialogResult.OK)
+                            extensionToExporter[extension].ExportSBAnimation(FileName, animation, (SBSkeleton)viewportPanel.LoadedScene.Skeleton);
                     }
                 }
             }
@@ -535,8 +540,16 @@ namespace StudioSB
                 {
                     if (FileName.ToLower().EndsWith(extension))
                     {
-                        viewportPanel.LoadedScene.FromIOModel(extensionToExporter[extension].ImportIOModel(FileName));
-                        viewportPanel.SetScene(viewportPanel.LoadedScene);
+                        DialogResult Result = DialogResult.OK;
+                        if (extensionToExporter[extension].Settings != null)
+                            using (var dialog = new SBCustomDialog(extensionToExporter[extension].Settings))
+                                Result = dialog.ShowDialog();
+
+                        if (Result == DialogResult.OK)
+                        {
+                            viewportPanel.LoadedScene.FromIOModel(extensionToExporter[extension].ImportIOModel(FileName));
+                            viewportPanel.SetScene(viewportPanel.LoadedScene);
+                        }
                     }
                 }
             }

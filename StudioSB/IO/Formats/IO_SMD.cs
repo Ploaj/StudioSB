@@ -14,6 +14,7 @@ namespace StudioSB.IO.Formats
     {
         public string Name { get; } = "Source Model";
         public string Extension { get; } = ".smd";
+        public object Settings { get; } = null;
 
         #region Classes
         

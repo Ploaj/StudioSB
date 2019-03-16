@@ -11,8 +11,15 @@ namespace StudioSB.IO.Formats
     public class IO_FBX : IImportableModelType
     {
         public string Name => "FBX";
-
         public string Extension => ".fbx";
+        public object Settings { get { return ImportSettings; } }
+
+        private static FBXImportSettings ImportSettings = new FBXImportSettings();
+
+        public class FBXImportSettings
+        {
+            public bool Rotate90 { get; set; } = false;
+        }
 
         public IOModel ImportIOModel(string FileName)
         {
@@ -54,7 +61,7 @@ namespace StudioSB.IO.Formats
             foreach (var mod in models)
             {
                 // rotation 90
-                Matrix4 transform = ((YupAxis == -1 || YupAxis == 2) ? Matrix4.CreateRotationX(-90 * DegToRag) : Matrix4.Identity) * GetModelTransform(mod);
+                Matrix4 transform = (ImportSettings.Rotate90 ? Matrix4.CreateRotationX(-90 * DegToRag) : Matrix4.Identity) * GetModelTransform(mod);
                 
                 foreach (var geom in mod.Geometries)
                 {

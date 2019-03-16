@@ -8,6 +8,7 @@ namespace StudioSB.IO
     {
         string Name { get; }
         string Extension { get; }
+        object Settings { get; }
 
         void ExportSBAnimation(string FileName, SBAnimation animation, SBSkeleton skeleton);
     }

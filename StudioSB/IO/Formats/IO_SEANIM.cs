@@ -9,6 +9,7 @@ namespace StudioSB.IO.Formats
     {
         public string Name { get; } = "SEAnim";
         public string Extension { get; } = ".seanim";
+        public object Settings { get; } = null;
 
         public void ExportSBAnimation(string FileName, SBAnimation animation, SBSkeleton skeleton)
         {
