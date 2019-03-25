@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
+using System.ComponentModel;
 
 namespace StudioSB.IO.Formats
 {
@@ -11,7 +12,11 @@ namespace StudioSB.IO.Formats
     {
         public class ExportSettings
         {
+            [DisplayName("Use Maya <= 2015"), Description("")]
             public bool Maya2015 { get; set; } = false;
+
+            [DisplayName("Use Radians"), Description("")]
+            public bool UseRadians { get; set; } = true;
         }
 
         public string Name => "Maya ANIM";
@@ -215,6 +220,8 @@ namespace StudioSB.IO.Formats
             IO_MayaANIM anim = new IO_MayaANIM();
 
             anim.header.endTime = animation.FrameCount + 1;
+            if (!MayaSettings.UseRadians)
+                anim.header.angularUnit = "deg";
 
             // get bone order
             List<SBBone> BonesInOrder = getBoneTreeOrder(Skeleton);
@@ -285,10 +292,11 @@ namespace StudioSB.IO.Formats
         {
             SBBone temp = new SBBone();
             temp.Transform = transform;
+            float rotationTransform = (float)(MayaSettings.UseRadians ? 1 : (180 / Math.PI));
             switch (ctype)
             {
                 case ControlType.rotate:
-                    return GetTrackValue(temp.RotationEuler, ttype);
+                    return GetTrackValue(temp.RotationEuler, ttype) * rotationTransform;
                 case ControlType.scale:
                     return GetTrackValue(temp.Scale, ttype);
                 case ControlType.translate:
