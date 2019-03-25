@@ -280,10 +280,14 @@ namespace StudioSB.Scenes.Ultimate
                 if(isSingleBound)
                     parentBone = iomodel.Skeleton.Bones[bone];
 
+                bool Has2ndUVChannel = false;
+
                 // because the vertex cannot be changed after creation, and we don't know if we need to single bind,
                 // we have to go through the vertices again after determining if this mesh is single bound
                 foreach (var vertex in iomesh.Vertices)
                 {
+                    if (vertex.UV1 != Vector2.Zero)
+                        Has2ndUVChannel = true;
                     mesh.Vertices.Add(IOToUltimateVertex(vertex, isSingleBound, parentBone == null ? Matrix4.Identity : parentBone.InvWorldTransform));
                 }
 
@@ -295,6 +299,8 @@ namespace StudioSB.Scenes.Ultimate
                 mesh.ExportAttributes.Add(UltimateVertexAttribute.Normal0);
                 mesh.ExportAttributes.Add(UltimateVertexAttribute.Tangent0);
                 mesh.ExportAttributes.Add(UltimateVertexAttribute.map1);
+                if(Has2ndUVChannel)
+                    mesh.ExportAttributes.Add(UltimateVertexAttribute.uvSet);
                 mesh.ExportAttributes.Add(UltimateVertexAttribute.colorSet1);
             }
 

@@ -225,8 +225,20 @@ namespace StudioSB.Scenes
         {
             get
             {
-                if(EnableAnimatedCompensateScale)
-                    return Matrix4.CreateScale(AnimatedCompensateScale) * (_parent == null ? AnimatedTransform : AnimatedTransform * _parent.AnimatedWorldTransform).ClearScale();
+                if (EnableAnimatedCompensateScale)
+                {
+                    Matrix4 transform = AnimatedTransform;
+                    if (_parent != null)
+                    {
+                        Vector3 parentScale = AnimatedTransform.ExtractScale();
+                        transform *= Matrix4.CreateScale(
+                            1f / parentScale.X,
+                            1f / parentScale.Y,
+                            1f / parentScale.Z);
+                        transform *= _parent.AnimatedWorldTransform;
+                    }
+                    return transform;
+                }
                 else
                     return _parent == null ? AnimatedTransform : AnimatedTransform * _parent.AnimatedWorldTransform;
             }

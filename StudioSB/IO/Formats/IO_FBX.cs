@@ -179,6 +179,10 @@ namespace StudioSB.IO.Formats
                             vertex.UV0 = uv;
                         if (layer.Layer == 1)
                             vertex.UV1 = uv;
+                        if (layer.Layer == 2)
+                            vertex.UV2 = uv;
+                        if (layer.Layer == 3)
+                            vertex.UV3 = uv;
                         break;
                 }
             }
