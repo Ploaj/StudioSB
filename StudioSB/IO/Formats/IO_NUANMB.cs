@@ -68,7 +68,7 @@ namespace StudioSB.IO.Formats
                             {
                                 Frame = i,
                                 Value = GetMatrix((AnimTrackTransform)Transform[i]),
-                                CompensateScale = t.AbsoluteScale,
+                                CompensateScale = t.CompensateScale,
                             });
                         }
                     }
