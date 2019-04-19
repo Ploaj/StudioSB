@@ -153,6 +153,7 @@ namespace StudioSB.IO.Formats
                 BoneIndices = boneIndices[VertexIndex],
                 BoneWeights = boneWeights[VertexIndex]
             };
+            vertex.Color = Vector4.One;
 
             //Deforming
             

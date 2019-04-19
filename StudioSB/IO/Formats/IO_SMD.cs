@@ -344,6 +344,7 @@ namespace StudioSB.IO.Formats
                 Normal = new Vector3(float.Parse(args[4]), float.Parse(args[5]), float.Parse(args[6])),
                 UV0 = new Vector2(float.Parse(args[7]), 1-float.Parse(args[8])),
             };
+            vertex.Color = Vector4.One;
 
             int InfluenceCount = int.Parse(args[9]);
             

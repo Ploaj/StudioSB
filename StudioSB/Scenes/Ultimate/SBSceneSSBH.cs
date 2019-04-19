@@ -317,7 +317,7 @@ namespace StudioSB.Scenes.Ultimate
                     Y = (int)iov.BoneIndices.Y,
                     Z = (int)iov.BoneIndices.Z,
                     W = (int)iov.BoneIndices.W },
-                 singleBound ? Vector4.Zero : iov.BoneWeights, Vector2.Zero, Vector4.One, Vector4.One);
+                 singleBound ? Vector4.Zero : iov.BoneWeights, Vector2.Zero, iov.Color, Vector4.One);
         }
 
         /// <summary>
