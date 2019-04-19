@@ -147,7 +147,7 @@ namespace StudioSB.Scenes.Ultimate
             modl.ModelFileName = simpleName;
             modl.SkeletonFileName = $"{simpleName}.nusktb";
             modl.MeshString = $"{simpleName}.numshb";
-            modl.UnknownFileName = "";
+            modl.UnknownFileName = null;
             modl.MaterialFileNames = new MODL_MaterialName[] { new MODL_MaterialName() { MaterialFileName = $"{simpleName}.numatb" } };
             SBConsole.WriteLine("Done");
             SSBH.TrySaveSSBHFile(FileName, modl);
