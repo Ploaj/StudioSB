@@ -28,10 +28,30 @@ namespace StudioSB.Scenes.Ultimate
 
                     SBUltimateModel model = new SBUltimateModel();
                     model.Name = mesh.ModelName;
-                    model.BoundingSphere = new Vector4(mesh.BoundingSphereX, mesh.BoundingSphereY, mesh.BoundingSphereZ, mesh.BoundingSphereRadius/2);
+                    model.BoundingSphere = new Vector4(mesh.BoundingSphereX, mesh.BoundingSphereY, mesh.BoundingSphereZ, mesh.BoundingSphereRadius);
+
+                    model.OBBTransform = new Matrix4(mesh.UnknownFloats[0], mesh.UnknownFloats[1], mesh.UnknownFloats[2], mesh.UnknownFloats[3],
+                        mesh.UnknownFloats[4], mesh.UnknownFloats[5], mesh.UnknownFloats[6], mesh.UnknownFloats[7],
+                        mesh.UnknownFloats[8], mesh.UnknownFloats[9], mesh.UnknownFloats[10], mesh.UnknownFloats[11],
+                        mesh.UnknownFloats[12], mesh.UnknownFloats[13], mesh.UnknownFloats[14], mesh.UnknownFloats[15]);
+
+                    var matrix = new Matrix3(
+                        mesh.UnknownFloats[3], mesh.UnknownFloats[4], mesh.UnknownFloats[5], 
+                        mesh.UnknownFloats[6], mesh.UnknownFloats[7], mesh.UnknownFloats[8], 
+                        mesh.UnknownFloats[9], mesh.UnknownFloats[10], mesh.UnknownFloats[11]);
+
+                    model.OBBTransform = new Matrix4(matrix);
+                    model.OBBPosition = new Vector3(mesh.UnknownFloats[0], mesh.UnknownFloats[1], mesh.UnknownFloats[2]);
+                    model.OBBSize = new Vector3(mesh.UnknownFloats[12], mesh.UnknownFloats[13], mesh.UnknownFloats[14]);
 
                     Vector3 min = new Vector3(mesh.MinBoundingBoxX, mesh.MinBoundingBoxY, mesh.MinBoundingBoxZ);
                     Vector3 max = new Vector3(mesh.MaxBoundingBoxX, mesh.MaxBoundingBoxY, mesh.MaxBoundingBoxZ);
+
+                    /*SBConsole.WriteLine($"Sphere {model.BoundingSphere.ToString()}");
+                    SBConsole.WriteLine($"Min: {min.ToString()} Max: {max.ToString()}");
+                    SBConsole.WriteLine($"Matrix: {model.VolumeTransform.ToString()}");
+                    SBConsole.WriteLine($"RotQ: {matrix.ExtractRotation().ToString()}");
+                    SBConsole.WriteLine($"Scale: {matrix.ExtractScale().ToString()}");*/
 
                     model.VolumeCenter = (max + min) / 2;
                     model.VolumeSize = (max - min) / 2;
@@ -215,6 +235,9 @@ namespace StudioSB.Scenes.Ultimate
                 BoneNames[BoneIndex++] = bone.Name;
             }
 
+            List<Vector3> allVertices = new List<Vector3>();
+            List<int> vertexCounts = new List<int>();
+
             foreach(var mesh in model.Meshes)
             {
                 // preprocess
@@ -228,9 +251,13 @@ namespace StudioSB.Scenes.Ultimate
 
                 List<SSBHVertexInfluence> Influences = new List<SSBHVertexInfluence>();
 
+                vertexCounts.Add(mesh.Vertices.Count);
+
                 int VertexIndex = 0;
                 foreach(var vertex in mesh.Vertices)
                 {
+                    allVertices.Add(vertex.Position0);
+
                     Position0.Add(vectorToAttribute(vertex.Position0));
                     Normal0.Add(vectorToAttribute(vertex.Normal0));
                     Tangent0.Add(vectorToAttribute(vertex.Tangent0));
@@ -275,8 +302,96 @@ namespace StudioSB.Scenes.Ultimate
                 if(mesh.ParentBone == "")
                     maker.AttachRiggingToMeshObject(Influences.ToArray());
             }
-            
-            return maker.GetMeshFile();
+
+            MESH meshFile = maker.GetMeshFile();
+
+            int vertexoffset = 0;
+            int meshindex = 0;
+            foreach(var meshObject in meshFile.Objects)
+            {
+                GenerateBB(meshObject, allVertices.GetRange(vertexoffset, vertexCounts[meshindex]));
+                vertexoffset += vertexCounts[meshindex];
+                meshindex++;
+            }
+
+            Vector3 maxBB, minBB;
+            Tools.BBGenerator.GenerateAABB(allVertices, out maxBB, out minBB);
+            var BoundingSphere = SFGraphics.Utils.BoundingSphereGenerator.GenerateBoundingSphere(allVertices);
+
+            meshFile.BoundingSphereX = BoundingSphere.X;
+            meshFile.BoundingSphereY = BoundingSphere.Y;
+            meshFile.BoundingSphereZ = BoundingSphere.Z;
+            meshFile.BoundingSphereRadius = BoundingSphere.W;
+
+            meshFile.MaxBoundingBoxX = maxBB.X;
+            meshFile.MaxBoundingBoxY = maxBB.Y;
+            meshFile.MaxBoundingBoxZ = maxBB.Z;
+
+            meshFile.MinBoundingBoxX = minBB.X;
+            meshFile.MinBoundingBoxY = minBB.Y;
+            meshFile.MinBoundingBoxZ = minBB.Z;
+
+
+            //TODO: oriented bounding box
+            // using Axis aligned for now
+
+            Vector3 BBCenter = (maxBB + minBB) / 2;
+            Vector3 BBSize = (maxBB + minBB) / 2;
+            var OBBTransform = Matrix3.Identity;
+
+            meshFile.UnknownFloats[0] = BBCenter.X;
+            meshFile.UnknownFloats[1] = BBCenter.Y;
+            meshFile.UnknownFloats[2] = BBCenter.Z;
+
+            meshFile.UnknownFloats[3] = OBBTransform.M11; meshFile.UnknownFloats[4] = OBBTransform.M12; meshFile.UnknownFloats[5] = OBBTransform.M13;
+            meshFile.UnknownFloats[6] = OBBTransform.M21; meshFile.UnknownFloats[7] = OBBTransform.M22; meshFile.UnknownFloats[8] = OBBTransform.M23;
+            meshFile.UnknownFloats[9] = OBBTransform.M31; meshFile.UnknownFloats[10] = OBBTransform.M32; meshFile.UnknownFloats[11] = OBBTransform.M33;
+
+            meshFile.UnknownFloats[12] = BBSize.X;
+            meshFile.UnknownFloats[13] = BBSize.Y;
+            meshFile.UnknownFloats[14] = BBSize.Z;
+
+            return meshFile;
+        }
+
+        private static void GenerateBB(MeshObject meshObject, List<Vector3> positions)
+        {
+            Vector3 maxBB, minBB;
+            Tools.BBGenerator.GenerateAABB(positions, out maxBB, out minBB);
+            var BoundingSphere = SFGraphics.Utils.BoundingSphereGenerator.GenerateBoundingSphere(positions);
+
+            meshObject.BoundingSphereX = BoundingSphere.X;
+            meshObject.BoundingSphereY = BoundingSphere.Y;
+            meshObject.BoundingSphereZ = BoundingSphere.Z;
+            meshObject.BoundingSphereRadius = BoundingSphere.W;
+
+            meshObject.MaxBoundingBoxX = maxBB.X;
+            meshObject.MaxBoundingBoxY = maxBB.Y;
+            meshObject.MaxBoundingBoxZ = maxBB.Z;
+
+            meshObject.MinBoundingBoxX = minBB.X;
+            meshObject.MinBoundingBoxY = minBB.Y;
+            meshObject.MinBoundingBoxZ = minBB.Z;
+
+
+            //TODO: oriented bounding box
+            // using Axis aligned for now
+
+            Vector3 BBCenter = (maxBB + minBB) / 2;
+            Vector3 BBSize = (maxBB + minBB) / 2;
+            var OBBTransform = Matrix3.Identity;
+
+            meshObject.UnknownFloats[0] = BBCenter.X;
+            meshObject.UnknownFloats[1] = BBCenter.Y;
+            meshObject.UnknownFloats[2] = BBCenter.Z;
+
+            meshObject.UnknownFloats[3] = OBBTransform.M11; meshObject.UnknownFloats[4] = OBBTransform.M12; meshObject.UnknownFloats[5] = OBBTransform.M13;
+            meshObject.UnknownFloats[6] = OBBTransform.M21; meshObject.UnknownFloats[7] = OBBTransform.M22; meshObject.UnknownFloats[8] = OBBTransform.M23;
+            meshObject.UnknownFloats[9] = OBBTransform.M31; meshObject.UnknownFloats[10] = OBBTransform.M32; meshObject.UnknownFloats[11] = OBBTransform.M33;
+
+            meshObject.UnknownFloats[12] = BBSize.X;
+            meshObject.UnknownFloats[13] = BBSize.Y;
+            meshObject.UnknownFloats[14] = BBSize.Z;
         }
 
         private static SSBHVertexInfluence CreateInfluence(ushort VertexIndex, string BoneName, float Weight)

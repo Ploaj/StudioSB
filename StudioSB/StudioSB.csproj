@@ -176,6 +176,7 @@
     <Compile Include="IO\Models\IOModel.cs" />
     <Compile Include="Rendering\DefaultTextures.cs" />
     <Compile Include="Rendering\Shapes\Capsule.cs" />
+    <Compile Include="Rendering\Shapes\RectangularPrism.cs" />
     <Compile Include="Rendering\Shapes\ScreenTriangle.cs" />
     <Compile Include="Rendering\Shapes\Sphere.cs" />
     <Compile Include="Rendering\TextRenderer.cs" />
@@ -238,6 +239,7 @@
     <Compile Include="Rendering\ShaderManager.cs" />
     <Compile Include="Rendering\Shapes\BonePrism.cs" />
     <Compile Include="Rendering\Shapes\Grid3D.cs" />
+    <Compile Include="Tools\BBGenerator.cs" />
     <Compile Include="Tools\CrossMath.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\SwitchSwizzler.cs" />
@@ -475,6 +477,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\NormalMap.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\RectangularPrism.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\Sphere.vert">

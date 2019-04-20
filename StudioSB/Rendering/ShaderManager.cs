@@ -52,6 +52,9 @@ namespace StudioSB.Rendering
             Shader capShader = CreateCapsuleShader();
             shaderByName.Add("Capsule", capShader);
 
+            Shader primShader = CreatePrismShader();
+            shaderByName.Add("Prism", primShader);
+
             foreach (var pair in shaderByName)
             {
                 if (!pair.Value.LinkStatusIsOk)
@@ -87,6 +90,13 @@ namespace StudioSB.Rendering
         {
             Shader boneShader = new Shader();
             boneShader.LoadShaders(File.ReadAllText("Shaders/Bone.vert"), File.ReadAllText("Shaders/SolidColor.frag"));
+            return boneShader;
+        }
+
+        private static Shader CreatePrismShader()
+        {
+            Shader boneShader = new Shader();
+            boneShader.LoadShaders(File.ReadAllText("Shaders/RectangularPrism.vert"), File.ReadAllText("Shaders/SolidColor.frag"));
             return boneShader;
         }
 

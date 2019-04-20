@@ -14,6 +14,8 @@ namespace StudioSB.Scenes.Ultimate
         public Vector3 VolumeCenter { get; set; }
         public Vector3 VolumeSize { get; set; }
 
-        public Matrix4 VolumeTransform { get; set; }
+        public Vector3 OBBPosition { get; set; }
+        public Vector3 OBBSize { get; set; }
+        public Matrix4 OBBTransform { get; set; }
     }
 }

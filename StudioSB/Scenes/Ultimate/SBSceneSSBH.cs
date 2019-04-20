@@ -454,8 +454,10 @@ namespace StudioSB.Scenes.Ultimate
                 rmesh.Draw(shader, null);
             }
 
+            //Vector3 size = ((SBUltimateModel)Model).VolumeSize;
             //StudioSB.Rendering.Shapes.Sphere.DrawRectangularPrism(((SBUltimateModel)Model).VolumeCenter, size.X, size.Y, size.Z, true);
 
+            //StudioSB.Rendering.Shapes.RectangularPrism.DrawRectangularPrism(camera, ((SBUltimateModel)Model).OBBPosition, ((SBUltimateModel)Model).OBBSize * 2, ((SBUltimateModel)Model).OBBTransform);
             //StudioSB.Rendering.Shapes.Sphere.DrawSphereLegacy(Model.BoundingSphere.Xyz, Model.BoundingSphere.W, 20, true);
         }
 
