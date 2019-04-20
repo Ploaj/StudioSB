@@ -107,18 +107,17 @@ namespace StudioSB.Scenes.Ultimate
                     }
                     if (currentMaterial == null)
                         continue;
-
-                    int subindex = 0;
-                    string prevMesh = "";
+                    
+                    Dictionary<string, int> subindexMatcher = new Dictionary<string, int>();
                     if (Model != null)
                     {
                         foreach (var mesh in Model.Meshes)
                         {
-                            if (prevMesh.Equals(mesh.Name))
-                                subindex++;
-                            else
-                                subindex = 0;
-                            prevMesh = mesh.Name;
+                            if (!subindexMatcher.ContainsKey(mesh.Name))
+                                subindexMatcher.Add(mesh.Name, 0);
+
+                            int subindex = subindexMatcher[mesh.Name]++;
+                            
                             if (subindex == entry.SubIndex && mesh.Name.Equals(entry.MeshName))
                             {
                                 mesh.Material = currentMaterial;
@@ -465,8 +464,8 @@ namespace StudioSB.Scenes.Ultimate
                     transform = Skeleton[mesh.ParentBone].AnimatedWorldTransform;
                 var sphereTransform = transform;
 
-                //mesh.BoundingSphere.Render(camera, transform);
-                //mesh.AABoundingBox.Render(camera, transform);
+                mesh.BoundingSphere.Render(camera, transform);
+                mesh.AABoundingBox.Render(camera, transform);
                 mesh.OrientedBoundingBox.Render(camera, transform);
             }
 # endif

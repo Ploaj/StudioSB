@@ -287,7 +287,8 @@ namespace StudioSB.Scenes.Ultimate
                     tr.M31, tr.M32, tr.M33,
                 };
                 maker.SetOrientedBoundingBox(vectorToAttribute(mesh.OrientedBoundingBox.Position), vectorToAttribute(mesh.OrientedBoundingBox.Size), matxArr);
-                
+                //maker.SetOrientedBoundingBox(new SSBHVertexAttribute(), new SSBHVertexAttribute(), new float[9]);
+
                 // Add attributes
                 if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.Normal0))
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.Normal0, Normal0.ToArray());
