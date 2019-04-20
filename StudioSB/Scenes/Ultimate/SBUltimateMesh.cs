@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using OpenTK;
 using SSBHLib;
+using StudioSB.Rendering.Bounding;
 
 namespace StudioSB.Scenes.Ultimate
 {
     public class SBUltimateMesh<T> : ISBMesh
     {
-        public Vector4 BoundingSphere { get; set; }
-
-        public Vector3 AABBMin { get; set; }
-        public Vector3 AABBMax { get; set; }
+        public BoundingSphere BoundingSphere { get; set; }
+        public AABoundingBox AABoundingBox { get; set; }
+        public OrientedBoundingBox OrientedBoundingBox { get; set; }
 
         public override int PolyCount => Indices.Count;
         public override int VertexCount => Vertices.Count;

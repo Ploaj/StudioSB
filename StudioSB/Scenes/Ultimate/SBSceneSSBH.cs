@@ -464,11 +464,10 @@ namespace StudioSB.Scenes.Ultimate
                 if (Skeleton != null && mesh.ParentBone != "" && Skeleton.ContainsBone(mesh.ParentBone))
                     transform = Skeleton[mesh.ParentBone].AnimatedWorldTransform;
                 var sphereTransform = transform;
-                //Rendering.Shapes.Capsule.DrawCapsule(camera, mesh.BoundingSphere.W, sphereTransform, sphereTransform);
-                StudioSB.Rendering.Shapes.Sphere.DrawSphereLegacy(Vector3.TransformPosition(mesh.BoundingSphere.Xyz, transform), mesh.BoundingSphere.W, 20, true);
-                Vector3 size = mesh.AABBMax - mesh.AABBMin;
-                StudioSB.Rendering.Shapes.RectangularPrism.DrawRectangularPrism(camera, Vector3.Zero , size, Matrix4.CreateTranslation((mesh.AABBMin + mesh.AABBMax) / 2) * transform);
 
+                //mesh.BoundingSphere.Render(camera, transform);
+                //mesh.AABoundingBox.Render(camera, transform);
+                mesh.OrientedBoundingBox.Render(camera, transform);
             }
 # endif
 
