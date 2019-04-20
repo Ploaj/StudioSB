@@ -76,9 +76,14 @@ namespace StudioSB.Scenes.Ultimate
                                 }
                             }
                             sbMesh.Name = meshObject.Name;
-                            sbMesh.BoundingSphere = new Vector4(meshObject.BoundingSphereX, meshObject.BoundingSphereY, meshObject.BoundingSphereZ, meshObject.BoundingSphereRadius);
                             sbMesh.ParentBone = meshObject.ParentBoneName;
+                            
+                            sbMesh.BoundingSphere = new Vector4(meshObject.BoundingSphereX, meshObject.BoundingSphereY, meshObject.BoundingSphereZ, meshObject.BoundingSphereRadius);
+                            
+                            sbMesh.AABBMin = new Vector3(meshObject.MinBoundingBoxX, meshObject.MinBoundingBoxY, meshObject.MinBoundingBoxZ);
 
+                            sbMesh.AABBMax = new Vector3(meshObject.MaxBoundingBoxX, meshObject.MaxBoundingBoxY, meshObject.MaxBoundingBoxZ);
+                            
                             sbMesh.Indices = new List<uint>(accessor.ReadIndices(0, meshObject.IndexCount, meshObject));
                             sbMesh.Vertices = CreateVertices(mesh, Scene.Skeleton, meshObject, accessor, sbMesh.Indices.ToArray());
                             model.Meshes.Add(sbMesh);

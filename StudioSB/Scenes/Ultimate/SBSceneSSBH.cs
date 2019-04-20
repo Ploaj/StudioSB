@@ -452,7 +452,25 @@ namespace StudioSB.Scenes.Ultimate
                 // draw mesh
                 var rmesh = sbMeshToRenderMesh[mesh];
                 rmesh.Draw(shader, null);
+
             }
+
+#if DEBUG
+            foreach (var mesh in Model.Meshes)
+            {
+                if (!mesh.Selected) continue;
+
+                Matrix4 transform = Matrix4.Identity;
+                if (Skeleton != null && mesh.ParentBone != "" && Skeleton.ContainsBone(mesh.ParentBone))
+                    transform = Skeleton[mesh.ParentBone].AnimatedWorldTransform;
+                var sphereTransform = transform;
+                //Rendering.Shapes.Capsule.DrawCapsule(camera, mesh.BoundingSphere.W, sphereTransform, sphereTransform);
+                StudioSB.Rendering.Shapes.Sphere.DrawSphereLegacy(Vector3.TransformPosition(mesh.BoundingSphere.Xyz, transform), mesh.BoundingSphere.W, 20, true);
+                Vector3 size = mesh.AABBMax - mesh.AABBMin;
+                StudioSB.Rendering.Shapes.RectangularPrism.DrawRectangularPrism(camera, Vector3.Zero , size, Matrix4.CreateTranslation((mesh.AABBMin + mesh.AABBMax) / 2) * transform);
+
+            }
+# endif
 
             //Vector3 size = ((SBUltimateModel)Model).VolumeSize;
             //StudioSB.Rendering.Shapes.Sphere.DrawRectangularPrism(((SBUltimateModel)Model).VolumeCenter, size.X, size.Y, size.Z, true);
