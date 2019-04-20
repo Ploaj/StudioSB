@@ -8,6 +8,9 @@ namespace StudioSB.Scenes.Ultimate
     {
         public Vector4 BoundingSphere { get; set; }
 
+        public Vector3 AABBMin { get; set; }
+        public Vector3 AABBMax { get; set; }
+
         public override int PolyCount => Indices.Count;
         public override int VertexCount => Vertices.Count;
 

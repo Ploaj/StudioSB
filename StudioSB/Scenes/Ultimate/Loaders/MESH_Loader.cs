@@ -335,7 +335,7 @@ namespace StudioSB.Scenes.Ultimate
             //TODO: oriented bounding box
             // using Axis aligned for now
 
-            Vector3 BBCenter = (maxBB + minBB) / 2;
+            /*Vector3 BBCenter = (maxBB + minBB) / 2;
             Vector3 BBSize = (maxBB + minBB) / 2;
             var OBBTransform = Matrix3.Identity;
 
@@ -349,7 +349,7 @@ namespace StudioSB.Scenes.Ultimate
 
             meshFile.UnknownFloats[12] = BBSize.X;
             meshFile.UnknownFloats[13] = BBSize.Y;
-            meshFile.UnknownFloats[14] = BBSize.Z;
+            meshFile.UnknownFloats[14] = BBSize.Z;*/
 
             return meshFile;
         }
@@ -377,7 +377,7 @@ namespace StudioSB.Scenes.Ultimate
             //TODO: oriented bounding box
             // using Axis aligned for now
 
-            Vector3 BBCenter = (maxBB + minBB) / 2;
+            /*Vector3 BBCenter = (maxBB + minBB) / 2;
             Vector3 BBSize = (maxBB + minBB) / 2;
             var OBBTransform = Matrix3.Identity;
 
@@ -391,7 +391,7 @@ namespace StudioSB.Scenes.Ultimate
 
             meshObject.UnknownFloats[12] = BBSize.X;
             meshObject.UnknownFloats[13] = BBSize.Y;
-            meshObject.UnknownFloats[14] = BBSize.Z;
+            meshObject.UnknownFloats[14] = BBSize.Z;*/
         }
 
         private static SSBHVertexInfluence CreateInfluence(ushort VertexIndex, string BoneName, float Weight)
