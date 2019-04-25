@@ -246,7 +246,7 @@ namespace StudioSB.Scenes.Ultimate
                     Tangent0.Add(vectorToAttribute(vertex.Tangent0));
                     Map1.Add(vectorToAttribute(vertex.Map1));
                     UvSet.Add(vectorToAttribute(vertex.UvSet));
-                    colorSet1.Add(vectorToAttribute(new Vector4(128, 128, 128, 128)));
+                    colorSet1.Add(vectorToAttribute(vertex.ColorSet1 * 128));
 
                     if (vertex.BoneWeights.X > 0)
                         Influences.Add(CreateInfluence((ushort)VertexIndex, BoneNames[vertex.BoneIndices.X], vertex.BoneWeights.X));
