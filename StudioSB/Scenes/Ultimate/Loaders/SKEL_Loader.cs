@@ -56,16 +56,19 @@ namespace StudioSB.Scenes.Ultimate
 
             short index = 0;
             Dictionary<SBBone, short> BoneToIndex = new Dictionary<SBBone, short>();
-            foreach (var bone in Skeleton.Bones)
+            var OrderedBones = SortBones(Skeleton.Bones);
+
+            foreach (var bone in OrderedBones)
             {
                 BoneToIndex.Add(bone, index);
                 var boneentry = new SKEL_BoneEntry();
                 boneentry.Name = bone.Name;
                 boneentry.Type = bone.Type;
                 boneentry.ID = index++;
+                boneentry.Type = 1;
                 boneentry.ParentID = -1;
-                if (bone.Parent != null && BoneToIndex.ContainsKey(bone.Parent))
-                    boneentry.ParentID = BoneToIndex[bone.Parent];
+                if (bone.Parent != null)// && BoneToIndex.ContainsKey(bone.Parent))
+                    boneentry.ParentID = (short)OrderedBones.IndexOf(bone.Parent);
                 BoneEntries.Add(boneentry);
 
                 Transforms.Add(TKMatrix_to_Skel(bone.Transform));
@@ -83,6 +86,80 @@ namespace StudioSB.Scenes.Ultimate
             SSBH.TrySaveSSBHFile(FileName, skelFile);
         }
 
+        private static string[] FighterBoneSet = {
+            "Trans",
+            "Rot",
+            "Hip",
+            "Waist",
+            "Bust",
+            "Neck",
+            "Head",
+            "ClavicleC",
+            "ClavicleR",
+            "ShoulderR",
+            "ArmR",
+            "HandR",
+            "HaveR",
+            "ClavicleL",
+            "ShoulderL",
+            "ArmL",
+            "HandL",
+            "HaveL",
+            "LegC",
+            "LegL",
+            "KneeL",
+            "FootL",
+            "ToeL",
+            "LegR",
+            "KneeR",
+            "FootR",
+            "ToeR",
+            "Throw",
+        };
+
+        private static List<SBBone> SortBones(IEnumerable<SBBone> boneList)
+        {
+            var basic = new List<SBBone>();
+            var swing = new List<SBBone>();
+            var extra = new List<SBBone>();
+            var helper = new List<SBBone>();
+
+            // first collect basic strings
+            var copy = new List<SBBone>(boneList);
+
+            foreach(var s in FighterBoneSet)
+            {
+                foreach(var b in copy)
+                {
+                    if(b.Name.Equals(s))
+                    {
+                        basic.Add(b);
+                        break;
+                    }
+                }
+            }
+            foreach(var b in basic)
+                copy.Remove(b);
+
+            // every other bone
+            foreach(SBBone b in copy)
+            {
+                if (b.Name.StartsWith("S_"))
+                    swing.Add(b);
+                else if (b.Name.StartsWith("H_"))
+                    helper.Add(b);
+                else
+                    extra.Add(b);
+            }
+
+            var finalList = new List<SBBone>();
+            finalList.AddRange(basic);
+            finalList.AddRange(swing);
+            finalList.AddRange(extra);
+            finalList.AddRange(helper);
+
+            return finalList;
+        }
 
         private static Matrix4 Skel_to_TKMatrix(SKEL_Matrix sm)
         {
