@@ -1,7 +1,5 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using StudioSB.Scenes;
-using StudioSB.GUI.Editors;
 
 namespace StudioSB.GUI
 {

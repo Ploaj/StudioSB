@@ -243,11 +243,11 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// Calls method 'func' on object 'obj' passing parameters 'parameters'
+        /// Calls method <paramref name="func"/> on object <paramref name="obj"/> passing parameters 'parameters'
         /// </summary>
-        /// <param name="obj">The object on which to excute function 'func'</param>
+        /// <param name="obj">The object on which to execute <paramref name="func"/></param>
         /// <param name="func">The function to execute</param>
-        /// <param name="parameters">The parameters to pass to function 'func'</param>
+        /// <param name="parameters">The parameters to pass to <paramref name="func"/></param>
         /// <returns>The result of the function invocation</returns>
         public object Call(object obj, string func, params object[] parameters)
         {
@@ -255,11 +255,11 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// Calls method 'func' on object 'obj' passing parameters 'parameters'
+        /// Calls method <paramref name="func"/> on object <paramref name="obj"/> passing parameters 'parameters'
         /// </summary>
-        /// <param name="obj">The object on which to excute function 'func'</param>
+        /// <param name="obj">The object on which to execute function <paramref name="func"/></param>
         /// <param name="func">The function to execute</param>
-        /// <param name="parameters">The parameters to pass to function 'func'</param>
+        /// <param name="parameters">The parameters to pass to function <paramref name="func"/></param>
         /// <returns>The result of the function invocation</returns>
         public object Call2(object obj, string func, object[] parameters)
         {
@@ -267,12 +267,12 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// Calls method 'func' on object 'obj' which is of type 'type' passing parameters 'parameters'
+        /// Calls method <paramref name="func"/> on object <paramref name="obj"/> which is of type <paramref name="type"/> passing parameters 'parameters'
         /// </summary>
-        /// <param name="type">The type of 'obj'</param>
-        /// <param name="obj">The object on which to excute function 'func'</param>
+        /// <param name="type">The type of <paramref name="obj"/></param>
+        /// <param name="obj">The object on which to execute function <paramref name="func"/></param>
         /// <param name="func">The function to execute</param>
-        /// <param name="parameters">The parameters to pass to function 'func'</param>
+        /// <param name="parameters">The parameters to pass to function <paramref name="func"/></param>
         /// <returns>The result of the function invocation</returns>
         public object CallAs(Type type, object obj, string func, params object[] parameters)
         {
@@ -280,12 +280,12 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// Calls method 'func' on object 'obj' which is of type 'type' passing parameters 'parameters'
+        /// Calls method <paramref name="func"/> on object <paramref name="obj"/> which is of type <paramref name="type"/> passing parameters 'parameters'
         /// </summary>
-        /// <param name="type">The type of 'obj'</param>
-        /// <param name="obj">The object on which to excute function 'func'</param>
+        /// <param name="type">The type of <paramref name="obj"/></param>
+        /// <param name="obj">The object on which to execute function <paramref name="func"/></param>
         /// <param name="func">The function to execute</param>
-        /// <param name="parameters">The parameters to pass to function 'func'</param>
+        /// <param name="parameters">The parameters to pass to function <paramref name="func"/></param>
         /// <returns>The result of the function invocation</returns>
         public object CallAs2(Type type, object obj, string func, object[] parameters)
         {
@@ -294,9 +294,9 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// Returns the value of property 'prop' of object 'obj'
+        /// Returns the value of property <paramref name="prop"/> of object <paramref name="obj"/>
         /// </summary>
-        /// <param name="obj">The object containing 'prop'</param>
+        /// <param name="obj">The object containing <paramref name="prop"/></param>
         /// <param name="prop">The property name</param>
         /// <returns>The property value</returns>
         public object Get(object obj, string prop)
@@ -305,10 +305,10 @@ namespace System.Windows.Forms
         }
 
         /// <summary>
-        /// Returns the value of property 'prop' of object 'obj' which has type 'type'
+        /// Returns the value of property <paramref name="prop"/> of object <paramref name="obj"/> which has type <paramref name="type"/>
         /// </summary>
-        /// <param name="type">The type of 'obj'</param>
-        /// <param name="obj">The object containing 'prop'</param>
+        /// <param name="type">The type of <paramref name="obj"/></param>
+        /// <param name="obj">The object containing <paramref name="prop"/></param>
         /// <param name="prop">The property name</param>
         /// <returns>The property value</returns>
         public static object GetAs(Type type, object obj, string prop)

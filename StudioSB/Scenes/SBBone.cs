@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using OpenTK;
-using StudioSB.GUI.Editors;
 
 namespace StudioSB.Scenes
 {

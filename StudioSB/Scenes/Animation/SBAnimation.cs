@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace StudioSB.Scenes.Animation
 {
@@ -32,7 +31,7 @@ namespace StudioSB.Scenes.Animation
             {
                 foreach (var mesh in scene.GetMeshObjects())
                 {
-                    // names match with start ignoreing the _VIS tags
+                    // names match with start ignoring the _VIS tags
                     if (a.MeshName != null && mesh.Name.StartsWith(a.MeshName))
                     {
                         mesh.Visible = a.Visibility.GetValue(Frame);

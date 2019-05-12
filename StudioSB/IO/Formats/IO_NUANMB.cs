@@ -1,5 +1,4 @@
-﻿using System;
-using SSBHLib.Formats.Animation;
+﻿using SSBHLib.Formats.Animation;
 using SSBHLib;
 using SSBHLib.Tools;
 using StudioSB.Scenes.Animation;

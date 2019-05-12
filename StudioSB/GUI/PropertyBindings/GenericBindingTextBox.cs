@@ -67,7 +67,7 @@ namespace StudioSB.GUI
         }
         
         /// <summary>
-        /// Trys to set the value
+        /// Tries to set the value
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>

@@ -1,5 +1,4 @@
-﻿using System;
-using SFGraphics.GLObjects.Shaders;
+﻿using SFGraphics.GLObjects.Shaders;
 using System.Reflection;
 using OpenTK;
 using System.Collections.Generic;

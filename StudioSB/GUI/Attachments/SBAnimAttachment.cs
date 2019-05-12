@@ -1,5 +1,4 @@
-﻿using System;
-using StudioSB.Scenes.Animation;
+﻿using StudioSB.Scenes.Animation;
 using System.Windows.Forms;
 
 namespace StudioSB.GUI.Attachments
