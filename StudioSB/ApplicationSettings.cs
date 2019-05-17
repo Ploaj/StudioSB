@@ -97,7 +97,7 @@ namespace StudioSB
         [SettingsGroup(SettingsGroupType.Viewport, "Use legacy OpenGL rendering instead of shaders", "Use Legacy Rendering (Very Slow)")]
         public static bool UseLegacyRendering { get; set; } = false;
         
-        [SettingsGroup(SettingsGroupType.Material, "Renders the mesh wireframes (not availiable with legacy rendering)", "Render Wireframes")]
+        [SettingsGroup(SettingsGroupType.Material, "Renders the mesh wireframes (not available with legacy rendering)", "Render Wireframes")]
         public static bool EnableWireframe { get; set; } = false;
 
         [SettingsGroup(SettingsGroupType.Viewport, "Renders the polygon and vertex counts for the scene", "Render Scene Information")]
@@ -118,7 +118,7 @@ namespace StudioSB
         [SettingsGroup(SettingsGroupType.Viewport, "Bottom Background Color in Viewport", "Back Gradient")]
         public static Color BGColor2 { get; set; } = Color.DarkGray;
 
-        [SettingsGroup(SettingsGroupType.Viewport, "Color of the the viewport grid's lines", "Grid Color")]
+        [SettingsGroup(SettingsGroupType.Viewport, "Color of the viewport grid's lines", "Grid Color")]
         public static Color GridLineColor { get; set; } = Color.Ivory;
 
         //skeleton
@@ -162,10 +162,10 @@ namespace StudioSB
         public static Vector4 RenderChannels { get; set; } = new Vector4(1, 1, 1, 1);
 
         /// <summary>
-        /// Skins and applys application setting to given control
-        /// This should be applied to the creation of all SB controls
+        /// Skins and applies application setting to the given control.
+        /// This should be applied to the creation of all SB controls.
         /// </summary>
-        /// <param name="c"></param>
+        /// <param name="control">The control to skin</param>
         public static void SkinControl(object control)
         {
             if (control is Control con)
@@ -198,18 +198,20 @@ namespace StudioSB
                     while (!reader.EndOfStream)
                     {
                         string line = reader.ReadLine();
-                        if (!line.Contains("=")) continue;
+                        if (!line.Contains("="))
+                            continue;
                         
-                            string[] args = line.Split('=');
-                            string PropertyName = args[0].Trim();
-                            string Value = args[1].Trim();
+                        string[] args = line.Split('=');
+                        string propertyName = args[0].Trim();
+                        string value = args[1].Trim();
 
-                            var property = typeof(ApplicationSettings).GetProperty(PropertyName);
+                        var property = typeof(ApplicationSettings).GetProperty(propertyName);
 
-                            if (property == null) continue;
-                        if (property.PropertyType == typeof(Color) && Value.Contains("#"))
+                        if (property == null)
+                            continue;
+                        if (property.PropertyType == typeof(Color) && value.Contains("#"))
                         {
-                            Color col = ColorTranslator.FromHtml(Value);
+                            Color col = ColorTranslator.FromHtml(value);
                             property.SetValue(null, col);
                         }
                         else
@@ -219,7 +221,7 @@ namespace StudioSB
                                 var converter = TypeDescriptor.GetConverter(property.PropertyType);
                                 if (converter != null)
                                 {
-                                    property.SetValue(null, converter.ConvertFromString(Value));
+                                    property.SetValue(null, converter.ConvertFromString(value));
                                 }
                             }
                             catch (NotSupportedException)

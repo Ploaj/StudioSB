@@ -1,5 +1,4 @@
-﻿using OpenTK;
-using SFGraphics.Cameras;
+﻿using SFGraphics.Cameras;
 using StudioSB.IO.Models;
 using System.Collections.Generic;
 

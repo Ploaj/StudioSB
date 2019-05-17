@@ -23,7 +23,7 @@ namespace StudioSB
 
         private SBMenuBar MenuBar { get; set; }
 
-        // constand panels
+        // constant panels
 
         private SBProjectTree projectTree { get; set; }
 

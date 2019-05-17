@@ -1,5 +1,4 @@
-﻿using System;
-using StudioSB.Scenes;
+﻿using StudioSB.Scenes;
 using StudioSB.Scenes.Animation;
 
 namespace StudioSB.IO

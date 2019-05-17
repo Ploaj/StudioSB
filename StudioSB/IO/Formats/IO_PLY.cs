@@ -17,12 +17,12 @@ namespace StudioSB.IO.Formats
 
             if (model.HasMeshes)
             {
-                //.ply only support a sigle mesh, So export each mesh as a seperate file
+                //.ply only supports a single mesh, so export each mesh as a separate file
                 foreach (IOMesh mesh in model.Meshes)
                 {
                     StringBuilder o = new StringBuilder();
 
-                    //Using \n instead of AppendLine because it adds a white space, no text editor can see.
+                    //Using \n instead of AppendLine because it adds a white space no text editor can see.
                     //No idea why. Opening it in a hex editor shows 0D
                     //.ply doesn't support white spaces unless it's a comment
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 namespace StudioSB.Scenes.Animation
 {
     public class SBKeyGroup<T>

@@ -1,11 +1,8 @@
-﻿using System;
-using SFGraphics.Cameras;
+﻿using SFGraphics.Cameras;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
-using StudioSB.Rendering.Shapes;
 using System.Collections.Generic;
 using SFGenericModel.VertexAttributes;
-using System.Windows.Forms;
 
 namespace StudioSB.Rendering
 {

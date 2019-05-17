@@ -8,7 +8,6 @@ using SFGraphics.Controls;
 using OpenTK.Graphics.OpenGL;
 using StudioSB.Rendering;
 using StudioSB.GUI.Menus;
-using System.IO;
 
 namespace StudioSB.GUI.Editors
 {
@@ -201,16 +200,17 @@ namespace StudioSB.GUI.Editors
         /// <summary>
         /// Exports material to file
         /// </summary>
-        /// <param name="material"></param>
+        /// <param name="FileName">The output file path</param>
+        /// <param name="material">The material to export</param>
         private void ExportMaterial(string FileName, ISBMaterial material)
         {
             material.ExportMaterial(FileName);
         }
 
         /// <summary>
-        /// Imports materail from file
+        /// Imports material from file
         /// </summary>
-        /// <param name="material"></param>
+        /// <param name="FileName"></param>
         private void ImportMaterial(string FileName)
         {
 
