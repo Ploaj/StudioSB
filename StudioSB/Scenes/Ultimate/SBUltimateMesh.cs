@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SSBHLib;
 using StudioSB.Rendering.Bounding;
+using OpenTK;
 
 namespace StudioSB.Scenes.Ultimate
 {
