@@ -7,7 +7,7 @@ namespace StudioSB.Scenes.Ultimate
 {
     public class SKEL_Loader
     {
-        public static void Open(string FileName, SBScene Scene)
+        public static SBSkeleton Open(string FileName, SBScene Scene)
         {
             ISSBH_File File;
             if (SSBH.TryParseSSBHFile(FileName, out File))
@@ -35,8 +35,11 @@ namespace StudioSB.Scenes.Ultimate
                     {
                         v.Key.Parent = idToBone[v.Value];
                     }
+
+                    return Skeleton;
                 }
             }
+            return null;
         }
 
         public static void Save(string FileName, SBScene Scene)

@@ -37,7 +37,7 @@ namespace StudioSB.Scenes.Ultimate
                     {
                         foreach (var meshObject in mesh.Objects)
                         {
-                            SBUltimateMesh<UltimateVertex> sbMesh = new SBUltimateMesh<UltimateVertex>();
+                            SBUltimateMesh sbMesh = new SBUltimateMesh();
                             foreach (var attr in meshObject.Attributes)
                             {
                                 foreach (var atstring in attr.AttributeStrings)
@@ -82,6 +82,7 @@ namespace StudioSB.Scenes.Ultimate
             var uvSet1Values = vertexAccessor.ReadAttribute("uvSet1", 0, meshObject.VertexCount, meshObject);
             var bake1Values = vertexAccessor.ReadAttribute("bake1", 0, meshObject.VertexCount, meshObject);
             var colorSet1Values = vertexAccessor.ReadAttribute("colorSet1", 0, meshObject.VertexCount, meshObject);
+            var colorSet2Values = vertexAccessor.ReadAttribute("colorSet2", 0, meshObject.VertexCount, meshObject);
             var colorSet5Values = vertexAccessor.ReadAttribute("colorSet5", 0, meshObject.VertexCount, meshObject);
 
             var generatedBitangents = GenerateBitangents(vertexIndices, positions, map1Values);
@@ -133,11 +134,15 @@ namespace StudioSB.Scenes.Ultimate
                 if (colorSet1Values.Length != 0)
                     colorSet1 = GetVector4(colorSet1Values[i]) / 128.0f;
 
+                var colorSet2 = new Vector4(1);
+                if (colorSet2Values.Length != 0)
+                    colorSet2 = GetVector4(colorSet2Values[i]) / 128.0f;
+
                 var colorSet5 = new Vector4(1);
                 if (colorSet5Values.Length != 0)
                     colorSet5 = GetVector4(colorSet5Values[i]) / 128.0f;
 
-                vertices.Add(new UltimateVertex(position, normal, tangent, bitangent, map1, uvSet, uvSet1, bones, weights, bake1, colorSet1, colorSet5));
+                vertices.Add(new UltimateVertex(position, normal, tangent, bitangent, map1, uvSet, uvSet1, bones, weights, bake1, colorSet1, colorSet2, colorSet5));
             }
 
             return vertices;
@@ -230,6 +235,8 @@ namespace StudioSB.Scenes.Ultimate
                 List<SSBHVertexAttribute> Map1 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> UvSet = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> colorSet1 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> colorSet2 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> colorSet5 = new List<SSBHVertexAttribute>();
 
                 List<SSBHVertexInfluence> Influences = new List<SSBHVertexInfluence>();
 
@@ -247,6 +254,8 @@ namespace StudioSB.Scenes.Ultimate
                     Map1.Add(vectorToAttribute(vertex.Map1));
                     UvSet.Add(vectorToAttribute(vertex.UvSet));
                     colorSet1.Add(vectorToAttribute(vertex.ColorSet1 * 128));
+                    colorSet2.Add(vectorToAttribute(vertex.ColorSet2 * 128));
+                    colorSet5.Add(vectorToAttribute(vertex.ColorSet5 * 128));
 
                     if (vertex.BoneWeights.X > 0)
                         Influences.Add(CreateInfluence((ushort)VertexIndex, BoneNames[vertex.BoneIndices.X], vertex.BoneWeights.X));
@@ -268,12 +277,6 @@ namespace StudioSB.Scenes.Ultimate
 
                 // start creating the mesh object
                 maker.StartMeshObject(mesh.Name, Indices, Position0.ToArray(), mesh.ParentBone);
-
-                // generate bounding info
-
-                mesh.BoundingSphere = new BoundingSphere(meshVertices);
-                mesh.AABoundingBox = new AABoundingBox(meshVertices);
-                mesh.OrientedBoundingBox = new OrientedBoundingBox(meshVertices);
 
                 // set bounding info
 
@@ -300,6 +303,10 @@ namespace StudioSB.Scenes.Ultimate
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet, UvSet.ToArray());
                 if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.colorSet1))
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet1, colorSet1.ToArray());
+                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.colorSet2))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2, colorSet2.ToArray());
+                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.colorSet5))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet5, colorSet5.ToArray());
 
                 // Add rigging
                 if (mesh.ParentBone == "")

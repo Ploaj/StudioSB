@@ -4,11 +4,11 @@ using StudioSB.Rendering.Bounding;
 
 namespace StudioSB.Scenes.Ultimate
 {
-    public class SBUltimateModel : ISBModel<SBUltimateMesh<UltimateVertex>>
+    public class SBUltimateModel : ISBModel<SBUltimateMesh>
     {
         public string Name { get; set; }
 
-        public List<SBUltimateMesh<UltimateVertex>> Meshes { get; set; } = new List<SBUltimateMesh<UltimateVertex>>();
+        public List<SBUltimateMesh> Meshes { get; set; } = new List<SBUltimateMesh>();
 
         public Vector4 BoundingSphere { get; set; }
         

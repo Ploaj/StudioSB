@@ -17,15 +17,17 @@ namespace StudioSB.Scenes.Ultimate
     [SceneFileInformation("NU Model File Binary", ".numdlb", "The model specification for Smash Ultimate models", sceneCode: "SSBU")]
     public class SBSceneSSBH : SBScene
     {
+        public static SBUltimateImportSettings ImportSettings = new SBUltimateImportSettings();
+
         /// <summary>
         /// 
         /// </summary>
-        public ISBModel<SBUltimateMesh<UltimateVertex>> Model { get; set; }
+        public ISBModel<SBUltimateMesh> Model { get; set; }
 
         public Dictionary<string, SBSurface> nameToSurface = new Dictionary<string, SBSurface>();
 
         // Rendering
-        public Dictionary<SBUltimateMesh<UltimateVertex>, UltimateRenderMesh> sbMeshToRenderMesh = new Dictionary<SBUltimateMesh<UltimateVertex>, UltimateRenderMesh>();
+        public Dictionary<SBUltimateMesh, UltimateRenderMesh> sbMeshToRenderMesh = new Dictionary<SBUltimateMesh, UltimateRenderMesh>();
         public Dictionary<SBSurface, Texture> surfaceToRenderTexture = new Dictionary<SBSurface, Texture>();
         public BufferObject boneUniformBuffer;
         Matrix4[] boneBinds = new Matrix4[200];
@@ -253,7 +255,7 @@ namespace StudioSB.Scenes.Ultimate
 
             foreach (var iomesh in iomodel.Meshes)
             {
-                SBUltimateMesh<UltimateVertex> mesh = new SBUltimateMesh<UltimateVertex>();
+                SBUltimateMesh mesh = new SBUltimateMesh();
                 mesh.Name = iomesh.Name;
                 mesh.ParentBone = "";
                 mesh.Material = material;
@@ -301,6 +303,9 @@ namespace StudioSB.Scenes.Ultimate
                 if(Has2ndUVChannel)
                     mesh.ExportAttributes.Add(UltimateVertexAttribute.uvSet);
                 mesh.ExportAttributes.Add(UltimateVertexAttribute.colorSet1);
+
+                // calculate bounding information
+                mesh.CalculateBounding();
             }
 
             Model = model;
@@ -316,7 +321,7 @@ namespace StudioSB.Scenes.Ultimate
                     Y = (int)iov.BoneIndices.Y,
                     Z = (int)iov.BoneIndices.Z,
                     W = (int)iov.BoneIndices.W },
-                 singleBound ? Vector4.Zero : iov.BoneWeights, Vector2.Zero, iov.Color, Vector4.One);
+                 singleBound ? Vector4.Zero : iov.BoneWeights, Vector2.Zero, iov.Color, Vector4.One, Vector4.One);
         }
 
         /// <summary>

@@ -48,10 +48,13 @@ namespace StudioSB.Scenes.Ultimate
         [VertexFloat("colorSet1", ValueCount.Four, VertexAttribPointerType.Float)]
         public Vector4 ColorSet1 { get; }
 
+        [VertexFloat("colorSet2", ValueCount.Four, VertexAttribPointerType.Float)]
+        public Vector4 ColorSet2 { get; }
+
         [VertexFloat("colorSet5", ValueCount.Four, VertexAttribPointerType.Float)]
         public Vector4 ColorSet5 { get; }
 
-        public UltimateVertex(Vector3 position0, Vector3 normal0, Vector3 tangent0, Vector3 bitangent0, Vector2 map1, Vector2 uvSet, Vector2 uvSet1, IVec4 boneIndices, Vector4 boneWeights, Vector2 bake1, Vector4 colorSet1, Vector4 colorSet5)
+        public UltimateVertex(Vector3 position0, Vector3 normal0, Vector3 tangent0, Vector3 bitangent0, Vector2 map1, Vector2 uvSet, Vector2 uvSet1, IVec4 boneIndices, Vector4 boneWeights, Vector2 bake1, Vector4 colorSet1, Vector4 colorSet2, Vector4 colorSet5)
         {
             Position0 = position0;
             Normal0 = normal0;
@@ -64,6 +67,7 @@ namespace StudioSB.Scenes.Ultimate
             BoneWeights = boneWeights;
             Bake1 = bake1;
             ColorSet1 = colorSet1;
+            ColorSet2 = colorSet2;
             ColorSet5 = colorSet5;
         }
     }

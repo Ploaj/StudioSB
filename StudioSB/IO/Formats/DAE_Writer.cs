@@ -800,23 +800,27 @@ namespace StudioSB.IO.Formats
                 }
                 else
                 {
-                    writer.WriteStartElement("instance_controller");
-                    writer.WriteAttributeString("url", $"#{m.Value}");
-                    writer.WriteStartElement("skeleton");
-                    writer.WriteString("#Armature_" + Joints[0].Name);
-                    writer.WriteEndElement();
-                    if (MeshIdToMaterial.ContainsKey(m.Key))
+                    if(Joints.Count > 0)
                     {
-                        writer.WriteStartElement("bind_material");
-                        writer.WriteStartElement("technique_common");
-                        writer.WriteStartElement("instance_material");
-                        writer.WriteAttributeString("symbol", MeshIdToMaterial[m.Key]);
-                        writer.WriteAttributeString("target", "#" + MeshIdToMaterial[m.Key]);
+                        writer.WriteStartElement("instance_controller");
+                        writer.WriteAttributeString("url", $"#{m.Value}");
+                        writer.WriteStartElement("skeleton");
+                        writer.WriteString("#Armature_" + Joints[0].Name);
                         writer.WriteEndElement();
-                        writer.WriteEndElement();
+                        if (MeshIdToMaterial.ContainsKey(m.Key))
+                        {
+                            writer.WriteStartElement("bind_material");
+                            writer.WriteStartElement("technique_common");
+                            writer.WriteStartElement("instance_material");
+                            writer.WriteAttributeString("symbol", MeshIdToMaterial[m.Key]);
+                            writer.WriteAttributeString("target", "#" + MeshIdToMaterial[m.Key]);
+                            writer.WriteEndElement();
+                            writer.WriteEndElement();
+                            writer.WriteEndElement();
+                        }
                         writer.WriteEndElement();
                     }
-                    writer.WriteEndElement();
+                    
                 }
 
 
