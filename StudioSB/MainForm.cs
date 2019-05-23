@@ -94,7 +94,7 @@ namespace StudioSB
                 {
                     var open = new SBToolStripMenuItem("Import");
                     {
-                        var scene = new SBToolStripMenuItem("Model Into Scene");
+                        var scene = new SBToolStripMenuItem("Model");
                         scene.Click += ImportToScene;
                         open.DropDownItems.Add(scene);
 
@@ -517,7 +517,6 @@ namespace StudioSB
             /// <param name="args"></param>
         public void ImportToScene(object sender, EventArgs args)
         {
-
             string Filter = "";
 
             //Create filter
@@ -551,16 +550,16 @@ namespace StudioSB
                                 SBConsole.WriteLine("No scene loaded, defaulted to Smash Ultimate scene");
                                 scene = new SBSceneSSBH();
                                 
-                                using (var dialog = new SBCustomDialog(SBSceneSSBH.ImportSettings))
+                                using (var dialog = new SBCustomDialog(SBSceneSSBH.NewImportSettings))
                                     Result = dialog.ShowDialog();
 
                                 if (Result == DialogResult.OK)
                                 {
-                                    if(SBSceneSSBH.ImportSettings.NUMATLB != null && SBSceneSSBH.ImportSettings.NUMATLB != "")
-                                        MATL_Loader.Open(SBSceneSSBH.ImportSettings.NUMATLB, scene);
+                                    if(SBSceneSSBH.NewImportSettings.NUMATLB != null && SBSceneSSBH.NewImportSettings.NUMATLB != "")
+                                        MATL_Loader.Open(SBSceneSSBH.NewImportSettings.NUMATLB, scene);
 
-                                    if(SBSceneSSBH.ImportSettings.NUSKTFile != null && SBSceneSSBH.ImportSettings.NUSKTFile != "")
-                                        ioModel.Skeleton = SKEL_Loader.Open(SBSceneSSBH.ImportSettings.NUSKTFile, scene);
+                                    if(SBSceneSSBH.NewImportSettings.NUSKTFile != null && SBSceneSSBH.NewImportSettings.NUSKTFile != "")
+                                        ioModel.Skeleton = SKEL_Loader.Open(SBSceneSSBH.NewImportSettings.NUSKTFile, scene);
                                 }
                                 else
                                 {
@@ -569,7 +568,25 @@ namespace StudioSB
                                 }
                             }
                             else
+                            {
                                 scene = viewportPanel.LoadedScene;
+
+                                using (var dialog = new SBCustomDialog(SBSceneSSBH.ImportSettings))
+                                    Result = dialog.ShowDialog();
+
+                                if (Result == DialogResult.OK)
+                                {
+                                    if (SBSceneSSBH.ImportSettings.UseExistingSkeleton)
+                                    {
+                                        ioModel.ConvertToSkeleton((SBSkeleton)scene.Skeleton);
+                                    }
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Failed to import model");
+                                    return;
+                                }
+                            }
 
                             scene.FromIOModel(ioModel);
                             viewportPanel.SetScene(scene);

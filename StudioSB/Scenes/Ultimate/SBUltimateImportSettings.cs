@@ -6,6 +6,13 @@ namespace StudioSB.Scenes.Ultimate
 {
     public class SBUltimateImportSettings
     {
+        [DisplayName("Use Existing Skeleton"),
+        Description("Uses the already existing skeleton instead of the imported one (Recommended)")]
+        public bool UseExistingSkeleton { get; set; } = true;
+        
+    }
+    public class SBUltimateNewImportSettings
+    {
         [Editor(
         typeof(FilteredFileNameEditor),
         typeof(UITypeEditor)),

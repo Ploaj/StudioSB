@@ -17,6 +17,7 @@ namespace StudioSB.Scenes.Ultimate
     public class SBSceneSSBH : SBScene
     {
         public static SBUltimateImportSettings ImportSettings = new SBUltimateImportSettings();
+        public static SBUltimateNewImportSettings NewImportSettings = new SBUltimateNewImportSettings();
 
         /// <summary>
         /// 
@@ -250,7 +251,7 @@ namespace StudioSB.Scenes.Ultimate
                 material = (UltimateMaterial)Materials[0];
             
             // convert meshes
-            SBUltimateModel model = new SBUltimateModel();
+            SBUltimateModel model = Model == null ? new SBUltimateModel() : (SBUltimateModel)Model;
 
             foreach (var iomesh in iomodel.Meshes)
             {
