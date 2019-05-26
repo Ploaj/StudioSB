@@ -209,6 +209,7 @@ namespace StudioSB.Scenes
         public Matrix4 AnimatedTransform { get; set; }
 
         public float AnimatedCompensateScale { get; set; }
+        
         public bool EnableAnimatedCompensateScale { get; set; } = false;
 
         public Matrix4 AnimatedBindMatrix

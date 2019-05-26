@@ -320,6 +320,7 @@ namespace StudioSB.IO.Formats
                 SBConsole.WriteLine($"Imported {pair.Key} from SMD");
 
                 //finalize rigging
+                if(indexToBone.Count > 0)
                 for(int i = 0; i < pair.Value.Vertices.Count; i++)
                 {
                     var vertex = pair.Value.Vertices[i];

@@ -5,13 +5,17 @@ using System.Collections.Generic;
 using StudioSB.Rendering;
 using SSBHLib.Formats.Materials;
 using OpenTK.Graphics.OpenGL;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace StudioSB.Scenes.Ultimate
 {
     public class UltimateMaterial : ISBMaterial
     {
+        [Category("Material Info"), Description("Name used for linking to Mesh Objects")]
         public string Name { get; set; }
 
+        [Category("Material Info"), Description("Label used for material animations and various misc")]
         public string Label { get; set; }
 
         #region States
@@ -36,8 +40,15 @@ namespace StudioSB.Scenes.Ultimate
         [MATLLoaderAttributeName("CustomVector8")]
         public SBMatAttrib<Vector4> paramA0 { get; } = new SBMatAttrib<Vector4>("CustomVector8", new Vector4(1), description: "Diffuse color multiplier?");
 
-        [MATLLoaderAttributeName("CustomVector11")]
+        [Browsable(false), MATLLoaderAttributeName("CustomVector11")]
         public SBMatAttrib<Vector4> paramA3 { get; } = new SBMatAttrib<Vector4>("CustomVector11", new Vector4(0), description: "Some sort of skin subsurface color", isColor: true);
+
+        [Category("Colors"), DisplayName("CustomVector11"), Description("Some sort of skin subsurface color")]
+        public Color paramA3View
+        {
+            get => Color.FromArgb((byte)(paramA3.Value.W * 255), (byte)(paramA3.Value.X * 255), (byte)(paramA3.Value.Y * 255), (byte)(paramA3.Value.Z* 255));
+            set => paramA3.Value = new Vector4(value.R / 255f, value.B / 255f, value.G / 255f, value.A / 255f);
+        } 
 
         [MATLLoaderAttributeName("CustomVector13")]
         public SBMatAttrib<Vector4> paramA5 { get; } = new SBMatAttrib<Vector4>("CustomVector13", new Vector4(1), description: "Diffuse color multiplier?");

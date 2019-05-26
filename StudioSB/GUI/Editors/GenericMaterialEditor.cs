@@ -31,6 +31,7 @@ namespace StudioSB.GUI.Editors
         private SBListView materialList;
         private GenericBindingTextBox<string> materialLabel;
         private GenericBindingTextBox<string> materialName;
+        private PropertyGrid propertyPanel;
 
         private ISBMaterial CurrentMaterial;
 
@@ -88,14 +89,14 @@ namespace StudioSB.GUI.Editors
             mainPanel.AutoScroll = true;
             mainPanel.Dock = DockStyle.Fill;
 
-            vectorSection = new SBPopoutPanel(PopoutSide.Bottom, "Vectors", "Vectors");
+            /*vectorSection = new SBPopoutPanel(PopoutSide.Bottom, "Vectors", "Vectors");
             vectorSection.Dock = DockStyle.Top;
 
             floatSection = new SBPopoutPanel(PopoutSide.Bottom, "Floats", "Floats");
             floatSection.Dock = DockStyle.Top;
 
             boolSection = new SBPopoutPanel(PopoutSide.Bottom, "Bools", "Bools");
-            boolSection.Dock = DockStyle.Top;
+            boolSection.Dock = DockStyle.Top;*/
 
             mainPanel.Controls.Add(vectorSection);
             mainPanel.Controls.Add(floatSection);
@@ -109,7 +110,12 @@ namespace StudioSB.GUI.Editors
 
             materialName = new GenericBindingTextBox<string>();
             materialName.Dock = DockStyle.Top;
+            
 
+            propertyPanel = new PropertyGrid();
+            propertyPanel.Dock = DockStyle.Fill;
+
+            Controls.Add(propertyPanel);
             Controls.Add(mainPanel);
             //Controls.Add(viewport);
             Controls.Add(materialName);
@@ -191,9 +197,9 @@ namespace StudioSB.GUI.Editors
         {
             //applyToMesh.Enabled = false;
             CurrentMaterial = null;
-            boolSection.Contents.Clear();
+            /*boolSection.Contents.Clear();
             floatSection.Contents.Clear();
-            vectorSection.Contents.Clear();
+            vectorSection.Contents.Clear();*/
             toolTips.RemoveAll();
         }
         
@@ -272,7 +278,8 @@ namespace StudioSB.GUI.Editors
         /// <returns></returns>
         private Control CreateControl(PropertyInfo property, object Object)
         {
-            if(property.PropertyType == typeof(SBMatAttrib<Vector4>))
+            propertyPanel.SelectedObject = Object;
+            /*if(property.PropertyType == typeof(SBMatAttrib<Vector4>))
             {
                 SBMatAttrib<Vector4> matinfo = (SBMatAttrib<Vector4>)property.GetValue(Object);
 
@@ -308,7 +315,7 @@ namespace StudioSB.GUI.Editors
 
                 toolTips.SetToolTip(hungrybox, matinfo.Description);
                 floatSection.Contents.Add(hungrybox);
-            }
+            }*/
 
             return null;
         }
