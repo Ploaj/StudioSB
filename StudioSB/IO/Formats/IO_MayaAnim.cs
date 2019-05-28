@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using System.ComponentModel;
+using System.IO;
 
 namespace StudioSB.IO.Formats
 {
-    public class IO_MayaANIM : IExportableAnimation
+    public class IO_MayaANIM : IExportableAnimation, IImportableAnimation
     {
         public class ExportSettings
         {
@@ -54,7 +55,8 @@ namespace StudioSB.IO.Formats
         {
             translate,
             rotate,
-            scale
+            scale,
+            visibility
         }
 
         private enum TrackType
@@ -67,7 +69,8 @@ namespace StudioSB.IO.Formats
             rotateZ,
             scaleX,
             scaleY,
-            scaleZ
+            scaleZ,
+            visibility
         }
 
         private class Header
@@ -140,7 +143,110 @@ namespace StudioSB.IO.Formats
 
         public IO_MayaANIM()
         {
-            header = new IO_MayaANIM.Header();
+            header = new Header();
+        }
+
+        public void Open(string fileName)
+        {
+            using (StreamReader r = new StreamReader(new FileStream(fileName, FileMode.Open)))
+            {
+                AnimData currentData = null;
+                while (!r.EndOfStream)
+                {
+                    var line = r.ReadLine();
+                    var args = line.Trim().Replace(";", "").Split(' ');
+
+                    switch (args[0])
+                    {
+                        case "animVersion":
+                            header.animVersion = float.Parse(args[1]);
+                            break;
+                        case "mayaVersion":
+                            header.mayaVersion = args[1];
+                            break;
+                        case "timeUnit":
+                            header.timeUnit = args[1];
+                            break;
+                        case "linearUnit":
+                            header.linearUnit = args[1];
+                            break;
+                        case "angularUnit":
+                            header.angularUnit = args[1];
+                            break;
+                        case "startTime":
+                            header.startTime = float.Parse(args[1]);
+                            break;
+                        case "endTime":
+                            header.endTime = float.Parse(args[1]);
+                            break;
+                        case "anim":
+                            var currentNode = Bones.Find(e => e.name.Equals(args[3]));
+                            if(currentNode == null)
+                            {
+                                currentNode = new AnimBone();
+                                currentNode.name = args[3];
+                                Bones.Add(currentNode);
+                            }
+                            currentData = new AnimData();
+                            currentData.controlType = (ControlType)Enum.Parse(typeof(ControlType), args[1].Split('.')[0]);
+                            currentData.type = (TrackType)Enum.Parse(typeof(TrackType), args[2]);
+                            currentNode.atts.Add(currentData);
+                            break;
+                        case "animData":
+                            if (currentData == null)
+                                continue;
+                            string dataLine = r.ReadLine();
+                            while (!dataLine.Contains("}"))
+                            {
+                                var dataArgs = dataLine.Trim().Replace(";", "").Split(' ');
+                                switch (dataArgs[0])
+                                {
+                                    case "input":
+                                        currentData.input = (InputType)Enum.Parse(typeof(InputType), dataArgs[1]);
+                                        break;
+                                    case "output":
+                                        currentData.output = (OutputType)Enum.Parse(typeof(OutputType), dataArgs[1]);
+                                        break;
+                                    case "weighted":
+                                        currentData.weighted = dataArgs[1] == "1";
+                                        break;
+                                    case "preInfinity":
+                                        currentData.preInfinity = (InfinityType)Enum.Parse(typeof(InfinityType), dataArgs[1]);
+                                        break;
+                                    case "postInfinity":
+                                        currentData.postInfinity = (InfinityType)Enum.Parse(typeof(InfinityType), dataArgs[1]);
+                                        break;
+                                    case "keys":
+                                        string keyLine = r.ReadLine();
+                                        while (!keyLine.Contains("}"))
+                                        {
+                                            var keyArgs = keyLine.Trim().Replace(";", "").Split(' ');
+
+                                            var key = new AnimKey()
+                                            {
+                                                input = float.Parse(keyArgs[0]),
+                                                output = float.Parse(keyArgs[1])
+                                            };
+
+                                            if(keyArgs.Length >= 7)
+                                            {
+                                                key.intan = keyArgs[1];
+                                                key.outtan = keyArgs[2];
+                                            }
+
+                                            currentData.keys.Add(key);
+
+                                            keyLine = r.ReadLine();
+                                        }
+                                        break;
+
+                                }
+                                dataLine = r.ReadLine();
+                            }
+                            break;
+                    }
+                }
+            }
         }
 
         public void Save(string fileName)
@@ -252,34 +358,57 @@ namespace StudioSB.IO.Formats
 
                 //TODO: bake scale for compensate scale...
 
-                AddAnimData(animBone, node.Transform, ControlType.translate, TrackType.translateX);
-                AddAnimData(animBone, node.Transform, ControlType.translate, TrackType.translateY);
-                AddAnimData(animBone, node.Transform, ControlType.translate, TrackType.translateZ);
+                foreach(var track in node.Tracks)
+                {
+                    switch (track.Type)
+                    {
+                        case SBTrackType.TranslateX:
+                            AddAnimData(animBone, track.Keys, ControlType.translate, TrackType.translateX);
+                            break;
+                        case SBTrackType.TranslateY:
+                            AddAnimData(animBone, track.Keys, ControlType.translate, TrackType.translateY);
+                            break;
+                        case SBTrackType.TranslateZ:
+                            AddAnimData(animBone, track.Keys, ControlType.translate, TrackType.translateZ);
+                            break;
+                        case SBTrackType.RotateX:
+                            AddAnimData(animBone, track.Keys, ControlType.rotate, TrackType.rotateX);
+                            break;
+                        case SBTrackType.RotateY:
+                            AddAnimData(animBone, track.Keys, ControlType.rotate, TrackType.rotateY);
+                            break;
+                        case SBTrackType.RotateZ:
+                            AddAnimData(animBone, track.Keys, ControlType.rotate, TrackType.rotateZ);
+                            break;
+                        case SBTrackType.ScaleX:
+                            AddAnimData(animBone, track.Keys, ControlType.scale, TrackType.scaleX);
+                            break;
+                        case SBTrackType.ScaleY:
+                            AddAnimData(animBone, track.Keys, ControlType.scale, TrackType.scaleY);
+                            break;
+                        case SBTrackType.ScaleZ:
+                            AddAnimData(animBone, track.Keys, ControlType.scale, TrackType.scaleZ);
+                            break;
+                    }
+                }
                 
-                AddAnimData(animBone, node.Transform, ControlType.rotate, TrackType.rotateX);
-                AddAnimData(animBone, node.Transform, ControlType.rotate, TrackType.rotateY);
-                AddAnimData(animBone, node.Transform, ControlType.rotate, TrackType.rotateZ);
-                
-                AddAnimData(animBone, node.Transform, ControlType.scale, TrackType.scaleX);
-                AddAnimData(animBone, node.Transform, ControlType.scale, TrackType.scaleY);
-                AddAnimData(animBone, node.Transform, ControlType.scale, TrackType.scaleZ);
             }
             
 
             anim.Save(fname);
         }
 
-        private static void AddAnimData(AnimBone animBone, SBKeyGroup<Matrix4> node, ControlType ctype, TrackType ttype)
+        private static void AddAnimData(AnimBone animBone, SBKeyGroup<float> keys, ControlType ctype, TrackType ttype)
         {
             AnimData d = new AnimData();
             d.controlType = ctype;
             d.type = ttype;
-            foreach (var key in node.Keys)
+            foreach (var key in keys.Keys)
             {
                 AnimKey animKey = new AnimKey()
                 {
                     input = key.Frame + 1,
-                    output = GetValue(key.Value, ctype, ttype)
+                    output = key.Value
                 };
                 d.keys.Add(animKey);
             }
@@ -320,6 +449,32 @@ namespace StudioSB.IO.Formats
         public void ExportSBAnimation(string FileName, SBAnimation animation, SBSkeleton skeleton)
         {
             ExportIOAnimationAsANIM(FileName, animation, skeleton);
+        }
+
+        public SBAnimation ImportSBAnimation(string FileName, SBSkeleton skeleton)
+        {
+            IO_MayaANIM anim = new IO_MayaANIM();
+            anim.Open(FileName);
+
+            var animation = new SBAnimation();
+            animation.FrameCount = anim.header.endTime + 1;
+            
+            foreach(var node in anim.Bones)
+            {
+                SBTransformAnimation a = new SBTransformAnimation();
+                a.Name = node.name;
+
+                foreach(var att in node.atts)
+                {
+                    SBAnimKey<Matrix4> key = new SBAnimKey<Matrix4>();
+                    
+                    SBBone transform = new SBBone();
+
+                    //a.Transform.Keys.Add();
+                }
+            }
+
+            return animation;
         }
     }
 }

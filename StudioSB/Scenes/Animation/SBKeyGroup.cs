@@ -8,17 +8,16 @@ namespace StudioSB.Scenes.Animation
         public SBAnimKey<T> GetKey(float Frame)
         {
             //TODO: actually grab the right frame
+
             if (Frame >= Keys.Count)
                 return Keys[0];
+
             return Keys[(int)Frame];
         }
 
         public T GetValue(float Frame)
         {
-            //TODO: actually grab the right frame
-            if (Frame >= Keys.Count)
-                return Keys[0].Value;
-            return Keys[(int)Frame].Value;
+            return GetKey(Frame).Value;
         }
     }
 }

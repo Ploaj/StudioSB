@@ -44,11 +44,11 @@ namespace StudioSB.Scenes.Animation
                 var bone = scene.Skeleton[a.Name];
                 if (bone != null)
                 {
-                    bone.AnimatedTransform = a.Transform.GetValue(Frame);
-                    if (a.Transform.GetKey(Frame).CompensateScale > 0)
+                    bone.AnimatedTransform = a.GetTransformAt(Frame, bone);
+                    if (a.GetTrackValueAt(Frame, SBTrackType.CompensateScale) > 0)
                     {
                         bone.EnableAnimatedCompensateScale = true;
-                        bone.AnimatedCompensateScale = a.Transform.GetKey(Frame).CompensateScale;
+                        bone.AnimatedCompensateScale = a.GetTrackValueAt(Frame, SBTrackType.CompensateScale);
                     }
                     else
                     {

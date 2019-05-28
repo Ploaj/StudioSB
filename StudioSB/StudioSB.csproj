@@ -185,6 +185,8 @@
     <Compile Include="Scenes\Animation\SBAnimation.cs" />
     <Compile Include="Scenes\Animation\SBAnimKey.cs" />
     <Compile Include="Scenes\Animation\SBKeyGroup.cs" />
+    <Compile Include="Scenes\Animation\SBTransformAnimation.cs" />
+    <Compile Include="Scenes\Animation\SBTransformTrack.cs" />
     <Compile Include="Scenes\Animation\SBVisibilityAnimation.cs" />
     <Compile Include="Scenes\ISBMaterial.cs" />
     <Compile Include="Scenes\ISBMesh.cs" />

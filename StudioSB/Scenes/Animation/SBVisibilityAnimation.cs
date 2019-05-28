@@ -2,15 +2,6 @@
 
 namespace StudioSB.Scenes.Animation
 {
-    public class SBMaterialAnimation
-    {
-        public string MaterialName;
-
-        public string AttributeName;
-
-        public SBKeyGroup<Vector4> Keys = new SBKeyGroup<Vector4>();
-    }
-
     public class SBVisibilityAnimation
     {
         public string MeshName { get; set; }
@@ -18,10 +9,12 @@ namespace StudioSB.Scenes.Animation
         public SBKeyGroup<bool> Visibility { get; } = new SBKeyGroup<bool>();
     }
 
-    public class SBTransformAnimation
+    public class SBMaterialAnimation
     {
-        public string Name { get; set; }
+        public string MaterialName;
 
-        public SBKeyGroup<Matrix4> Transform { get; } = new SBKeyGroup<Matrix4>();
+        public string AttributeName;
+
+        public SBKeyGroup<Vector4> Keys = new SBKeyGroup<Vector4>();
     }
 }

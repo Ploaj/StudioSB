@@ -54,6 +54,18 @@ namespace StudioSB.IO.Formats
                 {
                     Name = animNode.Name
                 };
+                SBTransformTrack X = new SBTransformTrack(SBTrackType.TranslateX);
+                SBTransformTrack Y = new SBTransformTrack(SBTrackType.TranslateY);
+                SBTransformTrack Z = new SBTransformTrack(SBTrackType.TranslateZ);
+                SBTransformTrack RX = new SBTransformTrack(SBTrackType.RotateX);
+                SBTransformTrack RY = new SBTransformTrack(SBTrackType.RotateY);
+                SBTransformTrack RZ = new SBTransformTrack(SBTrackType.RotateZ);
+                SBTransformTrack SX = new SBTransformTrack(SBTrackType.ScaleX);
+                SBTransformTrack SY = new SBTransformTrack(SBTrackType.ScaleY);
+                SBTransformTrack SZ = new SBTransformTrack(SBTrackType.ScaleZ);
+                SBTransformTrack CompensateScale = new SBTransformTrack(SBTrackType.CompensateScale);
+                tfrmAnim.Tracks.AddRange(new SBTransformTrack[] { X, Y, Z, RX, RY, RZ, SX, SY, SZ, CompensateScale });
+
                 foreach (AnimTrack track in animNode.Tracks)
                 {
                     object[] Transform = decoder.ReadTrack(track);
@@ -63,12 +75,19 @@ namespace StudioSB.IO.Formats
                         for (int i = 0; i < Transform.Length; i++)
                         {
                             AnimTrackTransform t = (AnimTrackTransform)Transform[i];
-                            tfrmAnim.Transform.Keys.Add(new SBAnimKey<Matrix4>()
-                            {
-                                Frame = i,
-                                Value = GetMatrix((AnimTrackTransform)Transform[i]),
-                                CompensateScale = t.CompensateScale,
-                            });
+
+                            SBBone transform = new SBBone();
+                            transform.Transform = GetMatrix((AnimTrackTransform)Transform[i]);
+                            X.AddKey(i, transform.X);
+                            Y.AddKey(i, transform.Y);
+                            Z.AddKey(i, transform.Z);
+                            RX.AddKey(i, transform.RX);
+                            RY.AddKey(i, transform.RY);
+                            RZ.AddKey(i, transform.RZ);
+                            SX.AddKey(i, transform.SX);
+                            SY.AddKey(i, transform.SY);
+                            SZ.AddKey(i, transform.SZ);
+                            CompensateScale.AddKey(i, 0);// t.CompensateScale);
                         }
                     }
                 }

@@ -19,15 +19,12 @@ namespace StudioSB.IO.Formats
                 for (int i = 0; i < animation.FrameCount; i++)
                 {
                     SBBone temp = new SBBone();
-                    temp.Transform = node.Transform.GetValue(i);
 
-                    OpenTK.Vector3 pos = temp.Translation;
-                    OpenTK.Quaternion rot = temp.RotationQuaternion;
-                    OpenTK.Vector3 sca = temp.Scale;
+                    temp.Transform = node.GetTransformAt(i, skeleton);
 
-                    seOut.AddTranslationKey(node.Name, i, pos.X, pos.Y, pos.Z);
-                    seOut.AddRotationKey(node.Name, i, rot.X, rot.Y, rot.Z, rot.W);
-                    seOut.AddScaleKey(node.Name, i, sca.X, sca.Y, sca.Z);
+                    seOut.AddTranslationKey(node.Name, i, temp.X, temp.Y, temp.Z);
+                    seOut.AddRotationKey(node.Name, i, temp.RotationQuaternion.X, temp.RotationQuaternion.Y, temp.RotationQuaternion.Z, temp.RotationQuaternion.W);
+                    seOut.AddScaleKey(node.Name, i, temp.SX, temp.SY, temp.SZ);
                 }
             }
 

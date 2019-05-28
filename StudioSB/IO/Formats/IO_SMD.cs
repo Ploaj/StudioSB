@@ -488,7 +488,7 @@ namespace StudioSB.IO.Formats
                         if (animbone.Name.Equals(bone.Name))
                         {
                             var tempBone = new SBBone();
-                            tempBone.Transform = animbone.Transform.GetValue(i);
+                            tempBone.Transform = animbone.GetTransformAt(i, skeleton);
                             group.skeletons.Add(new SMDSkeleton() { BoneID = bonelist.IndexOf(bone), Position = tempBone.Translation, Rotation = tempBone.RotationEuler });
                             found = true;
                             break;
