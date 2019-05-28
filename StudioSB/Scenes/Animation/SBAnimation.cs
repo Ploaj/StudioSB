@@ -10,6 +10,11 @@ namespace StudioSB.Scenes.Animation
         public List<SBVisibilityAnimation> VisibilityNodes = new List<SBVisibilityAnimation>();
         public List<SBMaterialAnimation> MaterialNodes = new List<SBMaterialAnimation>();
 
+        /// <summary>
+        /// Applies animation state to given scene
+        /// </summary>
+        /// <param name="Frame"></param>
+        /// <param name="scene"></param>
         public void UpdateScene(float Frame, SBScene scene)
         {
             if (scene == null)

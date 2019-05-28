@@ -182,6 +182,7 @@
     <Compile Include="Rendering\Shapes\Sphere.cs" />
     <Compile Include="Rendering\TextRenderer.cs" />
     <Compile Include="IO\IImportableAnimation.cs" />
+    <Compile Include="Scenes\Animation\Interpolation.cs" />
     <Compile Include="Scenes\Animation\SBAnimation.cs" />
     <Compile Include="Scenes\Animation\SBAnimKey.cs" />
     <Compile Include="Scenes\Animation\SBKeyGroup.cs" />

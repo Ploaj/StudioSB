@@ -127,11 +127,7 @@ namespace StudioSB.IO.Formats
                     for (int i = 0; i < MaterialAnim.Length; i++)
                     {
                         var vec = (AnimTrackCustomVector4)MaterialAnim[i];
-                        matAnim.Keys.Keys.Add(new SBAnimKey<Vector4>()
-                        {
-                            Frame = i,
-                            Value = new Vector4(vec.X, vec.Y, vec.Z, vec.W)
-                        });
+                        matAnim.Keys.AddKey(i, new Vector4(vec.X, vec.Y, vec.Z, vec.W));
                     }
                 }
             }
@@ -154,11 +150,7 @@ namespace StudioSB.IO.Formats
 
                         for (int i = 0; i < Visibility.Length; i++)
                         {
-                            visAnim.Visibility.Keys.Add(new SBAnimKey<bool>()
-                            {
-                                Frame = i,
-                                Value = (bool)Visibility[i]
-                            });
+                            visAnim.Visibility.AddKey(i, (bool)Visibility[i]);
                         }
                     }
                 }

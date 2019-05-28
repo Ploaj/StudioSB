@@ -451,30 +451,59 @@ namespace StudioSB.IO.Formats
             ExportIOAnimationAsANIM(FileName, animation, skeleton);
         }
 
+        private static Dictionary<TrackType, SBTrackType> trackTypeConversion = new Dictionary<TrackType, SBTrackType>()
+        {
+            { TrackType.translateX, SBTrackType.TranslateX },
+            { TrackType.translateY, SBTrackType.TranslateY },
+            { TrackType.translateZ, SBTrackType.TranslateZ },
+            { TrackType.rotateX, SBTrackType.RotateX },
+            { TrackType.rotateY, SBTrackType.RotateY },
+            { TrackType.rotateZ, SBTrackType.RotateZ },
+            { TrackType.scaleX, SBTrackType.ScaleX },
+            { TrackType.scaleY, SBTrackType.ScaleY },
+            { TrackType.scaleZ, SBTrackType.ScaleZ },
+        };
+
         public SBAnimation ImportSBAnimation(string FileName, SBSkeleton skeleton)
         {
             IO_MayaANIM anim = new IO_MayaANIM();
             anim.Open(FileName);
 
             var animation = new SBAnimation();
-            animation.FrameCount = anim.header.endTime + 1;
+            animation.FrameCount = anim.header.endTime - 1;
             
             foreach(var node in anim.Bones)
             {
                 SBTransformAnimation a = new SBTransformAnimation();
                 a.Name = node.name;
-
-                foreach(var att in node.atts)
+                animation.TransformNodes.Add(a);
+                
+                foreach (var att in node.atts)
                 {
-                    SBAnimKey<Matrix4> key = new SBAnimKey<Matrix4>();
-                    
-                    SBBone transform = new SBBone();
+                    if (!trackTypeConversion.ContainsKey(att.type))
+                        continue;
 
-                    //a.Transform.Keys.Add();
+                    SBTransformTrack track = new SBTransformTrack(trackTypeConversion[att.type]);
+                    a.Tracks.Add(track);
+
+                    foreach(var key in att.keys)
+                    {
+                        track.AddKey(key.input - header.startTime, GetOutputValue(anim, att, key.output), InterpolationType.Linear);
+                    }
                 }
             }
 
             return animation;
+        }
+
+        private float GetOutputValue(IO_MayaANIM anim, AnimData data, float value)
+        {
+            if(data.output == OutputType.angular)
+            {
+                if (anim.header.angularUnit == "deg")
+                    return (float)(value * Math.PI / 180);
+            }
+            return value;
         }
     }
 }

@@ -38,12 +38,7 @@ namespace StudioSB.Scenes.Animation
 
         public void AddKey(float frame, float value, InterpolationType interpolationType = InterpolationType.Linear)
         {
-            Keys.Keys.Add(new SBAnimKey<float>()
-            {
-                Frame = frame,
-                Value = value,
-                InterpolationType = interpolationType
-            });
+            Keys.AddKey(frame, value, interpolationType);
         }
     }
 }

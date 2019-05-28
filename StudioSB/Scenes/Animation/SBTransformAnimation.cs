@@ -38,9 +38,9 @@ namespace StudioSB.Scenes.Animation
             temp.Transform = bone.Transform;
 
             // temp for less matrix calculations
-            Vector3 newPos = Vector3.Zero;
-            Vector3 newRot = Vector3.Zero;
-            Vector3 newSca = Vector3.Zero;
+            Vector3 newPos = temp.Translation;
+            Vector3 newRot = temp.RotationEuler;
+            Vector3 newSca = temp.Scale;
 
             foreach (var track in Tracks)
             {
