@@ -90,7 +90,12 @@ namespace StudioSB.Scenes.Animation
                     float leftFrame = _keys.Keys[left];
                     float rightFrame = _keys.Keys[right];
 
-                    return (T)(object)Interpolation.Lerp(leftValue, rightValue, leftFrame, rightFrame, Frame);
+                    float value = Interpolation.Lerp(leftValue, rightValue, leftFrame, rightFrame, Frame);
+
+                    if (float.IsNaN(value))
+                        value = 0;
+
+                    return (T)(object)value;
                 }
             }
 

@@ -165,6 +165,7 @@
     <Compile Include="IO\Formats\IO_NUANMB.cs" />
     <Compile Include="IO\Formats\IO_OBJ.cs" />
     <Compile Include="IO\Formats\IO_PLY.cs" />
+    <Compile Include="IO\Formats\IO_SBAnimation.cs" />
     <Compile Include="IO\Formats\IO_SEANIM.cs" />
     <Compile Include="IO\Formats\IO_SMD.cs" />
     <Compile Include="IO\IExportableAnimation.cs" />

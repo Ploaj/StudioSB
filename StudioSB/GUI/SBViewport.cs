@@ -38,6 +38,24 @@ namespace StudioSB.GUI
                 ScreenTexture = null;
 
                 Updated = true;
+
+                if(_scene != null)
+                {
+                    float Extent = 0;
+                    var io = value.GetIOModel();
+                    foreach (var mesh in io.Meshes)
+                        foreach (var vert in mesh.Vertices)
+                        {
+                            Extent = Math.Max(Extent, vert.Position.Y);
+                        }
+                    if (Extent > 0)
+                    {
+                        Camera.RotationXDegrees = 0;
+                        Camera.RotationYDegrees = 0;
+                        Camera.Position = new Vector3(0, Extent / 2, -Extent * 3);
+                    }
+                }
+                
             }
         }
         private SBScene _scene;

@@ -4,13 +4,18 @@ using SSBHLib.Tools;
 using StudioSB.Scenes.Animation;
 using OpenTK;
 using StudioSB.Scenes;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace StudioSB.IO.Formats
 {
-    class IO_NUANMB : IImportableAnimation
+    class IO_NUANMB : IImportableAnimation, IExportableAnimation
     {
         public string Name { get { return "Namco Animation Binary"; } }
         public string Extension { get { return ".nuanmb"; } }
+
+        public object Settings => null;
 
         public SBAnimation ImportSBAnimation(string FileName, SBSkeleton skeleton)
         {
@@ -156,6 +161,49 @@ namespace StudioSB.IO.Formats
                 }
                 animation.VisibilityNodes.Add(visAnim);
             }
+        }
+
+        public void ExportSBAnimation(string FileName, SBAnimation animation, SBSkeleton skeleton)
+        {
+            SSBHAnimTrackEncoder encoder = new SSBHAnimTrackEncoder(animation.FrameCount);
+
+            var Nodes = animation.TransformNodes.OrderBy(e => e.Name, StringComparer.Ordinal);
+
+            foreach (var node in Nodes)
+            {
+                List<object> transforms = new List<object>();
+
+                for(int i = 0; i < animation.FrameCount; i++)
+                {
+                    transforms.Add(MatrixToTransform(node.GetTransformAt(i, skeleton)));
+                }
+
+                encoder.AddTrack(node.Name, "Transform", ANIM_TYPE.Transform, transforms);
+            }
+
+            encoder.Save(FileName);
+        }
+
+        private static AnimTrackTransform MatrixToTransform(Matrix4 matrix)
+        {
+            SBBone temp = new SBBone();
+            temp.Transform = matrix;
+
+            var t = new AnimTrackTransform()
+            {
+                X = temp.X,
+                Y = temp.Y,
+                Z = temp.Z,
+                RX = temp.RotationQuaternion.X,
+                RY = temp.RotationQuaternion.Y,
+                RZ = temp.RotationQuaternion.Z,
+                RW = temp.RotationQuaternion.W,
+                SX = temp.SX,
+                SY = temp.SY,
+                SZ = temp.SZ
+            };
+
+            return t;
         }
     }
 }

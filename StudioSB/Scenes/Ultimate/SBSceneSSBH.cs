@@ -18,10 +18,7 @@ namespace StudioSB.Scenes.Ultimate
     {
         public static SBUltimateImportSettings ImportSettings = new SBUltimateImportSettings();
         public static SBUltimateNewImportSettings NewImportSettings = new SBUltimateNewImportSettings();
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         public ISBModel<SBUltimateMesh> Model { get; set; }
 
         public Dictionary<string, SBSurface> nameToSurface = new Dictionary<string, SBSurface>();
@@ -29,8 +26,8 @@ namespace StudioSB.Scenes.Ultimate
         // Rendering
         public Dictionary<SBUltimateMesh, UltimateRenderMesh> sbMeshToRenderMesh = new Dictionary<SBUltimateMesh, UltimateRenderMesh>();
         public Dictionary<SBSurface, Texture> surfaceToRenderTexture = new Dictionary<SBSurface, Texture>();
-        public BufferObject boneUniformBuffer;
-        Matrix4[] boneBinds = new Matrix4[200];
+        private BufferObject boneUniformBuffer;
+        private Matrix4[] boneBinds = new Matrix4[200];
 
         public SBSceneSSBH()
         {
@@ -85,7 +82,7 @@ namespace StudioSB.Scenes.Ultimate
                 SBConsole.WriteLine($"Importing skeleton: {Path.GetFileName(skelPath)}");
                 SKEL_Loader.Open(skelPath, this);
             }
-            if(matlPath != "")
+            if (matlPath != "")
             {
                 SBConsole.WriteLine($"Importing materials: {Path.GetFileName(matlPath)}");
                 MATL_Loader.Open(matlPath, this);
@@ -165,6 +162,8 @@ namespace StudioSB.Scenes.Ultimate
             //SBConsole.WriteLine("Creating MATL...");
 
         }
+
+        #region IO
 
         /// <summary>
         /// Gets the model information in this scene as an IO Model
@@ -324,6 +323,8 @@ namespace StudioSB.Scenes.Ultimate
                  singleBound ? Vector4.Zero : iov.BoneWeights, Vector2.Zero, iov.Color, Vector4.One, Vector4.One);
         }
 
+        #endregion
+
         /// <summary>
         /// 
         /// </summary>
@@ -337,6 +338,8 @@ namespace StudioSB.Scenes.Ultimate
         {
             return Materials.ToArray();
         }
+
+        #region Rendering
 
         /// <summary>
         /// FOR THE LOVE OF SAKURAI DON'T USE THIS
@@ -517,6 +520,6 @@ namespace StudioSB.Scenes.Ultimate
             shader.SetBoolToInt("renderVertexColor", ApplicationSettings.RenderVertexColor);
         }
 
-
+        #endregion
     }
 }
