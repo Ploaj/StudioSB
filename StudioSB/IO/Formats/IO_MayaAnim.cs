@@ -180,6 +180,8 @@ namespace StudioSB.IO.Formats
                             header.endTime = float.Parse(args[1]);
                             break;
                         case "anim":
+                            if (args.Length != 7)
+                                continue;
                             var currentNode = Bones.Find(e => e.name.Equals(args[3]));
                             if(currentNode == null)
                             {

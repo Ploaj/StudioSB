@@ -167,9 +167,9 @@ namespace StudioSB.IO.Formats
         {
             SSBHAnimTrackEncoder encoder = new SSBHAnimTrackEncoder(animation.FrameCount);
 
-            var Nodes = animation.TransformNodes.OrderBy(e => e.Name, StringComparer.Ordinal);
+            var animNodes = animation.TransformNodes.OrderBy(e => e.Name, StringComparer.Ordinal);
 
-            foreach (var node in Nodes)
+            foreach (var node in animNodes)
             {
                 List<object> transforms = new List<object>();
 
@@ -179,6 +179,21 @@ namespace StudioSB.IO.Formats
                 }
 
                 encoder.AddTrack(node.Name, "Transform", ANIM_TYPE.Transform, transforms);
+            }
+
+
+            var visNodes = animation.VisibilityNodes.OrderBy(e => e.MeshName, StringComparer.Ordinal);
+
+            foreach (var node in visNodes)
+            {
+                List<object> visibilities = new List<object>();
+
+                for (int i = 0; i < animation.FrameCount; i++)
+                {
+                    visibilities.Add(node.Visibility.GetValue(i));
+                }
+
+                encoder.AddTrack(node.MeshName, "Visibility", ANIM_TYPE.Visibilty, visibilities);
             }
 
             encoder.Save(FileName);

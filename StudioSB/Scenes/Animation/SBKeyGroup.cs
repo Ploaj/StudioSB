@@ -51,21 +51,22 @@ namespace StudioSB.Scenes.Animation
         {
             int lower = 0;
             int upper = _keys.Count - 1;
+            int middle = 0;
 
             while (lower <= upper)
             {
-                int middle = lower + (upper - lower) / 2;
-                if (upper == lower)
-                    return lower;
+                middle = (upper + lower) / 2;
                 if (frame == _keys.Values[middle].Frame)
                     return middle;
-                else if (frame < _keys.Values[middle].Frame)
+                else 
+                if (frame < _keys.Values[middle].Frame)
                     upper = middle - 1;
                 else
                     lower = middle + 1;
             }
+            
 
-            return lower;
+            return Math.Max(lower < upper ? lower : upper, 0);
         }
 
         /// <summary>
@@ -75,6 +76,9 @@ namespace StudioSB.Scenes.Animation
         /// <returns></returns>
         public T GetValue(float Frame)
         {
+            if (_keys.Count == 1)
+                return _keys.Values[0].Value;
+
             int left = BinarySearchKeys(Frame);
             int right = left + 1;
 
