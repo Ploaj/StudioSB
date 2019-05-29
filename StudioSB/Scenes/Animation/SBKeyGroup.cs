@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK;
+using System;
 using System.Collections.Generic;
 
 namespace StudioSB.Scenes.Animation
@@ -82,7 +83,7 @@ namespace StudioSB.Scenes.Animation
             int left = BinarySearchKeys(Frame);
             int right = left + 1;
 
-            if(left == 0 || right >= _keys.Count)
+            if(right >= _keys.Count)
                 return _keys.Values[left].Value;
 
             if (_keys.Values[left].Value is float)
@@ -98,6 +99,22 @@ namespace StudioSB.Scenes.Animation
 
                     if (float.IsNaN(value))
                         value = 0;
+
+                    return (T)(object)value;
+                }
+            }
+            if (_keys.Values[left].Value is Vector4)
+            {
+                if (_keys.Values[left].InterpolationType == InterpolationType.Linear)
+                {
+                    var leftValue = (Vector4)(object)_keys.Values[left].Value;
+                    var rightValue = (Vector4)(object)_keys.Values[right].Value;
+                    float leftFrame = _keys.Keys[left];
+                    float rightFrame = _keys.Keys[right];
+
+                    float t = (Frame - leftFrame) / (rightFrame - leftFrame);
+
+                    var value = Vector4.Lerp(leftValue, rightValue, t);
 
                     return (T)(object)value;
                 }

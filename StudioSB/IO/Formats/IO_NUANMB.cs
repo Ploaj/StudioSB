@@ -7,15 +7,28 @@ using StudioSB.Scenes;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.ComponentModel;
 
 namespace StudioSB.IO.Formats
 {
-    class IO_NUANMB : IImportableAnimation, IExportableAnimation
+    public class IO_NUANMB : IImportableAnimation, IExportableAnimation
     {
-        public string Name { get { return "Namco Animation Binary"; } }
-        public string Extension { get { return ".nuanmb"; } }
+        public class NUExportSettings
+        {
+            //[DisplayName("Compress Vector"), Description("can make filesize smaller, but less accurate")]
+            public bool CompressVector4 = false;
 
-        public object Settings => null;
+            [DisplayName("CompressionLevel"), Description("the large the value the smaller the filesize")]
+            public float CompressionLevel { get; set; } = 0.000002f;
+        }
+
+        public string Name => "Namco Universal Animation Binary";
+
+        public string Extension => ".nuanmb";
+
+        private static NUExportSettings ExportSettings = new IO_NUANMB.NUExportSettings();
+
+        public object Settings => ExportSettings;
 
         public SBAnimation ImportSBAnimation(string FileName, SBSkeleton skeleton)
         {
@@ -167,6 +180,9 @@ namespace StudioSB.IO.Formats
         {
             SSBHAnimTrackEncoder encoder = new SSBHAnimTrackEncoder(animation.FrameCount);
 
+            encoder.CompressVector4 = ExportSettings.CompressVector4;
+            encoder.SetCompressionLevel(ExportSettings.CompressionLevel);
+
             var animNodes = animation.TransformNodes.OrderBy(e => e.Name, StringComparer.Ordinal);
 
             foreach (var node in animNodes)
@@ -187,13 +203,42 @@ namespace StudioSB.IO.Formats
             foreach (var node in visNodes)
             {
                 List<object> visibilities = new List<object>();
-
+                bool AllSame = true;
+                bool first = node.Visibility.GetValue(0);
                 for (int i = 0; i < animation.FrameCount; i++)
                 {
                     visibilities.Add(node.Visibility.GetValue(i));
+                    if (AllSame && node.Visibility.GetValue(i) != first)
+                        AllSame = false;
                 }
-
+                if (AllSame)
+                {
+                    visibilities.Clear();
+                    visibilities.Add(first);
+                }
                 encoder.AddTrack(node.MeshName, "Visibility", ANIM_TYPE.Visibilty, visibilities);
+            }
+
+            var matNodes = animation.MaterialNodes.OrderBy(e => e.MaterialName, StringComparer.Ordinal);
+
+            foreach (var mat in  matNodes)
+            {
+                var list = new List<object>();
+                bool AllSame = true;
+                Vector4 first = mat.Keys.GetValue(0);
+                for (int i = 0; i < animation.FrameCount; i++)
+                {
+                    var value = mat.Keys.GetValue(i);
+                    list.Add(new AnimTrackCustomVector4(value.X, value.Y, value.Z, value.W));
+                    if (AllSame && mat.Keys.GetValue(i) != first)
+                        AllSame = false;
+                }
+                if (AllSame)
+                {
+                    list.Clear();
+                    list.Add(new AnimTrackCustomVector4(first.X, first.Y, first.Z, first.W));
+                }
+                encoder.AddTrack(mat.MaterialName, mat.AttributeName, ANIM_TYPE.Material, list);
             }
 
             encoder.Save(FileName);
