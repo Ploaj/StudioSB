@@ -61,7 +61,8 @@ vec4 GetEmissionColor(vec2 uv1, vec2 uv2, vec4 transform1, vec4 transform2)
     vec2 uvLayer2 = TransformUv(uv2, transform2);
     vec4 emission2Color = texture(emi2Map, uvLayer2).rgba;
 
-    emissionColor.rgb = Blend(emissionColor, emission2Color);
+    // TODO: ???
+    emissionColor.rgb += emission2Color.rgb;
     return emissionColor;
 }
 
@@ -75,7 +76,7 @@ vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec4 transform1, vec4 transfor
     vec2 uvLayer2 = TransformUv(uv2, transform2);
     vec2 uvLayer3 = TransformUv(uv3, transform3);
 
-    vec4 albedoColor = texture(colMap, uvLayer1).rgba ;
+    vec4 albedoColor = texture(colMap, uvLayer1).rgba;
     vec4 albedoColor2 = texture(col2Map, uvLayer2).rgba;
 
     vec4 diffuseColor = texture(difMap, uvLayer1).rgba;
@@ -93,7 +94,7 @@ vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec4 transform1, vec4 transfor
     if (hasDiffuse == 1)
         albedoColor.rgb = Blend(albedoColor, diffuseColor);
     if (hasDiffuse2 == 1)
-        albedoColor.rgb = Blend(albedoColor, diffuse2Color);
+        albedoColor.rgb += diffuse2Color.rgb;
     // TODO: Is the blending always additive?
     if (hasDiffuse3 == 1)
         albedoColor.rgb += diffuse3Color.rgb;

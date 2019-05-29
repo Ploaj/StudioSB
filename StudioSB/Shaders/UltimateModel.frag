@@ -51,17 +51,24 @@ uniform int renderDiffuse;
 uniform int renderSpecular;
 uniform int renderEmission;
 uniform int renderRimLighting;
+uniform int renderExperimental;
 
 uniform int renderWireframe;
 uniform int renderVertexColor;
 uniform int renderNormalMaps;
 
-uniform vec4 paramA3;
 uniform vec4 paramA6;
+
+uniform vec4 paramA3;
+uniform vec4 param145;
+
 uniform vec4 paramA5;
 uniform vec4 paramA0;
 uniform vec4 param98;
 uniform vec4 param9B;
+
+uniform int hasParam151;
+uniform vec4 param151;
 
 // UV transforms.
 uniform vec4 param146;
@@ -76,6 +83,7 @@ uniform vec4 param153;
 uniform vec4 param154;
 
 uniform int paramE9;
+uniform int paramEA;
 
 uniform float paramC8;
 uniform float paramCA;
@@ -90,7 +98,16 @@ uniform vec3 V;
 
 out vec4 fragColor;
 
-const float directLightIntensity = 1.25;
+const float directLightIntensity = 1.00;
+const float iblIntensity = 1.00;
+
+// Matrices for ordered dithering
+// https://en.wikipedia.org/wiki/Ordered_dithering
+mat4 thresholdMatrix16 = mat4(
+0.0 / 16.0,  8.0 / 16.0,  2.0 / 16.0, 10.0 / 16.0,
+12.0 / 16.0,  4.0 / 16.0, 14.0 / 16.0,  6.0 / 16.0,
+3.0 / 16.0, 11.0 / 16.0,  1.0 / 16.0, 9.0 / 16.0,
+15.0 / 16.0,  7.0 / 16.0, 13.0 / 16.0,  5.0 / 16.0);
 
 // Defined in Wireframe.frag.
 float WireframeIntensity(vec3 distanceToEdges);
@@ -158,8 +175,15 @@ float GgxAnisotropic(vec3 N, vec3 H, vec3 tangent, vec3 bitangent, float roughX,
 vec4 GetEmissionColor(vec2 uv1, vec2 uv2, vec4 transform1, vec4 transform2);
 vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec4 transform1, vec4 transform2, vec4 transform3, vec4 colorSet5);
 
-vec3 DiffuseTerm(vec4 albedoColor, vec3 diffuseIbl, vec3 N, vec3 V, vec3 kDiffuse)
+vec3 DiffuseTerm(vec4 albedoColor, vec3 diffuseIbl, vec3 N, vec3 V, vec3 kDiffuse, float metalness)
 {
+    vec3 diffuseTerm = kDiffuse * albedoColor.rgb;
+
+    // Some sort of fake SSS color.
+    // TODO: The SSS color may be part of a separate render pass
+    // and not take into account diffuse lighting.
+    diffuseTerm += paramA3.rgb * metalness * renderExperimental;
+
     // Baked ambient lighting.
     vec3 diffuseLight = vec3(0);
     diffuseLight += diffuseIbl;
@@ -168,7 +192,7 @@ vec3 DiffuseTerm(vec4 albedoColor, vec3 diffuseIbl, vec3 N, vec3 V, vec3 kDiffus
     // Direct lighting.
     diffuseLight += LambertShading(N, V) * directLightIntensity;
 
-    vec3 diffuseTerm = kDiffuse * albedoColor.rgb * diffuseLight;
+    diffuseTerm *= diffuseLight;
 
     // Color multiplier param.
     diffuseTerm *= paramA5.rgb;
@@ -177,6 +201,13 @@ vec3 DiffuseTerm(vec4 albedoColor, vec3 diffuseIbl, vec3 N, vec3 V, vec3 kDiffus
         diffuseTerm = param153.rgb + param154.rgb;
 
     return diffuseTerm;
+}
+
+vec3 RimLightingTerm(vec3 N, vec3 V, vec3 specularIbl)
+{
+    // TODO: How does this work?
+    float facingRatio = (1 - max(dot(N, V), 0));
+    return mix(vec3(1), paramA6.rgb, pow(facingRatio, 2));
 }
 
 vec3 SpecularTerm(vec3 N, vec3 V, vec3 tangent, vec3 bitangent, float roughness, vec3 specularIbl, vec3 kSpecular, float occlusion)
@@ -194,30 +225,35 @@ vec3 SpecularTerm(vec3 N, vec3 V, vec3 tangent, vec3 bitangent, float roughness,
 
     // Direct lighting.
     // The two BRDFs look very different so don't just use anisotropic for everything.
+    float specularBrdf = 0;
     if (paramCA != 0)
-        specularTerm += kSpecular * GgxAnisotropic(N, V, tangent, bitangent, roughnessX, roughnessY) * directLightIntensity;
+        specularBrdf = GgxAnisotropic(N, V, tangent, bitangent, roughnessX, roughnessY) * directLightIntensity;
     else
-        specularTerm += kSpecular * Ggx(N, V, roughness) * directLightIntensity;
+        specularBrdf = pow(Ggx(N, V, roughness), param145.x) * directLightIntensity;
+
+    // TODO: Some sort of fake SSS.
+    if (renderExperimental == 1)
+        specularBrdf = pow(specularBrdf, param145.x);
+
+    specularTerm += kSpecular * vec3(specularBrdf);
 
     // Cavity Map used for specular occlusion.
     if (paramE9 == 1)
         specularTerm.rgb *= occlusion;
 
-    return specularTerm;
-}
+    // TODO: Specular color?
+    specularTerm *= paramA0.rgb;
 
-vec3 RimLightingTerm(vec3 N, vec3 V, vec3 specularIbl)
-{
-    // TODO: How does this work?
-    float rimLight = (1 - max(dot(N, V), 0));
-    return paramA6.rgb * pow(rimLight, 3) * specularIbl * 0.5;
+    vec3 rimTerm = RimLightingTerm(N, V, specularIbl);
+    specularTerm *= mix(vec3(1), rimTerm, renderRimLighting);
+
+    return specularTerm;
 }
 
 vec3 EmissionTerm(vec4 emissionColor)
 {
     return emissionColor.rgb * param9B.rgb;
 }
-
 
 float GetF0(float ior)
 {
@@ -255,6 +291,8 @@ void main()
     // Probably some sort of override for PRM color.
     if (hasParam156 == 1)
         prmColor = param156;
+    // if (hasParam151 == 1)
+    //     prmColor.bga = param151.bga;
 
     // Material masking.
     float transitionBlend = GetTransitionBlend(norColor.b, transitionFactor);
@@ -287,7 +325,6 @@ void main()
     float metalness = prmColor.r;
 
     // Image based lighting.
-    float iblIntensity = 2.0;
     vec3 diffuseIbl = textureLod(diffusePbrCube, N, 0).rrr * iblIntensity;
     int maxLod = 10;
     vec3 specularIbl = textureLod(specularPbrCube, R, roughness * maxLod).rrr * iblIntensity;
@@ -296,7 +333,8 @@ void main()
 
     float f0Dialectric = GetF0(paramC8 + 1);
     vec3 f0Final = mix(prmColor.aaa * f0Dialectric, albedoColor.rgb, metalness);
-    vec3 kSpecular = FresnelSchlickRoughness(max(dot(newNormal, V), 0.0), f0Final, roughness);
+    float nDotV = max(dot(newNormal, V), 0.0);
+    vec3 kSpecular = FresnelSchlickRoughness(nDotV, f0Final, roughness);
 
     // Only use one component to prevent discoloration of diffuse.
     vec3 kDiffuse = (1 - kSpecular.rrr);
@@ -306,15 +344,8 @@ void main()
     kDiffuse *= (1 - metalness);
 
     // Render passes.
-    vec3 diffuseTerm = DiffuseTerm(albedoColor, diffuseIbl, newNormal, V, kDiffuse);
-
-	// skin diffuse? (note: added by ploaj and could be wrong because they are a know-nothing)
-	diffuseTerm += paramA3.rgb * (1-kDiffuse);
-
+    vec3 diffuseTerm = DiffuseTerm(albedoColor, diffuseIbl, newNormal, V, kDiffuse, metalness);
     fragColor.rgb += diffuseTerm * renderDiffuse;
-
-    vec3 rimTerm = RimLightingTerm(newNormal, V, specularIbl);
-    fragColor.rgb += rimTerm * renderRimLighting;
 
     vec3 specularTerm = SpecularTerm(newNormal, V, tangent, bitangent, roughness, specularIbl, kSpecular, norColor.a);
     fragColor.rgb += specularTerm * renderSpecular;
@@ -351,8 +382,15 @@ void main()
         fragColor.a *= colorSet1.a;
 
     // Alpha testing.
-    if ((fragColor.a + param98.x) < 0.01)
+    if ((fragColor.a + param98.x) < 0.1)
         discard;
+
+    // TODO: Transparency seems to use some sort of stipple pattern.
+    // int x = int(mod(gl_FragCoord.x - 0.5, 4));
+    // int y = int(mod(gl_FragCoord.y - 0.5, 4));
+    // if ((fragColor.a < (thresholdMatrix16[x][y])))
+    //     discard;
+
     // TODO: How does this work?
     if (hasInkNorMap == 1 && transitionBlend < 1)
         discard;

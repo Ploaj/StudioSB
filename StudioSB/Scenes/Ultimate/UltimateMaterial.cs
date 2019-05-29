@@ -58,12 +58,20 @@ namespace StudioSB.Scenes.Ultimate
 
         [MATLLoaderAttributeName("CustomVector18")]
         public SBMatAttrib<Vector4> paramAA { get; } = new SBMatAttrib<Vector4>("CustomVector18", new Vector4(1), description: "Sprite sheet UV parameters.");
-        
+
+        [MATLLoaderAttributeName("CustomVector30")]
+        public SBMatAttrib<Vector4> param145 { get; } = new SBMatAttrib<Vector4>("CustomVector30", new Vector4(0, 0, 0, 0), description: "");
+
         [MATLLoaderAttributeName("CustomVector31")]
         public SBMatAttrib<Vector4> param146 { get; } = new SBMatAttrib<Vector4>("CustomVector31", new Vector4(1, 1, 0, 0), description: "UV transform");
 
         [MATLLoaderAttributeName("CustomVector32")]
         public SBMatAttrib<Vector4> param147 { get; } = new SBMatAttrib<Vector4>("CustomVector32", new Vector4(1, 1, 0, 0), description: "UV transform");
+
+        [MATLLoaderAttributeName("CustomVector42")]
+        public SBMatAttrib<Vector4> param151 { get; } = new SBMatAttrib<Vector4>("CustomVector42", new Vector4(0), description: "");
+
+        public bool hasParam151 { get => param151.Used; }
 
         [MATLLoaderAttributeName("CustomVector44")]
         public SBMatAttrib<Vector4> param153 { get; } = new SBMatAttrib<Vector4>("CustomVector44", new Vector4(0), description: "Wii Fit trainer stage color.");
@@ -83,7 +91,10 @@ namespace StudioSB.Scenes.Ultimate
         #region Booleans
         [MATLLoaderAttributeName("CustomBoolean1")]
         public SBMatAttrib<bool> paramE9 { get; } = new SBMatAttrib<bool>("CustomBoolean1", true, description: "Enables/disables specular occlusion");
-        
+
+        [MATLLoaderAttributeName("CustomBoolean2")]
+        public SBMatAttrib<bool> paramEA { get; } = new SBMatAttrib<bool>("CustomBoolean2", true, description: "");
+
         [MATLLoaderAttributeName("CustomBoolean6")]
         public SBMatAttrib<bool> paramEE { get; } = new SBMatAttrib<bool>("CustomBoolean6", true, description: "Enables/disables UV scrolling animations");
 

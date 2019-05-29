@@ -515,6 +515,7 @@ namespace StudioSB.Scenes.Ultimate
             shader.SetBoolToInt("renderSpecular", ApplicationSettings.EnableSpecular);
             shader.SetBoolToInt("renderEmission", ApplicationSettings.EnableEmission);
             shader.SetBoolToInt("renderRimLighting", ApplicationSettings.EnableRimLighting);
+            shader.SetBoolToInt("renderExperimental", ApplicationSettings.EnableExperimental);
 
             shader.SetBoolToInt("renderNormalMaps", ApplicationSettings.RenderNormalMaps);
             shader.SetBoolToInt("renderVertexColor", ApplicationSettings.RenderVertexColor);

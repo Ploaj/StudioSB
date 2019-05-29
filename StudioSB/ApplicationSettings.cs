@@ -153,6 +153,9 @@ namespace StudioSB
         [SettingsGroup(SettingsGroupType.Lighting, "Enables rim lighting", "Enable Rim Lighting")]
         public static bool EnableRimLighting { get; set; } = true;
 
+        [SettingsGroup(SettingsGroupType.Lighting, "Enables experimental shading", "Enable Experimental Shading")]
+        public static bool EnableExperimental { get; set; } = false;
+
         [SettingsGroup(SettingsGroupType.Material, "Enables the use of normal maps", "Enable Normal Maps")]
         public static bool RenderNormalMaps { get; set; } = true;
 
