@@ -48,6 +48,7 @@ namespace StudioSB.GUI.Attachments
                 return;
 
             animationBar.Process();
+
             if (animationBar.Frame != PreviousFrame)
             {
                 animation.UpdateScene(animationBar.Frame, viewport.Scene);

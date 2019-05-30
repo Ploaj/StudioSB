@@ -182,7 +182,7 @@ vec3 DiffuseTerm(vec4 albedoColor, vec3 diffuseIbl, vec3 N, vec3 V, vec3 kDiffus
     // Some sort of fake SSS color.
     // TODO: The SSS color may be part of a separate render pass
     // and not take into account diffuse lighting.
-    diffuseTerm += paramA3.rgb * metalness * renderExperimental;
+    diffuseTerm += paramA3.rgb * metalness * renderExperimental * albedoColor.rgb;
 
     // Baked ambient lighting.
     vec3 diffuseLight = vec3(0);

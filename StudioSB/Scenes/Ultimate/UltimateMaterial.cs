@@ -18,16 +18,20 @@ namespace StudioSB.Scenes.Ultimate
         [Category("Material Info"), Description("Label used for material animations and various misc")]
         public string Label { get; set; }
 
-        #region States
+        /*private Dictionary<string, object> AnimatedParams = new Dictionary<string, object>();
+        private Dictionary<string, float> FloatParams = new Dictionary<string, float>();
+        private Dictionary<string, Vector4> VectorParams = new Dictionary<string, Vector4>();
+        private Dictionary<string, bool> BoolParams = new Dictionary<string, bool>();
+        private Dictionary<string, int> IntParams = new Dictionary<string, int>();*/
         
+        [DisplayName("Rasterizer State")]
         public MatlAttribute.MatlRasterizerState RasterizerState { get; set; } = new MatlAttribute.MatlRasterizerState();
-        
+
+        [DisplayName("Blend State")]
         public MatlAttribute.MatlBlendState BlendState { get; set; } = new MatlAttribute.MatlBlendState();
-
-        #endregion
-
+        
         #region Vectors
-
+        
         [MATLLoaderAttributeName("CustomVector0")]
         public SBMatAttrib<Vector4> param98 { get; } = new SBMatAttrib<Vector4>("CustomVector0", new Vector4(0), description: "Alpha offset.");
 
@@ -266,7 +270,6 @@ namespace StudioSB.Scenes.Ultimate
         /// </summary>
         private void BindBlendState()
         {
-
         }
 
         /// <summary>
