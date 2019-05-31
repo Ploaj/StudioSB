@@ -7,7 +7,7 @@ namespace StudioSB.GUI
     /// And editor for the SBBone
     /// Bones can be generic representations of any transform, however
     /// </summary>
-    public class SBBoneEditor : Panel
+    public class SBBoneEditor : GroupBox
     {
         private Label NameLabel;
         private GenericBindingTextBox<float> X, Y, Z;
@@ -21,6 +21,8 @@ namespace StudioSB.GUI
 
         public SBBoneEditor()
         {
+            Text = "Bone Panel";
+            
             ApplicationSettings.SkinControl(this);
 
             X = new GenericBindingTextBox<float>();

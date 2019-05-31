@@ -80,7 +80,7 @@ namespace StudioSB
                     var open = new SBToolStripMenuItem("Open");
                     {
                         var folder = new SBToolStripMenuItem("Folder");
-                        folder.Click += OpenFolder;
+                        folder.Click += projectTree.OpenFolder;
                         folder.ShortcutKeys = Keys.O | Keys.Control | Keys.Shift | Keys.Alt;
                         open.DropDownItems.Add(folder);
 
@@ -325,20 +325,6 @@ namespace StudioSB
                 }
             }
 
-        }
-
-        /// <summary>
-        /// Opens a folder and sets it in the file tree
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void OpenFolder(object sender, EventArgs args)
-        {
-            string Folder = StudioSB.Tools.FileTools.TryOpenFolder();
-            if(Folder != "")
-            {
-                projectTree.SetRoot(Folder);
-            }
         }
 
         /// <summary>

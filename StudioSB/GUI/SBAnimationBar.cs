@@ -6,7 +6,7 @@ namespace StudioSB.GUI
     /// <summary>
     /// Animation bar for setting and playing frames
     /// </summary>
-    public class SBAnimationBar : Panel
+    public class SBAnimationBar : GroupBox
     {
         /// <summary>
         /// read only current frame value
@@ -50,9 +50,13 @@ namespace StudioSB.GUI
 
         public SBAnimationBar()
         {
+            Text = "Animation Track";
+
             ApplicationSettings.SkinControl(this);
 
-            BackColor = ApplicationSettings.MiddleColor;
+            //BackColor = ApplicationSettings.MiddleColor;
+
+            Size = new System.Drawing.Size(int.MaxValue, 130);
 
             animationTrack = new TrackBar();
             animationTrack.Dock = DockStyle.Top;

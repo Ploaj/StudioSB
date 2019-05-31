@@ -259,6 +259,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="DefaultTextures\diffuseSdr00.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -606,6 +607,10 @@
     <Content Include="lib\SSBHLib.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\icon_unknown.png" />
+    <None Include="Resources\icon_file.png" />
+    <None Include="Resources\icon_folder.png" />
+    <None Include="Resources\icons8-folder-48.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

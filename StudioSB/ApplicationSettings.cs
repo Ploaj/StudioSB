@@ -91,7 +91,7 @@ namespace StudioSB
         public static Color FontColor { get; internal set; } = Color.Ivory;
 
         [SettingsGroup(SettingsGroupType.Application)]
-        public static Color SeletectedToolColor { get; internal set; } = Color.Goldenrod;
+        public static Color SeletectedToolColor { get; internal set; } = Color.SkyBlue;
 
         // Settings for Renderer
         [SettingsGroup(SettingsGroupType.Viewport, "Use legacy OpenGL rendering instead of shaders", "Use Legacy Rendering (Very Slow)")]

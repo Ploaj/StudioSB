@@ -26,6 +26,8 @@ namespace StudioSB.GUI.Projects
         {
             FilePath = FolderPath;
             AfterCollapse();
+            ImageKey = "folder";
+            SelectedImageKey = "folder";
         }
 
         public void BeforeExpand()

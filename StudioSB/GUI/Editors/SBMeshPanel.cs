@@ -4,7 +4,7 @@ using StudioSB.Scenes;
 
 namespace StudioSB.GUI.Editors
 {
-    public class SBMeshPanel : Panel
+    public class SBMeshPanel : GroupBox
     {
         private Label meshName;
         //private Label indexCount;
@@ -56,6 +56,12 @@ namespace StudioSB.GUI.Editors
 
         public SBMeshPanel()
         {
+            Text = "Mesh Panel";
+
+            ApplicationSettings.SkinControl(this);
+
+            Size = new System.Drawing.Size(400, 400);
+
             materialSelector = new GenericBindingComboBox<ISBMaterial>("");
             materialSelector.Dock = DockStyle.Top;
             materialSelector.Bind(this, "Material");

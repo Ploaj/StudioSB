@@ -19,9 +19,13 @@ namespace StudioSB.GUI.Projects
             {
                 _path = value;
                 Text = Path.GetFileName(_path.Replace(":", ""));
+                ImageKey = "file";
+                SelectedImageKey = "file";
                 if (!MainForm.OpenableExtensions.Contains(Path.GetExtension(Text)))
                 {
                     ForeColor = Color.Gray;
+                    ImageKey = "unknown";
+                    SelectedImageKey = "unknown";
                 }
             }
         }
