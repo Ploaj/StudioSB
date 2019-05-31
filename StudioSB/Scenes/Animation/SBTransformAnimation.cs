@@ -14,6 +14,30 @@ namespace StudioSB.Scenes.Animation
 
         public List<SBTransformTrack> Tracks = new List<SBTransformTrack>();
 
+        /// <summary>
+        /// adds a new key frame to the animation
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="value"></param>
+        /// <param name="type"></param>
+        /// <param name="interpolationType"></param>
+        public void AddKey(float frame, float value, SBTrackType type, InterpolationType interpolationType = InterpolationType.Linear)
+        {
+            var track = Tracks.Find(e => e.Type == type);
+            if(track == null)
+            {
+                track = new SBTransformTrack(type);
+                Tracks.Add(track);
+            }
+            track.AddKey(frame, value, interpolationType);
+        }
+
+        /// <summary>
+        /// gets the interpolated values for track type at frame
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public float GetTrackValueAt(float frame, SBTrackType type)
         {
             var track = Tracks.Find(e => e.Type == type);
@@ -24,11 +48,23 @@ namespace StudioSB.Scenes.Animation
             return track.Keys.GetValue(frame);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Frame"></param>
+        /// <param name="skeleton"></param>
+        /// <returns></returns>
         public Matrix4 GetTransformAt(float Frame, SBSkeleton skeleton)
         {
             return GetTransformAt(Frame, skeleton[Name]);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Frame"></param>
+        /// <param name="bone"></param>
+        /// <returns></returns>
         public Matrix4 GetTransformAt(float Frame, SBBone bone)
         {
             if (bone == null)

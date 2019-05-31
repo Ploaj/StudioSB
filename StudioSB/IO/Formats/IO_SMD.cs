@@ -6,10 +6,11 @@ using System.IO;
 using StudioSB.Scenes;
 using System.Text.RegularExpressions;
 using StudioSB.Scenes.Animation;
+using System;
 
 namespace StudioSB.IO.Formats
 {
-    public class IO_SMD : IExportableModelType, IImportableModelType, IExportableAnimation
+    public class IO_SMD : IExportableModelType, IImportableModelType, IExportableAnimation, IImportableAnimation
     {
         public string Name { get; } = "Source Model";
         public string Extension { get; } = ".smd";
@@ -503,6 +504,44 @@ namespace StudioSB.IO.Formats
             }
 
             file.Save(FileName);
+        }
+
+        public SBAnimation ImportSBAnimation(string FileName, SBSkeleton skeleton)
+        {
+            SMD smd = new SMD();
+            smd.Open(FileName);
+
+            SBAnimation animation = new SBAnimation();
+            Dictionary<int, SBTransformAnimation> idToAnim = new Dictionary<int, SBTransformAnimation>();
+
+            foreach (var node in smd.nodes)
+            {
+                var nodeAnim = new SBTransformAnimation() { Name = node.Name };
+                idToAnim.Add(node.ID, nodeAnim);
+            }
+
+            var frameCount = 0;
+            foreach(var v in smd.skeleton)
+            {
+                frameCount = Math.Max(v.time, frameCount);
+                foreach (var node in v.skeletons)
+                {
+                    var animNode = idToAnim[node.BoneID];
+
+                    animNode.AddKey(v.time, node.Position.X, SBTrackType.TranslateX);
+                    animNode.AddKey(v.time, node.Position.Y, SBTrackType.TranslateY);
+                    animNode.AddKey(v.time, node.Position.Z, SBTrackType.TranslateZ);
+                    animNode.AddKey(v.time, node.Rotation.X, SBTrackType.RotateX);
+                    animNode.AddKey(v.time, node.Rotation.Y, SBTrackType.RotateY);
+                    animNode.AddKey(v.time, node.Rotation.Z, SBTrackType.RotateZ);
+
+                    animation.TransformNodes.Add(animNode);
+                }
+            }
+
+            animation.FrameCount = frameCount;
+
+            return animation;
         }
 
         #endregion
