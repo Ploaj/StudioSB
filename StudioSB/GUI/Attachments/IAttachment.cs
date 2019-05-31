@@ -12,6 +12,6 @@
 
         void Step();
 
-        void Render(SBViewport viewport);
+        void Render(SBViewport viewport, float frame = 0);
     }
 }

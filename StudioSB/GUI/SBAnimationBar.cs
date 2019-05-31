@@ -13,10 +13,12 @@ namespace StudioSB.GUI
         /// </summary>
         public float Frame
         {
-            get => frame.Value;
+            get => animationTrack.Value;
         }
-        private PropertyBinding<float> frame;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public int FrameCount
         {
             get
@@ -26,7 +28,7 @@ namespace StudioSB.GUI
             set
             {
                 animationTrack.Maximum = value;
-                frameCountLabel.Text = $"Frame Count: {value}";
+                frameCountLabel.Text = $"Frame: 0 / {value}";
             }
         }
 
@@ -50,9 +52,11 @@ namespace StudioSB.GUI
         {
             ApplicationSettings.SkinControl(this);
 
+            BackColor = ApplicationSettings.MiddleColor;
+
             animationTrack = new TrackBar();
             animationTrack.Dock = DockStyle.Top;
-            animationTrack.ValueChanged += FrameChanged;
+            //animationTrack.ValueChanged += FrameChanged;
 
             buttonBar = new Panel();
             buttonBar.MaximumSize = new System.Drawing.Size(int.MaxValue, 32);
@@ -89,7 +93,8 @@ namespace StudioSB.GUI
 
             frameLabel = new Label();
             frameLabel.Text = "Frame Count: ";
-            frameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            frameLabel.Dock = DockStyle.Top;
+            frameLabel.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             //hbox.AddControl(frameLabel);
 
             currentFrame = new NumericUpDown();
@@ -104,20 +109,6 @@ namespace StudioSB.GUI
             Controls.Add(buttonBar);
             Controls.Add(animationTrack);
             Controls.Add(frameCountLabel);
-
-            frame = new PropertyBinding<float>();
-        }
-        
-        /// <summary>
-        /// Trys to bind an objects frame property, as a float, to this animation bar
-        /// </summary>
-        /// <param name=""></param>
-        /// <param name=""></param>
-        /// <param name="PropertyName"></param>
-        public void BindFrame(Object obj, string PropertyName)
-        {
-            frame.UnBind();
-            frame.Bind(obj, PropertyName);
         }
 
         /// <summary>
@@ -127,8 +118,8 @@ namespace StudioSB.GUI
         /// <param name="args"></param>
         private void FrameChanged(object sender, EventArgs args)
         {
-            frame.Value = animationTrack.Value;
-            //frameLabel.Text = $"Frame: {frame.Value}/{FrameCount}";
+            //frame.Value = animationTrack.Value;
+            //frameLabel.Text = $"Frame: {animationTrack.Value}/{FrameCount}";
         }
 
         /// <summary>

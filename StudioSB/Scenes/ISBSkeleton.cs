@@ -49,6 +49,11 @@ namespace StudioSB.Scenes
         void RenderLegacy();
 
         /// <summary>
+        /// Resets the animated positions of the bones to the defaults
+        /// </summary>
+        void Reset();
+
+        /// <summary>
         /// Renders the skeleton using Shaders on the current thread
         /// </summary>
         void RenderShader(Camera camera);

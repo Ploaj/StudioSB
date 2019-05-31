@@ -79,6 +79,8 @@ namespace StudioSB.GUI
         private Vector2 mousePosition = new Vector2();
         private float mouseScrollWheel = 0;
 
+        public float Frame { get; set; }
+
         public SBViewport()
         {
             // Do I even need to skin this?
@@ -131,7 +133,7 @@ namespace StudioSB.GUI
             // Only render when something in the scene has been updated
             // TODO: This conditional causes flickering.
             //if (Updated)
-                Render();
+            Render();
             Updated = false;
         }
 
@@ -189,7 +191,7 @@ namespace StudioSB.GUI
 
             foreach(var attachment in Attachments)
             {
-                attachment.Render(this);
+                attachment.Render(this, Frame);
             }
 
             if (ApplicationSettings.RenderSceneInformation)

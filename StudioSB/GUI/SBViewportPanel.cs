@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using StudioSB.Scenes;
 using StudioSB.GUI.Attachments;
+using System.Diagnostics;
 
 namespace StudioSB.GUI
 {
@@ -12,6 +13,32 @@ namespace StudioSB.GUI
     /// </summary>
     public class SBViewportPanel : Panel
     {
+        public float CurrentFrame
+        {
+            get
+            {
+                return animationBar.Frame;
+            }
+        }
+        public int FrameCount
+        {
+            set
+            {
+                animationBar.FrameCount = value;
+            }
+        }
+        public bool EnableAnimationBar
+        {
+            set
+            {
+                if (value)
+                    Controls.Add(animationBar);
+                else
+                    Controls.Remove(animationBar);
+            }
+        }
+        private SBAnimationBar animationBar;
+
         public SBViewport Viewport
         {
             get => _viewport;
@@ -36,11 +63,17 @@ namespace StudioSB.GUI
         
         private SBPopoutPanel RightPane { get; set; }
 
+        private Stopwatch stopWatch;
+        public int timing = 0;
+
         public SBViewportPanel()
         {
             ApplicationSettings.SkinControl(this);
             BackColor = ApplicationSettings.MiddleColor;
-            
+
+            //Application.Idle += new EventHandler(TriggerViewportRender);
+            stopWatch = new Stopwatch();
+            stopWatch.Start();
             RenderTimer = new Timer();
             RenderTimer.Interval = 1000 / 120;
             RenderTimer.Tick += new EventHandler(TriggerViewportRender);
@@ -56,11 +89,16 @@ namespace StudioSB.GUI
             TabPanel.Dock = DockStyle.Fill;
 
             RightPane.Contents.Add(TabPanel);
+            
+            animationBar = new SBAnimationBar();
+            animationBar.Dock = DockStyle.Bottom;
+
+            animationBar.FrameCount = 0;
 
             Clear();
             Setup();
         }
-
+        
 
         /// <summary>
         /// Raises a render frame event for the viewport.
@@ -69,9 +107,19 @@ namespace StudioSB.GUI
         /// <param name="e"></param>
         void TriggerViewportRender(object sender, EventArgs e)
         {
-            if (!Viewport.IsDisposed && Viewport.IsIdle)
+            timing += (int)stopWatch.ElapsedMilliseconds;
+            stopWatch.Reset();
+            stopWatch.Start();
+
+            if (!Viewport.IsDisposed && Viewport.IsIdle && timing > 16)
             {
+                timing = timing % 16;
+
                 Viewport.Updated = true;
+
+                animationBar.Process();
+
+                Viewport.Frame = CurrentFrame;
                 Viewport.RenderFrame();
             }
         }
@@ -125,6 +173,10 @@ namespace StudioSB.GUI
                     RemoveAttachment(att);
                 }
             }
+
+            if (LoadedScene != null)
+                if(LoadedScene.HasBones)
+                    LoadedScene.Skeleton.Reset();
 
             attachment.AttachToPanel(this);
             Viewport.Attachments.Add(attachment);

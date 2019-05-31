@@ -16,7 +16,7 @@ namespace StudioSB.GUI
             //ImageList = new System.Windows.Forms.ImageList();
             //ImageList.ImageSize = new System.Drawing.Size(24, 24);
 
-            Indent = 8;
+            Indent = 16;
 
             LabelEdit = true;
 
@@ -93,7 +93,7 @@ namespace StudioSB.GUI
             // none
         }
 
-        public void Render(SBViewport viewport)
+        public void Render(SBViewport viewport, float frame)
         {
             // none
         }
@@ -103,14 +103,17 @@ namespace StudioSB.GUI
             return false;
         }
 
-        Panel container = new Panel();
+        private Panel container;
 
         public void AttachToPanel(SBViewportPanel viewportPanel)
         {
+            if (container != null)
+                container.Dispose();
+            container = new Panel();
             container.AutoScroll = true;
             container.Dock = DockStyle.Fill;
             container.Controls.Add(BoneEditor);
-            container.Controls.Add(new Splitter() { Dock = DockStyle.Top });
+            container.Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
             container.Controls.Add(this);
             viewportPanel.TabPanel.AddTab("Bone", container);
         }

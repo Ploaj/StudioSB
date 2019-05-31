@@ -71,6 +71,12 @@ namespace StudioSB.Scenes
             return this[Name] != null;
         }
 
+        public void Reset()
+        {
+            foreach (var v in Bones)
+                v.AnimatedTransform = v.Transform;
+        }
+
         #region Rendering
         
         //Rendering
