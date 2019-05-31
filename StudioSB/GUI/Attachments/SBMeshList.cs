@@ -3,6 +3,8 @@ using StudioSB.GUI.Editors;
 using StudioSB.Scenes;
 using System;
 using System.Windows.Forms;
+using StudioSB.Rendering.Bounding;
+using OpenTK;
 
 namespace StudioSB.GUI
 {
@@ -193,6 +195,23 @@ namespace StudioSB.GUI
 
         public void Render(SBViewport viewport, float frame)
         {
+        }
+
+        public void Pick(Ray ray)
+        {
+            // bounding sphere for mesh needs to be transformed by parent bone
+            /*Vector3 close;
+            foreach(ListViewItem item in Items)
+            {
+                if(item.Tag is ISBMesh mesh)
+                {
+                    Vector3 spherePosition = mesh.BoundingSphere.Position;
+                    if (ray.CheckSphereHit(, mesh.BoundingSphere.Radius, out close))
+                    {
+                        SBConsole.WriteLine(mesh.Name);
+                    }
+                }
+            }*/
         }
     }
 }

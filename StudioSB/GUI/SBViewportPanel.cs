@@ -4,6 +4,8 @@ using System.Windows.Forms;
 using StudioSB.Scenes;
 using StudioSB.GUI.Attachments;
 using System.Diagnostics;
+using OpenTK;
+using StudioSB.Rendering.Bounding;
 
 namespace StudioSB.GUI
 {
@@ -95,8 +97,36 @@ namespace StudioSB.GUI
 
             animationBar.FrameCount = 0;
 
+            Viewport.MouseDoubleClick += Pick;
+
             Clear();
             Setup();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void Pick(object sender, MouseEventArgs args)
+        {
+            int mouse_x = args.X;
+            int mouse_y = args.Y;
+
+            float x = (2.0f * mouse_x) / Viewport.Width - 1.0f;
+            float y = 1.0f - (2.0f * mouse_y) / Viewport.Height;
+            Vector4 va = Vector4.Transform(new Vector4(x, y, -1.0f, 1.0f), Viewport.Camera.MvpMatrix.Inverted());
+            Vector4 vb = Vector4.Transform(new Vector4(x, y, 1.0f, 1.0f), Viewport.Camera.MvpMatrix.Inverted());
+
+            Vector3 p1 = va.Xyz;
+            Vector3 p2 = p1 - (va - (va + vb)).Xyz * 100;
+
+            Ray r = new Ray(p1, p2);
+
+            foreach(var attachment in Viewport.Attachments)
+            {
+                attachment.Pick(r);
+            }
         }
         
 

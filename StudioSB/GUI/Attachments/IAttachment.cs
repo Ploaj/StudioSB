@@ -1,4 +1,6 @@
-﻿namespace StudioSB.GUI.Attachments
+﻿using StudioSB.Rendering.Bounding;
+
+namespace StudioSB.GUI.Attachments
 {
     public interface IAttachment
     {
@@ -11,6 +13,8 @@
         void Update(SBViewport viewport);
 
         void Step();
+
+        void Pick(Ray ray);
 
         void Render(SBViewport viewport, float frame = 0);
     }

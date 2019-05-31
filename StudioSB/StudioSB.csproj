@@ -176,6 +176,7 @@
     <Compile Include="Rendering\Bounding\AABoundingBox.cs" />
     <Compile Include="Rendering\Bounding\BoundingSphere.cs" />
     <Compile Include="Rendering\Bounding\OrientedBoundingBox.cs" />
+    <Compile Include="Rendering\Bounding\Ray.cs" />
     <Compile Include="Rendering\DefaultTextures.cs" />
     <Compile Include="Rendering\Shapes\Capsule.cs" />
     <Compile Include="Rendering\Shapes\RectangularPrism.cs" />
@@ -610,7 +611,6 @@
     <None Include="Resources\icon_unknown.png" />
     <None Include="Resources\icon_file.png" />
     <None Include="Resources\icon_folder.png" />
-    <None Include="Resources\icons8-folder-48.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

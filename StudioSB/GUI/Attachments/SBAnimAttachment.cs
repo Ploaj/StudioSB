@@ -1,4 +1,5 @@
-﻿using StudioSB.Scenes.Animation;
+﻿using StudioSB.Rendering.Bounding;
+using StudioSB.Scenes.Animation;
 
 namespace StudioSB.GUI.Attachments
 {
@@ -53,6 +54,11 @@ namespace StudioSB.GUI.Attachments
 
         public void Update(SBViewport viewport)
         {
+        }
+
+        public void Pick(Ray ray)
+        {
+
         }
     }
 }

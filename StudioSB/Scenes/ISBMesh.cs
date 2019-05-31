@@ -1,4 +1,6 @@
-﻿namespace StudioSB.Scenes
+﻿using StudioSB.Rendering.Bounding;
+
+namespace StudioSB.Scenes
 {
     /// <summary>
     /// Interface for mesh object
@@ -12,6 +14,9 @@
         public ISBMaterial Material { get; set; }
 
         #region GUI interfacing stuff
+
+        public BoundingSphere BoundingSphere { get; set; }
+
         public bool Visible { get; set; }
 
         public bool Selected { get; set; }

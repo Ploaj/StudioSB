@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using StudioSB.Scenes;
 using System.Windows.Forms;
 using StudioSB.GUI.Attachments;
+using StudioSB.Rendering.Bounding;
+using OpenTK;
 
 namespace StudioSB.GUI
 {
@@ -121,6 +123,35 @@ namespace StudioSB.GUI
         public void RemoveFromPanel(SBViewportPanel viewportPanel)
         {
 
+        }
+
+        public void Pick(Ray ray)
+        {
+            foreach(var v in Nodes)
+            {
+                if(v is SBTreeNode node)
+                {
+                    Pick(node, ray);
+                }
+            }
+        }
+
+        private void Pick(SBTreeNode treeNode, Ray ray)
+        {
+            Vector3 close;
+            if (treeNode.Tag is SBBone bone)
+            {
+                if (ray.CheckSphereHit(Vector3.TransformPosition(Vector3.Zero, bone.WorldTransform), 0.5f, out close))
+                {
+                    SelectedNode = treeNode;
+                    return;
+                }
+            }
+
+            foreach (var child in treeNode.Nodes)
+            {
+                Pick((SBTreeNode)child, ray);
+            }
         }
     }
 

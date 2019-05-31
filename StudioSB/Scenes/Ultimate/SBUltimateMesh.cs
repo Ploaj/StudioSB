@@ -7,7 +7,6 @@ namespace StudioSB.Scenes.Ultimate
 {
     public class SBUltimateMesh : ISBMesh
     {
-        public BoundingSphere BoundingSphere { get; set; }
         public AABoundingBox AABoundingBox { get; set; }
         public OrientedBoundingBox OrientedBoundingBox { get; set; }
 
