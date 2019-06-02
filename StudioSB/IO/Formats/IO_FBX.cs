@@ -204,14 +204,14 @@ namespace StudioSB.IO.Formats
 
             bone.Transform = Matrix4.Identity;
             
-            bone.Translation = new Vector3((float)model.LclTranslation.X, (float)model.LclTranslation.Y, (float)model.LclTranslation.Z);
-            bone.RotationEuler = new Vector3((float)model.LclRotation.X * DegToRag, (float)model.LclRotation.Y * DegToRag, (float)model.LclRotation.Z * DegToRag);
             bone.Scale = new Vector3((float)model.LclScaling.X, (float)model.LclScaling.Y, (float)model.LclScaling.Z);
+            bone.RotationEuler = new Vector3((float)model.LclRotation.X * DegToRag, (float)model.LclRotation.Y * DegToRag, (float)model.LclRotation.Z * DegToRag);
+            bone.Translation = new Vector3((float)model.LclTranslation.X, (float)-model.LclTranslation.Z, (float)model.LclTranslation.Y);
 
             if (bone.Scale == new Vector3(100))
                 bone.Scale /= 100;
-
-            return bone.Transform;
+            
+            return Matrix4.CreateScale(bone.Scale) * Matrix4.CreateFromQuaternion(bone.RotationQuaternion) * Matrix4.CreateTranslation(bone.Translation);
         }
 
         /// <summary>
