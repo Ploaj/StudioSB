@@ -94,6 +94,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationSettings.cs" />
+    <Compile Include="GUI\Attachments\LVDAttachment.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GUI\Attachments\SBAnimAttachment.cs" />
     <Compile Include="GUI\Attachments\IAttachment.cs" />
     <Compile Include="GUI\Editors\SBMeshPanel.cs">
@@ -194,6 +197,22 @@
     <Compile Include="Scenes\ISBMaterial.cs" />
     <Compile Include="Scenes\ISBMesh.cs" />
     <Compile Include="Scenes\ISBModel.cs" />
+    <Compile Include="Scenes\LVD\LevelData.cs" />
+    <Compile Include="Scenes\LVD\LVDBounds.cs" />
+    <Compile Include="Scenes\LVD\LVDCollision.cs" />
+    <Compile Include="Scenes\LVD\LVDCollisionCliff.cs" />
+    <Compile Include="Scenes\LVD\LVDCollisionCurve.cs" />
+    <Compile Include="Scenes\LVD\LVDCollisionMaterial.cs" />
+    <Compile Include="Scenes\LVD\LVDDamageShape.cs" />
+    <Compile Include="Scenes\LVD\LVDEnemyGenerator.cs" />
+    <Compile Include="Scenes\LVD\LVDEntry.cs" />
+    <Compile Include="Scenes\LVD\LVDGeneralPoint.cs" />
+    <Compile Include="Scenes\LVD\LVDGeneralShape.cs" />
+    <Compile Include="Scenes\LVD\LVDGeneralVector.cs" />
+    <Compile Include="Scenes\LVD\LVDItemSpawner.cs" />
+    <Compile Include="Scenes\LVD\LVDRangeCurve.cs" />
+    <Compile Include="Scenes\LVD\LVDShape.cs" />
+    <Compile Include="Scenes\LVD\LVDSpawn.cs" />
     <Compile Include="Scenes\SBBone.cs" />
     <Compile Include="Scenes\SBScene.cs" />
     <Compile Include="Scenes\ISBSkeleton.cs" />
@@ -246,6 +265,7 @@
     <Compile Include="Rendering\ShaderManager.cs" />
     <Compile Include="Rendering\Shapes\BonePrism.cs" />
     <Compile Include="Rendering\Shapes\Grid3D.cs" />
+    <Compile Include="Tools\BinaryReaderExt.cs" />
     <Compile Include="Tools\CrossMath.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\SwitchSwizzler.cs" />

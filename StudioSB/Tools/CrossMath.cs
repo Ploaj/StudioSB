@@ -106,5 +106,10 @@ namespace StudioSB.Tools
             }
             return new Vector3(x, y, z);
         }
+
+        public static bool FastDistance(Vector3 p1, Vector3 p2, float distance)
+        {
+            return Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2) + Math.Pow(p1.Z - p2.Z, 2) < distance * distance;
+        }
     }
 }

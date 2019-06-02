@@ -50,6 +50,8 @@ namespace StudioSB
         private List<IImportableAnimation> AnimationImporters = new List<IImportableAnimation>();
         private List<IExportableAnimation> AnimationExporters = new List<IExportableAnimation>();
 
+        private List<IAttachment> AttachmentTypes = new List<IAttachment>();
+
         public MainForm()
         {
             InitializeComponent();
@@ -288,6 +290,17 @@ namespace StudioSB
         /// <param name="FilePath"></param>
         public void OpenFile(string FilePath)
         {
+            // Attachments
+            foreach(var attachment in AttachmentTypes)
+            {
+                if (FilePath.ToLower().EndsWith(attachment.Extension()))
+                {
+                    attachment.Open(FilePath);
+                    viewportPanel.AddAttachment(attachment);
+                    return;
+                }
+            }
+
             // Animation
             foreach (var openableAnimation in AnimationImporters)
             {
@@ -630,6 +643,23 @@ namespace StudioSB
                     var importer = (IImportableAnimation)Activator.CreateInstance(type);
                     AnimationImporters.Add(importer);
                     OpenableExtensions.Add(importer.Extension);
+                }
+            }
+
+            var attachments = from type in assemblyTypes
+                                           where typeof(IAttachment).IsAssignableFrom(type)
+                                           select type;
+
+            foreach (var type in attachments)
+            {
+                if (type != typeof(IAttachment))
+                {
+                    var importer = (IAttachment)Activator.CreateInstance(type);
+                    if(importer.Extension() != null)
+                    {
+                        AttachmentTypes.Add(importer);
+                        OpenableExtensions.Add(importer.Extension());
+                    }
                 }
             }
 

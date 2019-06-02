@@ -9,6 +9,11 @@ namespace StudioSB.GUI.Attachments
 
         private float PreviousFrame = 0;
 
+        public SBAnimAttachment()
+        {
+
+        }
+
         public SBAnimAttachment(SBAnimation animation)
         {
             this.animation = animation;
@@ -48,7 +53,7 @@ namespace StudioSB.GUI.Attachments
             PreviousFrame = frame;
         }
 
-        public void Step()
+        public void Step(SBViewport viewport)
         {
         }
 
@@ -59,6 +64,19 @@ namespace StudioSB.GUI.Attachments
         public void Pick(Ray ray)
         {
 
+        }
+
+        public string Extension()
+        {
+            return null;
+        }
+
+        public void Open(string FilePath)
+        {
+        }
+
+        public void Save(string FilePath)
+        {
         }
     }
 }

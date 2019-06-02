@@ -189,19 +189,13 @@ namespace StudioSB.GUI
         {
             if (!attachment.AllowMultiple())
             {
-                List<IAttachment> ToRemove = new List<IAttachment>();
-                foreach (var att in Viewport.Attachments)
+                var remove = Viewport.Attachments.Find(e => e.GetType() == attachment.GetType());
+                if (remove != null && remove is Control c)
                 {
-                    if (!attachment.AllowMultiple() && att.GetType() == attachment.GetType())
-                    {
-                        ToRemove.Add(att);
-                        continue;
-                    }
+                    TabPanel.RemoveTab(c);
                 }
-                foreach(var att in ToRemove)
-                {
-                    RemoveAttachment(att);
-                }
+                if (remove != null)
+                    Viewport.Attachments.Remove(remove);
             }
 
             if (LoadedScene != null)

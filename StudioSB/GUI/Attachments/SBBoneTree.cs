@@ -90,7 +90,7 @@ namespace StudioSB.GUI
             LoadFromScene(viewport.Scene);
         }
 
-        public void Step()
+        public void Step(SBViewport viewport)
         {
             // none
         }
@@ -152,6 +152,19 @@ namespace StudioSB.GUI
             {
                 Pick((SBTreeNode)child, ray);
             }
+        }
+        
+        public string Extension()
+        {
+            return null;
+        }
+
+        public void Open(string FilePath)
+        {
+        }
+
+        public void Save(string FilePath)
+        {
         }
     }
 

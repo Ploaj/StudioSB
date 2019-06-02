@@ -157,6 +157,11 @@ namespace StudioSB.GUI
         protected void OnUpdateFrame()
         {
             UpdateCamera();
+            
+            foreach (var attachment in Attachments)
+            {
+                attachment.Step(this);
+            }
         }
 
         /// <summary>
@@ -244,17 +249,22 @@ namespace StudioSB.GUI
             }
         }
 
+        public Vector2 GetMousePosition()
+        {
+            return mousePosition;
+        }
+
         /// <summary>
         /// Updates the camera with the given inputs
         /// </summary>
         private void UpdateCamera()
         {
-            if (Mouse.GetState() == null)
+            if (Mouse.GetState() == null || Keyboard.GetState() == null)
                 return;
 
             Vector2 newMousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
             float newMouseScrollWheel = Mouse.GetState().Wheel;
-            if (Focused && ClientRectangle.Contains(PointToClient(MousePosition)))
+            if (Focused && ClientRectangle.Contains(PointToClient(MousePosition)) && !Keyboard.GetState().IsKeyDown(Key.AltLeft))
             {
                 if (Mouse.GetState().IsButtonDown(MouseButton.Left))
                 {
