@@ -117,7 +117,7 @@ namespace StudioSB.IO.Formats
                                 var skel = new SMDSkeleton();
                                 skel.BoneID = int.Parse(args[0]);
                                 skel.Position = new Vector3(float.Parse(args[1]), float.Parse(args[2]), float.Parse(args[3]));
-                                skel.Position = new Vector3(float.Parse(args[4]), float.Parse(args[5]), float.Parse(args[6]));
+                                skel.Rotation = new Vector3(float.Parse(args[4]), float.Parse(args[5]), float.Parse(args[6]));
                                 CurrentSkeleton.skeletons.Add(skel);
                                 break;
                             case "triangles":
@@ -518,6 +518,8 @@ namespace StudioSB.IO.Formats
             {
                 var nodeAnim = new SBTransformAnimation() { Name = node.Name };
                 idToAnim.Add(node.ID, nodeAnim);
+
+                animation.TransformNodes.Add(nodeAnim);
             }
 
             var frameCount = 0;
@@ -534,8 +536,6 @@ namespace StudioSB.IO.Formats
                     animNode.AddKey(v.time, node.Rotation.X, SBTrackType.RotateX);
                     animNode.AddKey(v.time, node.Rotation.Y, SBTrackType.RotateY);
                     animNode.AddKey(v.time, node.Rotation.Z, SBTrackType.RotateZ);
-
-                    animation.TransformNodes.Add(animNode);
                 }
             }
 
