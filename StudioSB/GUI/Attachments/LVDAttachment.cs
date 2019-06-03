@@ -11,8 +11,14 @@ using OpenTK.Input;
 
 namespace StudioSB.GUI.Attachments
 {
+    /// <summary>
+    /// Attachment for editing LVD files
+    /// </summary>
     public class LVDAttachment : GroupBox, IAttachment
     {
+        /// <summary>
+        /// Returns true if this panel the current attachment
+        /// </summary>
         private bool IsActive
         {
             get
@@ -28,16 +34,18 @@ namespace StudioSB.GUI.Attachments
             }
         }
 
+        // UI
+        private GroupBox ToolPanel;
         private SBToolStrip Tools;
+        private SBToolStrip PointToolStrip;
         private SBTreeView NodeTree;
         private PropertyGrid PropertyGrid;
 
-        private float PlatformWidth = 8f;
-
+        // LVD
         private LevelData LVD;
 
-        private bool CameraLocked = false;
-
+        // Options
+        private float PlatformWidth = 8f;
         private static float PickRange = 2.5f;
 
         public LVDAttachment()
@@ -47,14 +55,31 @@ namespace StudioSB.GUI.Attachments
 
             ApplicationSettings.SkinControl(this);
 
+            ToolPanel = new GroupBox();
+            ToolPanel.Text = "Options";
+            ToolPanel.ForeColor = ApplicationSettings.ForegroundColor;
+            ToolPanel.Dock = DockStyle.Top;
+            ToolPanel.Height = 40;
+
             Tools = new SBToolStrip();
             Tools.Dock = DockStyle.Top;
+            
+            PointToolStrip = new SBToolStrip();
 
-            ToolStripButton lockCamera = new ToolStripButton();
-            lockCamera.Click += (object sender, EventArgs args) => {
-                CameraLocked = !CameraLocked;
+            ToolStripButton addVertex = new ToolStripButton();
+            addVertex.Text = "Add";
+            addVertex.Click += (object sender, EventArgs args) => {
+                if(PropertyGrid.SelectedObject is LVDVector2 point)
+                    AddNewPoint(point);
             };
-            Tools.Items.Add(lockCamera);
+            ToolStripButton deleteVertex = new ToolStripButton();
+            deleteVertex.Text = "Delete";
+            deleteVertex.Click += (object sender, EventArgs args) => {
+                if (PropertyGrid.SelectedObject is LVDVector2 point)
+                    DeleteVertex(point);
+            };
+            PointToolStrip.Items.Add(addVertex);
+            PointToolStrip.Items.Add(deleteVertex);
 
             NodeTree = new SBTreeView();
             NodeTree.Dock = DockStyle.Top;
@@ -63,34 +88,79 @@ namespace StudioSB.GUI.Attachments
             PropertyGrid = new PropertyGrid();
             PropertyGrid.Dock = DockStyle.Top;
             PropertyGrid.Size = new Size(200, 500);
+            PropertyGrid.SelectedObjectsChanged += SelectObjectChanged;
 
             Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
             Controls.Add(PropertyGrid);
             Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
             Controls.Add(NodeTree);
-            Controls.Add(Tools);
+            Controls.Add(ToolPanel);
         }
 
+        /// <summary>
+        /// Reads LVD data 
+        /// </summary>
+        /// <param name="FileName"></param>
         public void Open(string FileName)
         {
             LevelData lvd = new LevelData();
             lvd.Open(FileName);
 
-            var lvdNode = new TreeNode() { Text = "LVD", Tag = lvd };
+            LVD = lvd;
+            RefreshNodes();
+        }
+
+        /// <summary>
+        /// refreshes lvd nodes list
+        /// </summary>
+        private void RefreshNodes()
+        {
+            var lvdNode = new TreeNode() { Text = "LVD", Tag = LVD };
             NodeTree.Nodes.Clear();
             NodeTree.Nodes.Add(lvdNode);
 
-            foreach(var col in lvd.Collisions)
+            var collisionNode = new TreeNode() { Text = "Collisions" };
+            var itemSpawnerNode = new TreeNode() { Text = "ItemSpawners" };
+            lvdNode.Nodes.Add(collisionNode);
+            lvdNode.Nodes.Add(itemSpawnerNode);
+
+            foreach (var col in LVD.Collisions)
             {
                 var colNode = new TreeNode();
-                colNode.Text = col.EntryName;
+                colNode.Text = col.EntryLabel;
                 colNode.Tag = col;
-                lvdNode.Nodes.Add(colNode);
+                collisionNode.Nodes.Add(colNode);
             }
-
-            LVD = lvd;
+            foreach (var item in LVD.ItemSpawners)
+            {
+                var itemNode = new TreeNode();
+                itemNode.Text = item.EntryLabel;
+                itemNode.Tag = item;
+                itemSpawnerNode.Nodes.Add(itemNode);
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void SelectObjectChanged(object sender, EventArgs args)
+        {
+            ToolPanel.Controls.Clear();
+            ToolPanel.Text = "LVD Options";
+            if (PropertyGrid.SelectedObject is LVDVector2)
+            {
+                ToolPanel.Text = "Point Options";
+                ToolPanel.Controls.Add(PointToolStrip);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void SelectNode(object sender, EventArgs args)
         {
             if(NodeTree.SelectedNode != null)
@@ -132,7 +202,6 @@ namespace StudioSB.GUI.Attachments
             Vector2 nearestLine;
             float closest = float.MaxValue;
             LVDCollisionMaterial collisionMat = null;
-            Vector3 sphereHit;
             
             foreach(var point in LVD.GeneralPoints)
             {
@@ -248,6 +317,14 @@ namespace StudioSB.GUI.Attachments
                     ADown = false;
                 if (Mouse.GetState().IsButtonDown(MouseButton.Left))
                 {
+                    if (PropertyGrid.SelectedObject is LVDGeneralPoint point)
+                    {
+                        point.StartPosition.X -= deltaMouse.X / 4;
+                        point.StartPosition.Y += deltaMouse.Y / 4;
+                        point.X -= deltaMouse.X / 4;
+                        point.Y += deltaMouse.Y / 4;
+                        PropertyGrid.SelectedObject = PropertyGrid.SelectedObject;
+                    }
                     if (PropertyGrid.SelectedObject is LVDSpawn spawn)
                     {
                         spawn.StartPosition.X -= deltaMouse.X / 4;
@@ -343,6 +420,7 @@ namespace StudioSB.GUI.Attachments
         /// <param name="v"></param>
         private void DeleteVertex(LVDVector2 v)
         {
+            LVDCollision remove = null;
             foreach (var col in LVD.Collisions)
             {
                 int index = col.Vertices.IndexOf(v);
@@ -374,6 +452,20 @@ namespace StudioSB.GUI.Attachments
                 {
                     col.Normals[index - 1] = LVDVector2.GenerateNormal(col.Vertices[index - 1], col.Vertices[index]);
                 }
+
+                if (col.Vertices.Count < 2)
+                {
+                    remove = col;
+                }
+
+                break;
+            }
+
+            // remove collision that is marked for removal
+            if(remove != null)
+            {
+                LVD.Collisions.Remove(remove);
+                RefreshNodes();
             }
         }
 
@@ -432,6 +524,12 @@ namespace StudioSB.GUI.Attachments
                 foreach (var camera in LVD.CameraBounds)
                     RenderBounds(camera, Color.SkyBlue);
 
+                foreach (var blast in LVD.ShrunkBlastZoneBounds)
+                    RenderBounds(blast, Color.LightPink);
+
+                foreach (var camera in LVD.ShrunkCameraBounds)
+                    RenderBounds(camera, Color.SkyBlue);
+
                 int playerIndex = 1;
                 foreach (var spawn in LVD.Spawns)
                 {
@@ -471,8 +569,22 @@ namespace StudioSB.GUI.Attachments
 
                 GL.PopAttrib();
             }
+
+            if(PropertyGrid.SelectedObject is LVDVector2)
+            {
+                Rendering.TextRenderer.DrawOrtho(viewport.Camera, "Alt+Mouse: Move Point", new Vector2(4, viewport.Camera.RenderHeight - 30));
+                Rendering.TextRenderer.DrawOrtho(viewport.Camera, "Alt + A  : Add Point", new Vector2(4, viewport.Camera.RenderHeight - 16));
+                Rendering.TextRenderer.DrawOrtho(viewport.Camera, "Delete   : Delete", new Vector2(4, viewport.Camera.RenderHeight - 2));
+            }
+            else
+            {
+                Rendering.TextRenderer.DrawOrtho(viewport.Camera, "Double Click to Select", new Vector2(4, viewport.Camera.RenderHeight - 16));
+            }
         }
 
+        /// <summary>
+        /// Renders collisions from LVD
+        /// </summary>
         private void RenderCollisions()
         {
             foreach (var col in LVD.Collisions)
@@ -492,6 +604,14 @@ namespace StudioSB.GUI.Attachments
             }
         }
 
+        /// <summary>
+        /// Renders a collision wall
+        /// </summary>
+        /// <param name="col"></param>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="mat"></param>
+        /// <param name="normal"></param>
         private void RenderWall(LVDCollision col, LVDVector2 p1, LVDVector2 p2, LVDCollisionMaterial mat, Vector2 normal)
         {
             Vector2 v1 = new Vector2(p1.X, p1.Y);
@@ -554,6 +674,11 @@ namespace StudioSB.GUI.Attachments
         }
 
 
+        /// <summary>
+        /// Renders the bounds using legacy opengl camera, blastzones ect...
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="color"></param>
         private void RenderBounds(LVDBounds b, Color color)
         {
             Vector3 sPos = b.UseStartPosition ? new Vector3(b.StartPosition.X, b.StartPosition.Y, b.StartPosition.Z) : new Vector3(0, 0, 0);
@@ -574,6 +699,13 @@ namespace StudioSB.GUI.Attachments
             GL.End();
         }
 
+        /// <summary>
+        /// Returns color of normal
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="normals"></param>
+        /// <param name="material"></param>
+        /// <returns></returns>
         private Color GetNormalColor(LVDCollision c, Vector2 normals, LVDCollisionMaterial material)
         {
             float angle = (float)(Math.Atan2(normals.Y, normals.X) * 180 / Math.PI);
@@ -590,6 +722,11 @@ namespace StudioSB.GUI.Attachments
                 return Color.FromArgb(128, Color.Cyan);
         }
 
+        /// <summary>
+        /// returns color of Collision Material
+        /// </summary>
+        /// <param name="mat"></param>
+        /// <returns></returns>
         private Color GetMatlColor(LVDCollisionMaterial mat)
         {
             if (PropertyGrid.SelectedObject == mat)
@@ -655,6 +792,11 @@ namespace StudioSB.GUI.Attachments
             }
         }
 
+        /// <summary>
+        /// Gets the color of the specified object
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
         private Vector3 GetElementColor(object o)
         {
             if (PropertyGrid.SelectedObject == o)

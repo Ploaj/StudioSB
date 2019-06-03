@@ -48,7 +48,6 @@ namespace StudioSB.GUI.Projects
 
             toolStrip = new SBToolStrip();
             toolStrip.Dock = DockStyle.Top;
-            toolStrip.BackColor = ApplicationSettings.MiddleColor;
 
             ToolStripButton item = new ToolStripButton();
             item.Image = Resources.icon_folder;

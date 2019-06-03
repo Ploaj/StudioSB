@@ -10,6 +10,7 @@ namespace StudioSB.GUI.Menus
         public SBToolStrip()
         {
             ApplicationSettings.SkinControl(this);
+            BackColor = ApplicationSettings.MiddleColor;
         }
     }
     
