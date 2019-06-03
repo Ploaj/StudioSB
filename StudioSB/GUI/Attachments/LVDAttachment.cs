@@ -38,6 +38,8 @@ namespace StudioSB.GUI.Attachments
 
         private bool CameraLocked = false;
 
+        private static float PickRange = 2.5f;
+
         public LVDAttachment()
         {
             Text = "LVD Editor";
@@ -131,10 +133,50 @@ namespace StudioSB.GUI.Attachments
             float closest = float.MaxValue;
             LVDCollisionMaterial collisionMat = null;
             Vector3 sphereHit;
-
-            foreach(var spawn in LVD.Spawns)
+            
+            foreach(var point in LVD.GeneralPoints)
             {
-                if(CrossMath.FastDistance(Picked, new Vector3(spawn.X, spawn.Y, 0), 5))
+                if (CrossMath.FastDistance(Picked, new Vector3(point.X, point.Y, point.Z), PickRange * 2.5f))
+                {
+                    PropertyGrid.SelectedObject = point;
+                    return;
+                }
+            }
+            foreach (var bound in LVD.CameraBounds)
+            {
+                if (Ray.CheckBoundHit(Picked.Xy, new Vector2(bound.Left, bound.Top), new Vector2(bound.Right, bound.Bottom), PickRange))
+                {
+                    PropertyGrid.SelectedObject = bound;
+                    return;
+                }
+            }
+            foreach (var bound in LVD.BlastZoneBounds)
+            {
+                if(Ray.CheckBoundHit(Picked.Xy, new Vector2(bound.Left, bound.Top), new Vector2(bound.Right, bound.Bottom), PickRange))
+                {
+                    PropertyGrid.SelectedObject = bound;
+                    return;
+                }
+            }
+            foreach (var bound in LVD.ShrunkBlastZoneBounds)
+            {
+                if (Ray.CheckBoundHit(Picked.Xy, new Vector2(bound.Left, bound.Top), new Vector2(bound.Right, bound.Bottom), PickRange))
+                {
+                    PropertyGrid.SelectedObject = bound;
+                    return;
+                }
+            }
+            foreach (var bound in LVD.ShrunkCameraBounds)
+            {
+                if (Ray.CheckBoundHit(Picked.Xy, new Vector2(bound.Left, bound.Top), new Vector2(bound.Right, bound.Bottom), PickRange))
+                {
+                    PropertyGrid.SelectedObject = bound;
+                    return;
+                }
+            }
+            foreach (var spawn in LVD.Spawns)
+            {
+                if(CrossMath.FastDistance(Picked, new Vector3(spawn.X, spawn.Y, 0), PickRange * 2.5f))
                 {
                     PropertyGrid.SelectedObject = spawn;
                     return;
@@ -142,7 +184,7 @@ namespace StudioSB.GUI.Attachments
             }
             foreach (var spawn in LVD.Respawns)
             {
-                if (CrossMath.FastDistance(Picked, new Vector3(spawn.X, spawn.Y, 0), 5))
+                if (CrossMath.FastDistance(Picked, new Vector3(spawn.X, spawn.Y, 0), PickRange * 2.5f))
                 {
                     PropertyGrid.SelectedObject = spawn;
                     return;
@@ -156,14 +198,14 @@ namespace StudioSB.GUI.Attachments
                     if (i < col.Materials.Count)
                     {
                         var vert2 = col.Vertices[i+1];
-                        var dis = ray.GetDistanceToSegment(depthPicked.Xy, new Vector2(vert.X, vert.Y), new Vector2(vert2.X, vert2.Y), out nearestLine);
+                        var dis = Ray.GetDistanceToSegment(depthPicked.Xy, new Vector2(vert.X, vert.Y), new Vector2(vert2.X, vert2.Y), out nearestLine);
                         if (dis < PlatformWidth / 4 & dis < closest)
                         {
                             closest = dis;
                             collisionMat = col.Materials[i];
                         }
                     }
-                    if (CrossMath.FastDistance(Picked, new Vector3(vert.X, vert.Y, 0), 1))
+                    if (CrossMath.FastDistance(Picked, new Vector3(vert.X, vert.Y, 0), PickRange))
                     {
                         PropertyGrid.SelectedObject = vert;
                         return;
@@ -190,32 +232,42 @@ namespace StudioSB.GUI.Attachments
             PrevMousePosition = mouseP;
             if (!IsActive)
                 return;
-            if (PropertyGrid.SelectedObject is LVDVector2 v)
+            if (Keyboard.GetState().IsKeyDown(Key.AltLeft))
             {
-                if (Keyboard.GetState().IsKeyDown(Key.AltLeft))
+                if (Keyboard.GetState().IsKeyDown(Key.A))
                 {
-                    if (Keyboard.GetState().IsKeyDown(Key.A))
+                    if (!ADown)
                     {
-                        if (!ADown)
-                        {
-                            ADown = true;
+                        ADown = true;
+
+                        if (PropertyGrid.SelectedObject is LVDVector2 v)
                             AddNewPoint(v);
-                        }
                     }
-                    else
-                        ADown = false;
-                    if (Mouse.GetState().IsButtonDown(MouseButton.Left))
+                }
+                else
+                    ADown = false;
+                if (Mouse.GetState().IsButtonDown(MouseButton.Left))
+                {
+                    if (PropertyGrid.SelectedObject is LVDSpawn spawn)
                     {
-                        v.X -= deltaMouse.X / 8;
-                        v.Y += deltaMouse.Y / 8;
+                        spawn.StartPosition.X -= deltaMouse.X / 4;
+                        spawn.StartPosition.Y += deltaMouse.Y / 4;
+                        spawn.X -= deltaMouse.X / 4;
+                        spawn.Y += deltaMouse.Y / 4;
+                        PropertyGrid.SelectedObject = PropertyGrid.SelectedObject;
+                    }
+                    if (PropertyGrid.SelectedObject is LVDVector2 v)
+                    {
+                        v.X -= deltaMouse.X / 4;
+                        v.Y += deltaMouse.Y / 4;
 
                         // recalculate normals
                         // is there a better way to do this?
-                        foreach(var col in LVD.Collisions)
+                        foreach (var col in LVD.Collisions)
                         {
                             int index = col.Vertices.IndexOf(v);
                             if (index == -1) continue;
-                            
+
                             if (index < col.Normals.Count)
                                 col.Normals[index] = LVDVector2.GenerateNormal(v, col.Vertices[index + 1]);
                             if (index > 0)
@@ -224,18 +276,22 @@ namespace StudioSB.GUI.Attachments
                         }
                         PropertyGrid.SelectedObject = PropertyGrid.SelectedObject;
                     }
+                        
                 }
-                if (Keyboard.GetState().IsKeyDown(Key.Delete))
-                {
-                    if (!DeleteDown)
-                    {
-                        DeleteDown = true;
-                        DeleteVertex(v);
-                    }
-                }
-                else
-                    DeleteDown = false;
             }
+            if (Keyboard.GetState().IsKeyDown(Key.Delete))
+            {
+                if (!DeleteDown)
+                {
+                    DeleteDown = true;
+
+                    if (PropertyGrid.SelectedObject is LVDVector2 v)
+                        DeleteVertex(v);
+                }
+            }
+            else
+                DeleteDown = false;
+
         }
 
         private Vector2 PrevMousePosition;
@@ -379,13 +435,38 @@ namespace StudioSB.GUI.Attachments
                 int playerIndex = 1;
                 foreach (var spawn in LVD.Spawns)
                 {
-                    Rendering.TextRenderer.Draw(viewport.Camera, "P" + playerIndex++, Matrix4.CreateTranslation(new Vector3(spawn.X, spawn.Y, 0)));
-                    //Rendering.Shapes.Spawn.RenderSpawn(spawn.X, spawn.Y, 5);
+                    if (PropertyGrid.SelectedObject == spawn)
+                        Rendering.TextRenderer.Draw(viewport.Camera, "P" + playerIndex++, Matrix4.CreateTranslation(new Vector3(spawn.X, spawn.Y, 0)), FlashColor);
+                    else
+                        Rendering.TextRenderer.Draw(viewport.Camera, "P" + playerIndex++, Matrix4.CreateTranslation(new Vector3(spawn.X, spawn.Y, 0)));
+                    
                 }
 
                 foreach (var spawn in LVD.Respawns)
                 {
-                    Rendering.Shapes.Spawn.RenderSpawn(spawn.X, spawn.Y, 5);
+                    if(PropertyGrid.SelectedObject == spawn)
+                        Rendering.Shapes.Spawn.RenderSpawn(spawn.X, spawn.Y, 5, FlashColor);
+                    else
+                        Rendering.Shapes.Spawn.RenderSpawn(spawn.X, spawn.Y, 5, new Vector3(0.95f, 0.95f, 0.95f));
+                }
+                
+                foreach (var point in LVD.GeneralPoints)
+                {
+                    Rendering.Shapes.VectorGraphicType graphic = Rendering.Shapes.VectorGraphicType.StarStorm;
+                    Vector3 col = new Vector3(0.75f, 0.85f, 1);
+                    if (point.EntryLabel.Contains("Ike"))
+                    {
+                        graphic = Rendering.Shapes.VectorGraphicType.FireEmblem;
+                        col = new Vector3(1, 0.85f, 0.75f);
+                    }
+                    if (point.EntryLabel.Contains("Pikmin"))
+                    {
+                        graphic = Rendering.Shapes.VectorGraphicType.Pikmin;
+                        col = new Vector3(0.65f, 1, 0.65f);
+                    }
+                    if (PropertyGrid.SelectedObject == point)
+                        col = FlashColor;
+                    Rendering.Shapes.VectorGraphic.RenderGraphic(graphic, Matrix4.CreateTranslation(point.X, point.Y, point.Z), col, 8);
                 }
 
                 GL.PopAttrib();
@@ -418,6 +499,14 @@ namespace StudioSB.GUI.Attachments
             Vector2 mid = (v1 + v2) / 2;
             Vector2 nrm = mid + normal * 3;
 
+            Vector3 p1Color = GetElementColor(p1);
+            Vector3 p2Color = GetElementColor(p2);
+            if(PropertyGrid.SelectedObject == col)
+            {
+                p1Color = FlashColor;
+                p2Color = FlashColor;
+            }
+
             // material
             var materialColor = GetMatlColor(mat);
             GL.Color4(materialColor.R / 255f, materialColor.G / 255f, materialColor.B / 255f, 0.75f);
@@ -432,27 +521,27 @@ namespace StudioSB.GUI.Attachments
             GL.Begin(PrimitiveType.Lines);
             
             // point line 1
-            GL.Color3(GetElementColor(p1));
+            GL.Color3(p1Color);
             GL.Vertex3(v1.X, v1.Y, 0);
-            GL.Color3(GetElementColor(p1));
+            GL.Color3(p1Color);
             GL.Vertex3(v1.X, v1.Y, -PlatformWidth);
 
             // point line 2
-            GL.Color3(GetElementColor(p2));
+            GL.Color3(p2Color);
             GL.Vertex3(v2.X, v2.Y, 0);
-            GL.Color3(GetElementColor(p2));
+            GL.Color3(p2Color);
             GL.Vertex3(v2.X, v2.Y, -PlatformWidth);
 
             // front line
-            GL.Color3(GetElementColor(p1));
+            GL.Color3(p1Color);
             GL.Vertex3(v1.X, v1.Y, 0);
-            GL.Color3(GetElementColor(p2));
+            GL.Color3(p2Color);
             GL.Vertex3(v2.X, v2.Y, 0);
 
             // back line
-            GL.Color3(GetElementColor(p1));
+            GL.Color3(p1Color);
             GL.Vertex3(v1.X, v1.Y, -PlatformWidth);
-            GL.Color3(GetElementColor(p2));
+            GL.Color3(p2Color);
             GL.Vertex3(v2.X, v2.Y, -PlatformWidth);
             
             // normal
@@ -465,11 +554,13 @@ namespace StudioSB.GUI.Attachments
         }
 
 
-        private static void RenderBounds(LVDBounds b, Color color)
+        private void RenderBounds(LVDBounds b, Color color)
         {
             Vector3 sPos = b.UseStartPosition ? new Vector3(b.StartPosition.X, b.StartPosition.Y, b.StartPosition.Z) : new Vector3(0, 0, 0);
-
+            
             GL.Color4(Color.FromArgb(128, color));
+            if (PropertyGrid.SelectedObject == b)
+                GL.Color3(FlashColor);
 
             GL.LineWidth(2);
 
@@ -481,11 +572,6 @@ namespace StudioSB.GUI.Attachments
             GL.Vertex3(b.Left + sPos.X, b.Bottom + sPos.Y, sPos.Z);
 
             GL.End();
-        }
-
-        private void RenderSpawn()
-        {
-
         }
 
         private Color GetNormalColor(LVDCollision c, Vector2 normals, LVDCollisionMaterial material)

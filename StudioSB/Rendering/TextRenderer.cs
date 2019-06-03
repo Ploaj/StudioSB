@@ -25,6 +25,11 @@ namespace StudioSB.Rendering
             Draw(camera, Text, Transform, Vector3.One, Vector2.Zero, Blend: true, Center: true);
         }
 
+        public static void Draw(Camera camera, string Text, Matrix4 Transform, Vector3 Color)
+        {
+            Draw(camera, Text, Transform, Color, Vector2.Zero);
+        }
+
         public static void DrawOrtho(Camera camera, string Text, Vector2 Position)
         {
             Draw(camera, Text, Matrix4.Identity, Vector3.One, Position, Blend: true, RelativeToWorld: false);

@@ -67,14 +67,14 @@ namespace StudioSB.Rendering.Shapes
              new Vector3(1, -1, -1).Normalized(),
         };
 
-        public static void RenderSpawn(float X, float Y, float scale)
+        public static void RenderSpawn(float X, float Y, float scale, Vector3 color)
         {
             GL.UseProgram(0);
 
             GL.PushAttrib(AttribMask.AllAttribBits);
             var position = new Vector3(X, Y, 0);
 
-            GL.Color3(0.95f, 0.95f, 0.95f);
+            GL.Color3(color);
             GL.Begin(PrimitiveType.Triangles);
             for(int i = 0; i <Positions.Length; i++)
             {

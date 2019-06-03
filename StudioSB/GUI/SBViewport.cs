@@ -182,7 +182,7 @@ namespace StudioSB.GUI
 
             GL.Enable(EnableCap.DepthTest);
 
-            GL.MatrixMode(MatrixMode.Modelview);
+            GL.MatrixMode(MatrixMode.Projection);
             Matrix4 modelViewMatrix = Camera.MvpMatrix;
             GL.LoadMatrix(ref modelViewMatrix);
             
@@ -221,8 +221,8 @@ namespace StudioSB.GUI
         private void RenderBackground()
         {
             GL.UseProgram(0);
+            GL.MatrixMode(MatrixMode.Projection);
             GL.PushMatrix();
-            GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
             GL.Begin(PrimitiveType.Quads);
             GL.Color3(ApplicationSettings.BGColor1);

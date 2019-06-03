@@ -29,7 +29,7 @@ namespace StudioSB.Rendering.Bounding
         /// <param name="closest"></param>
         /// <returns></returns>
         /// http://csharphelper.com/blog/2016/09/find-the-shortest-distance-between-a-point-and-a-line-segment-in-c/
-        public float GetDistanceToSegment(Vector2 pt, Vector2 p1, Vector2 p2, out Vector2 closest)
+        public static float GetDistanceToSegment(Vector2 pt, Vector2 p1, Vector2 p2, out Vector2 closest)
         {
             float dx = p2.X - p1.X;
             float dy = p2.Y - p1.Y;
@@ -112,5 +112,29 @@ namespace StudioSB.Rendering.Bounding
                 + Math.Pow(sphere.Z - closest.Z, 2) <= rad * rad);
         }
 
+
+        /// <summary>
+        /// Checks if selection point is near bounds
+        /// </summary>
+        /// <param name="selectionPoint"></param>
+        /// <param name="boundMin"></param>
+        /// <param name="boundMax"></param>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public static bool CheckBoundHit(Vector2 selectionPoint, Vector2 boundMin, Vector2 boundMax, float range)
+        {
+            Vector2 close;
+
+            if (GetDistanceToSegment(selectionPoint, new Vector2(boundMin.X, boundMin.Y), new Vector2(boundMax.X, boundMin.Y), out close) < range)
+                return true;
+            if (GetDistanceToSegment(selectionPoint, new Vector2(boundMax.X, boundMin.Y), new Vector2(boundMax.X, boundMax.Y), out close) < range)
+                return true;
+            if (GetDistanceToSegment(selectionPoint, new Vector2(boundMin.X, boundMin.Y), new Vector2(boundMin.X, boundMax.Y), out close) < range)
+                return true;
+            if (GetDistanceToSegment(selectionPoint, new Vector2(boundMin.X, boundMax.Y), new Vector2(boundMax.X, boundMax.Y), out close) < range)
+                return true;
+
+            return false;
+        }
     }
 }
