@@ -51,6 +51,16 @@ namespace StudioSB.Scenes.LVD
 
         public List<LVDBounds> ShrunkBlastZoneBounds = new List<LVDBounds>();
 
+        public LevelData()
+        {
+            //TODO: make defaults?
+        }
+
+        public LevelData(string FileName)
+        {
+            Open(FileName);
+        }
+
         public void Open(string FileName)
         {
             using (BinaryReaderExt stream = new BinaryReaderExt(new FileStream(FileName, FileMode.Open)))
@@ -173,23 +183,15 @@ namespace StudioSB.Scenes.LVD
                         point.Read(stream);
                         GeneralVectors.Add(point);
                     }
-
-                    stream.ReadByte();
-                    if (stream.ReadInt32() > 0)
-                        throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
                 }
-                else
+                
+                stream.ReadByte();
+                int genShapeCount = stream.ReadInt32();
+                for (int i = 0; i < genShapeCount; i++)
                 {
-                    stream.PrintPosition();
-                    stream.ReadByte();
-                    int genShapeCount = stream.ReadInt32();
-                    for (int i = 0; i < genShapeCount; i++)
-                    {
-                        stream.PrintPosition();
-                        LVDGeneralShape shape = new LVDGeneralShape();
-                        shape.Read(stream);
-                        GeneralShapes.Add(shape);
-                    }
+                    LVDGeneralShape shape = new LVDGeneralShape();
+                    shape.Read(stream);
+                    GeneralShapes.Add(shape);
                 }
                 
                 stream.ReadByte();
@@ -240,8 +242,8 @@ namespace StudioSB.Scenes.LVD
 
                 if(stream.BaseStream.Length != stream.BaseStream.Position)
                 {
-                    SBConsole.WriteLine("Error fully parsing LVD " + stream.BaseStream.Position.ToString("X"));
                     stream.PrintPosition();
+                    throw new Exception("Error fully parsing LVD " + stream.BaseStream.Position.ToString("X"));
                 }
             }
         }

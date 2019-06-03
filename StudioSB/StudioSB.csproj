@@ -184,6 +184,7 @@
     <Compile Include="Rendering\Shapes\Capsule.cs" />
     <Compile Include="Rendering\Shapes\RectangularPrism.cs" />
     <Compile Include="Rendering\Shapes\ScreenTriangle.cs" />
+    <Compile Include="Rendering\Shapes\Spawn.cs" />
     <Compile Include="Rendering\Shapes\Sphere.cs" />
     <Compile Include="Rendering\TextRenderer.cs" />
     <Compile Include="IO\IImportableAnimation.cs" />

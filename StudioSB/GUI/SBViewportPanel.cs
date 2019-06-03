@@ -86,6 +86,7 @@ namespace StudioSB.GUI
 
             RightPane = new SBPopoutPanel(PopoutSide.Right, "<", ">");
             RightPane.Dock = DockStyle.Right;
+            RightPane.BackColor = ApplicationSettings.BackgroundColor;
 
             TabPanel = new SBTabPanel();
             TabPanel.Dock = DockStyle.Fill;
@@ -178,7 +179,7 @@ namespace StudioSB.GUI
         {
             Controls.Clear();
             Controls.Add(Viewport);
-            if (TabPanel.TabPages.Count > 0)
+            //if (TabPanel.TabPages.Count > 0)
                 Controls.Add(RightPane);
         }
 

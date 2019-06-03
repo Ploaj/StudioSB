@@ -30,8 +30,8 @@ namespace StudioSB.Scenes.LVD
             W = r.ReadSingle();
 
             r.ReadByte();
-            r.ReadByte();
 
+            r.ReadByte();
             int pointCount = r.ReadInt32();
             for (int i = 0; i < pointCount; i++)
             {

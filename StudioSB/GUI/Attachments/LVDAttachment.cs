@@ -32,6 +32,8 @@ namespace StudioSB.GUI.Attachments
         private SBTreeView NodeTree;
         private PropertyGrid PropertyGrid;
 
+        private float PlatformWidth = 8f;
+
         private LevelData LVD;
 
         private bool CameraLocked = false;
@@ -122,13 +124,31 @@ namespace StudioSB.GUI.Attachments
 
             PropertyGrid.SelectedObject = null;
 
-            var depthPicked = ray.GetPlaneIntersection(-Vector3.UnitZ, new Vector3(0, 0, -2.5f));
+            var depthPicked = ray.GetPlaneIntersection(-Vector3.UnitZ, new Vector3(0, 0, -PlatformWidth / 2));
             Picked = ray.GetPlaneIntersection(-Vector3.UnitZ, Vector3.Zero);
 
             Vector2 nearestLine;
             float closest = float.MaxValue;
             LVDCollisionMaterial collisionMat = null;
-            foreach(var col in LVD.Collisions)
+            Vector3 sphereHit;
+
+            foreach(var spawn in LVD.Spawns)
+            {
+                if(CrossMath.FastDistance(Picked, new Vector3(spawn.X, spawn.Y, 0), 5))
+                {
+                    PropertyGrid.SelectedObject = spawn;
+                    return;
+                }
+            }
+            foreach (var spawn in LVD.Respawns)
+            {
+                if (CrossMath.FastDistance(Picked, new Vector3(spawn.X, spawn.Y, 0), 5))
+                {
+                    PropertyGrid.SelectedObject = spawn;
+                    return;
+                }
+            }
+            foreach (var col in LVD.Collisions)
             {
                 for(int i =0; i < col.Vertices.Count; i++)
                 {
@@ -137,7 +157,7 @@ namespace StudioSB.GUI.Attachments
                     {
                         var vert2 = col.Vertices[i+1];
                         var dis = ray.GetDistanceToSegment(depthPicked.Xy, new Vector2(vert.X, vert.Y), new Vector2(vert2.X, vert2.Y), out nearestLine);
-                        if (dis < 1 & dis < closest)
+                        if (dis < PlatformWidth / 4 & dis < closest)
                         {
                             closest = dis;
                             collisionMat = col.Materials[i];
@@ -146,7 +166,7 @@ namespace StudioSB.GUI.Attachments
                     if (CrossMath.FastDistance(Picked, new Vector3(vert.X, vert.Y, 0), 1))
                     {
                         PropertyGrid.SelectedObject = vert;
-                        break;
+                        return;
                     }
                 }
             }
@@ -351,10 +371,22 @@ namespace StudioSB.GUI.Attachments
                 RenderCollisions();
 
                 foreach(var blast in LVD.BlastZoneBounds)
-                    RenderBounds(blast, Color.MediumVioletRed);
+                    RenderBounds(blast, Color.LightPink);
 
                 foreach (var camera in LVD.CameraBounds)
-                    RenderBounds(camera, Color.BlueViolet);
+                    RenderBounds(camera, Color.SkyBlue);
+
+                int playerIndex = 1;
+                foreach (var spawn in LVD.Spawns)
+                {
+                    Rendering.TextRenderer.Draw(viewport.Camera, "P" + playerIndex++, Matrix4.CreateTranslation(new Vector3(spawn.X, spawn.Y, 0)));
+                    //Rendering.Shapes.Spawn.RenderSpawn(spawn.X, spawn.Y, 5);
+                }
+
+                foreach (var spawn in LVD.Respawns)
+                {
+                    Rendering.Shapes.Spawn.RenderSpawn(spawn.X, spawn.Y, 5);
+                }
 
                 GL.PopAttrib();
             }
@@ -384,15 +416,15 @@ namespace StudioSB.GUI.Attachments
             Vector2 v1 = new Vector2(p1.X, p1.Y);
             Vector2 v2 = new Vector2(p2.X, p2.Y);
             Vector2 mid = (v1 + v2) / 2;
-            Vector2 nrm = mid + normal;
+            Vector2 nrm = mid + normal * 3;
 
             // material
             var materialColor = GetMatlColor(mat);
             GL.Color4(materialColor.R / 255f, materialColor.G / 255f, materialColor.B / 255f, 0.75f);
             GL.Begin(PrimitiveType.Quads);
             GL.Vertex3(p1.X, p1.Y, 0);
-            GL.Vertex3(p1.X, p1.Y, -5);
-            GL.Vertex3(p2.X, p2.Y, -5);
+            GL.Vertex3(p1.X, p1.Y, -PlatformWidth);
+            GL.Vertex3(p2.X, p2.Y, -PlatformWidth);
             GL.Vertex3(p2.X, p2.Y, 0);
             GL.End();
 
@@ -403,13 +435,13 @@ namespace StudioSB.GUI.Attachments
             GL.Color3(GetElementColor(p1));
             GL.Vertex3(v1.X, v1.Y, 0);
             GL.Color3(GetElementColor(p1));
-            GL.Vertex3(v1.X, v1.Y, -5);
+            GL.Vertex3(v1.X, v1.Y, -PlatformWidth);
 
             // point line 2
             GL.Color3(GetElementColor(p2));
             GL.Vertex3(v2.X, v2.Y, 0);
             GL.Color3(GetElementColor(p2));
-            GL.Vertex3(v2.X, v2.Y, -5);
+            GL.Vertex3(v2.X, v2.Y, -PlatformWidth);
 
             // front line
             GL.Color3(GetElementColor(p1));
@@ -419,15 +451,15 @@ namespace StudioSB.GUI.Attachments
 
             // back line
             GL.Color3(GetElementColor(p1));
-            GL.Vertex3(v1.X, v1.Y, -5);
+            GL.Vertex3(v1.X, v1.Y, -PlatformWidth);
             GL.Color3(GetElementColor(p2));
-            GL.Vertex3(v2.X, v2.Y, -5);
+            GL.Vertex3(v2.X, v2.Y, -PlatformWidth);
             
             // normal
             GL.Color3(GetNormalColor(col, normal, mat));
-            GL.Vertex3(mid.X, mid.Y, -2.5f);
+            GL.Vertex3(mid.X, mid.Y, -PlatformWidth/2);
             GL.Color3(GetNormalColor(col, normal, mat));
-            GL.Vertex3(nrm.X, nrm.Y, -2.5f);
+            GL.Vertex3(nrm.X, nrm.Y, -PlatformWidth/2);
 
             GL.End();
         }

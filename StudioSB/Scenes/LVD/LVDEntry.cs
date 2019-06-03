@@ -32,6 +32,9 @@ namespace StudioSB.Scenes.LVD
         public int UnknownIndex { get; set; } = 0;
 
         [Category("Entry")]
+        public int UnknownIndex2 { get; set; } = 0; // usually 0; related to connecting to bones? wily has 1 and 2
+
+        [Category("Entry")]
         public string BoneName { get; set; }
 
         public virtual void Read(BinaryReaderExt r)
@@ -51,8 +54,7 @@ namespace StudioSB.Scenes.LVD
             
             // Unknown
             r.Skip(1);
-            if (r.ReadInt32() != 0)
-                throw new NotImplementedException("LVD not supported " + r.BaseStream.Position.ToString("X"));
+            UnknownIndex2 = r.ReadInt32();
             
             r.Skip(1);
             UnknownVector = new LVDVector3(r.ReadSingle(), r.ReadSingle(), r.ReadSingle());
