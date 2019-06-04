@@ -44,30 +44,25 @@ namespace StudioSB.Rendering
 
         public DefaultTextures()
         {
-            LoadBitmap(uvPattern, "DefaultTextures/UVPattern.png");
+            LoadBitmap("uvPattern", uvPattern, "DefaultTextures/UVPattern.png");
 
-            LoadBitmap(defaultWhite, "DefaultTextures/default_White.png");
-            LoadBitmap(defaultPrm, "DefaultTextures/default_Params.tif");
-            LoadBitmap(defaultNormal, "DefaultTextures/default_normal.png");
-            LoadBitmap(defaultBlack, "DefaultTextures/default_black.png");
+            LoadBitmap("defaultWhite", defaultWhite, "DefaultTextures/default_White.png");
+            LoadBitmap("defaultPrm", defaultPrm, "DefaultTextures/default_Params.tif");
+            LoadBitmap("defaultNormal", defaultNormal, "DefaultTextures/default_normal.png");
+            LoadBitmap("defaultBlack", defaultBlack, "DefaultTextures/default_black.png");
 
-            LoadBitmap(renderFont, "DefaultTextures/render_font.png");
+            LoadBitmap("renderFront", renderFont, "DefaultTextures/render_font.png");
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (float)TextureMinFilter.Nearest);
 
-            LoadBitmap(iblLut, "DefaultTextures/ibl_brdf_lut.png");
+            LoadBitmap("iblBrdf", iblLut, "DefaultTextures/ibl_brdf_lut.png");
 
             using (var bmp = new Bitmap("DefaultTextures/default_cube_black.png"))
                 blackCube.LoadImageData(bmp, 8);
+            TextureByName.Add("blackCube", blackCube);
 
             LoadDiffusePbr();
-            LoadSpecularPbr();
-
-            foreach(var prop in GetType().GetProperties())
-            {
-                if (prop.PropertyType == typeof(Texture))
-                    TextureByName.Add(prop.Name, (Texture)prop.GetValue(this));
-            }
+            LoadSpecularPbr();         
         }
 
         public Texture GetTextureByName(string Name)
@@ -78,11 +73,12 @@ namespace StudioSB.Rendering
                 return defaultWhite;
         }
 
-        private void LoadBitmap(Texture2D texture, string path)
+        private void LoadBitmap(string name, Texture2D texture, string path)
         {
             using (var bmp = new Bitmap(path))
             {
                 texture.LoadImageData(bmp);
+                TextureByName.Add(name, texture);
             }
         }
 
