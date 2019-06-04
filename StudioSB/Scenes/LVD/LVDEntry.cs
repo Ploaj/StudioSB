@@ -1,6 +1,5 @@
 ﻿using OpenTK;
 using StudioSB.Tools;
-using System;
 using System.ComponentModel;
 
 namespace StudioSB.Scenes.LVD
@@ -64,8 +63,37 @@ namespace StudioSB.Scenes.LVD
             BoneName = r.ReadString(0x40);
         }
 
-        public virtual void Write()
+        public virtual void Write(BinaryWriterExt writer)
         {
+            writer.Write(EntryFlags);
+            writer.Write(EntryNumber);
+
+            writer.Write((byte)1);
+            writer.Write(EntryName);
+            writer.Write(new byte[0x38 - EntryName.Length - 1]);
+
+            writer.Write((byte)1);
+            writer.Write(EntryLabel);
+            writer.Write(new byte[0x40 - EntryLabel.Length - 1]);
+            
+            writer.Write((byte)1);
+            writer.Write(StartPosition.X);
+            writer.Write(StartPosition.Y);
+            writer.Write(StartPosition.Z);
+            writer.Write(UseStartPosition);
+
+            writer.Write((byte)1);
+            writer.Write(UnknownIndex2);
+
+            writer.Write((byte)1);
+            writer.Write(UnknownVector.X);
+            writer.Write(UnknownVector.Y);
+            writer.Write(UnknownVector.Z);
+            writer.Write(UnknownIndex);
+            
+            writer.Write((byte)1);
+            writer.Write(BoneName);
+            writer.Write(new byte[0x40 - BoneName.Length - 1]);
 
         }
     }

@@ -37,5 +37,24 @@ namespace StudioSB.Scenes.LVD
             Unknown1 = r.ReadInt32();
             Unknown2 = r.ReadInt32();
         }
+
+        public override void Write(BinaryWriterExt writer)
+        {
+            base.Write(writer);
+
+            writer.Write(ID);
+
+            writer.Write((byte)1);
+            writer.Write(Name.ToCharArray());
+            writer.Write(new byte[0x40 - Name.Length]);
+
+            writer.Write(X);
+            writer.Write(Y);
+            writer.Write(Z);
+            writer.Write(W);
+
+            writer.Write(Unknown1);
+            writer.Write(Unknown2);
+        }
     }
 }

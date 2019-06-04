@@ -85,8 +85,13 @@ namespace StudioSB.Scenes.LVD
         public void Read(BinaryReaderExt r)
         {
             r.ReadByte();
-
             MaterialData = r.ReadBytes(0xC);
+        }
+
+        public void Write(BinaryWriterExt writer)
+        {
+            writer.Write((byte)1);
+            writer.Write(MaterialData);
         }
     }
 }

@@ -44,5 +44,38 @@ namespace StudioSB.Scenes.LVD
             for (int i = 0; i < 16; i++)
                 Mat4x4_2[i] = r.ReadSingle();
         }
+
+        public override void Write(BinaryWriterExt writer)
+        {
+            base.Write(writer);
+
+            writer.Write((byte)1);
+            writer.Write(Vector1.X);
+            writer.Write(Vector1.Y);
+            writer.Write(Vector1.Z);
+
+            writer.Write((byte)1);
+            writer.Write(Vector2.X);
+            writer.Write(Vector2.Y);
+            writer.Write(Vector2.Z);
+
+            writer.Write((byte)1);
+            writer.Write(Vectors.Count);
+            foreach(var v in Vectors)
+            {
+                writer.Write((byte)1);
+                writer.Write(v.X);
+                writer.Write(v.Y);
+                writer.Write(v.Z);
+            }
+
+            writer.Write((byte)1);
+            foreach (var v in Mat4x4_1)
+                writer.Write(v);
+
+            writer.Write((byte)1);
+            foreach (var v in Mat4x4_2)
+                writer.Write(v);
+        }
     }
 }

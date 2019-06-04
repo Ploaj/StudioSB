@@ -247,5 +247,133 @@ namespace StudioSB.Scenes.LVD
                 }
             }
         }
+
+        public void Save(string FileName)
+        {
+            File.WriteAllBytes(FileName, GetData());
+        }
+
+        public byte[] GetData()
+        {
+            MemoryStream stream = new MemoryStream();
+
+            using (BinaryWriterExt writer = new BinaryWriterExt(stream))
+            {
+                writer.BigEndian = true;
+
+                writer.Write(Heading);
+                writer.Write(VersionMinor);
+                writer.Write(VersionMajor);
+                writer.Write(Magic.ToCharArray());
+
+                writer.Write((byte)1);
+                writer.Write(Collisions.Count);
+                foreach (var v in Collisions)
+                    v.Write(writer, VersionMinor);
+
+                writer.Write((byte)1);
+                writer.Write(Spawns.Count);
+                foreach (var v in Spawns)
+                    v.Write(writer);
+
+                writer.Write((byte)1);
+                writer.Write(Respawns.Count);
+                foreach (var v in Respawns)
+                    v.Write(writer);
+
+                writer.Write((byte)1);
+                writer.Write(CameraBounds.Count);
+                foreach (var v in CameraBounds)
+                    v.Write(writer);
+
+                writer.Write((byte)1);
+                writer.Write(BlastZoneBounds.Count);
+                foreach (var v in BlastZoneBounds)
+                    v.Write(writer);
+
+                writer.Write((byte)1);
+                writer.Write(EnemyGenerators.Count);
+                foreach (var v in EnemyGenerators)
+                    v.Write(writer);
+
+                writer.Write((byte)1);
+                writer.Write(0);
+
+                writer.Write((byte)1);
+                writer.Write(0);
+
+                writer.Write((byte)1);
+                writer.Write(0);
+
+                writer.Write((byte)1);
+                writer.Write(0);
+
+                writer.Write((byte)1);
+                writer.Write(0);
+
+                writer.Write((byte)1);
+                writer.Write(DamageShapes.Count);
+                foreach (var v in DamageShapes)
+                    v.Write(writer);
+
+                writer.Write((byte)1);
+                writer.Write(ItemSpawners.Count);
+                foreach (var v in ItemSpawners)
+                    v.Write(writer);
+
+                if (VersionMinor > 0xA)
+                {
+                    writer.Write((byte)1);
+                    writer.Write(RangeCurves.Count);
+                    foreach (var v in RangeCurves)
+                        v.Write(writer);
+                    
+                    writer.Write((byte)1);
+                    writer.Write(GeneralVectors.Count);
+                    foreach (var v in GeneralVectors)
+                        v.Write(writer);
+                }
+
+                writer.Write((byte)1);
+                writer.Write(GeneralShapes.Count);
+                foreach (var v in GeneralShapes)
+                    v.Write(writer);
+
+                writer.Write((byte)1);
+                writer.Write(GeneralPoints.Count);
+                foreach (var v in GeneralPoints)
+                    v.Write(writer);
+
+                writer.Write((byte)1);
+                writer.Write(0);
+
+                writer.Write((byte)1);
+                writer.Write(0);
+
+                writer.Write((byte)1);
+                writer.Write(0);
+
+                writer.Write((byte)1);
+                writer.Write(0);
+
+                if (VersionMinor > 0xA)
+                {
+                    writer.Write((byte)1);
+                    writer.Write(ShrunkCameraBounds.Count);
+                    foreach (var v in ShrunkCameraBounds)
+                        v.Write(writer);
+
+                    writer.Write((byte)1);
+                    writer.Write(ShrunkBlastZoneBounds.Count);
+                    foreach (var v in ShrunkBlastZoneBounds)
+                        v.Write(writer);
+                }
+            }
+
+            byte[] output = stream.ToArray(); ;
+            stream.Close();
+            stream.Dispose();
+            return  output;
+        }
     }
 }

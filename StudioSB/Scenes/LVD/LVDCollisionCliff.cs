@@ -20,6 +20,16 @@ namespace StudioSB.Scenes.LVD
             Angle = r.ReadSingle();
             LineIndex = r.ReadInt32();
         }
-        
+
+        public override void Write(BinaryWriterExt writer)
+        {
+            base.Write(writer);
+
+            writer.Write((byte)1);
+            writer.Write(Position.X);
+            writer.Write(Position.Y);
+            writer.Write(Angle);
+            writer.Write(LineIndex);
+        }
     }
 }

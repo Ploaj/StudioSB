@@ -26,5 +26,23 @@ namespace StudioSB.Scenes.LVD
                 Sections.Add(shape);
             }
         }
+
+        public override void Write(BinaryWriterExt writer)
+        {
+            base.Write(writer);
+
+            writer.Write((byte)1);
+            writer.Write(ID);
+
+            writer.Write((byte)1);
+            writer.Write((byte)1);
+
+            writer.Write(Sections.Count);
+            foreach(var v in Sections)
+            {
+                writer.Write((byte)1);
+                v.Write(writer);
+            }
+        }
     }
 }

@@ -143,5 +143,57 @@ namespace StudioSB.Scenes.LVD
                 }
             }
         }
+
+        public void Write(BinaryWriterExt writer, int VersionMinor)
+        {
+            base.Write(writer);
+
+            writer.Write(Flag1);
+            writer.Write(Flag2);
+            writer.Write(Flag3);
+            writer.Write(Flag4);
+
+            writer.Write((byte)1);
+            writer.Write(Vertices.Count);
+            foreach(var v in Vertices)
+            {
+                writer.Write((byte)1);
+                writer.Write(v.X);
+                writer.Write(v.Y);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(Normals.Count);
+            foreach (var v in Normals)
+            {
+                writer.Write((byte)1);
+                writer.Write(v.X);
+                writer.Write(v.Y);
+            }
+            
+            writer.Write((byte)1);
+            writer.Write(Cliffs.Count);
+            foreach (var v in Cliffs)
+            {
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(Materials.Count);
+            foreach (var v in Materials)
+            {
+                v.Write(writer);
+            }
+            
+            if (VersionMinor > 10)
+            {
+                writer.Write((byte)1);
+                writer.Write(Curves.Count);
+                foreach (var v in Curves)
+                {
+                    v.Write(writer);
+                }
+            }
+        }
     }
 }

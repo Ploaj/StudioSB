@@ -25,5 +25,21 @@ namespace StudioSB.Scenes.LVD
             Z = r.ReadSingle();
             r.Skip(0x10);
         }
+
+        public override void Write(BinaryWriterExt writer)
+        {
+            base.Write(writer);
+
+            writer.Write((byte)1);
+            writer.Write(ID);
+
+            writer.Write((byte)1);
+            writer.Write(Type);
+
+            writer.Write(X);
+            writer.Write(Y);
+            writer.Write(Z);
+            writer.Write(new byte[0x10]);
+        }
     }
 }

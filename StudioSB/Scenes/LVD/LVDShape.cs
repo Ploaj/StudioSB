@@ -39,5 +39,25 @@ namespace StudioSB.Scenes.LVD
                 points.Add(new LVDVector2(r.ReadSingle(), r.ReadSingle()));
             }
         }
+
+        public void Write(BinaryWriterExt writer)
+        {
+            writer.Write((byte)3);
+            writer.Write((int)Type);
+            writer.Write(X);
+            writer.Write(Y);
+            writer.Write(Z);
+            writer.Write(W);
+
+            writer.Write((byte)1);
+            writer.Write((byte)1);
+            writer.Write(points.Count);
+            foreach(var v in points)
+            {
+                writer.Write((byte)1);
+                writer.Write(v.X);
+                writer.Write(v.Y);
+            }
+        }
     }
 }

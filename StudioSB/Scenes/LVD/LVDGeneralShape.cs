@@ -6,6 +6,7 @@ namespace StudioSB.Scenes.LVD
     {
         public int ID { get; set; }
         public LVDShape Shape { get; set; }
+
         public override void Read(BinaryReaderExt r)
         {
             base.Read(r);
@@ -15,6 +16,16 @@ namespace StudioSB.Scenes.LVD
 
             Shape = new LVDShape();
             Shape.Read(r);
+        }
+
+        public override void Write(BinaryWriterExt writer)
+        {
+            base.Write(writer);
+
+            writer.Write((byte)1);
+            writer.Write(ID);
+
+            Shape.Write(writer);
         }
     }
 }

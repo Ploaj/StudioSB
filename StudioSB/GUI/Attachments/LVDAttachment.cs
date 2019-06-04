@@ -40,6 +40,7 @@ namespace StudioSB.GUI.Attachments
         private SBToolStrip PointToolStrip;
         private SBTreeView NodeTree;
         private PropertyGrid PropertyGrid;
+        private SBButton ExportLVD;
 
         // LVD
         private LevelData LVD;
@@ -63,6 +64,14 @@ namespace StudioSB.GUI.Attachments
 
             Tools = new SBToolStrip();
             Tools.Dock = DockStyle.Top;
+
+            ExportLVD = new SBButton("Export LVD");
+            ExportLVD.Click += (sender, args) =>
+            {
+                string fileName;
+                if(FileTools.TrySaveFile(out fileName, "Smash Level Data |*.lvd"))
+                    LVD.Save(fileName);
+            };
             
             PointToolStrip = new SBToolStrip();
 
@@ -153,6 +162,10 @@ namespace StudioSB.GUI.Attachments
             {
                 ToolPanel.Text = "Point Options";
                 ToolPanel.Controls.Add(PointToolStrip);
+            }
+            else
+            {
+                ToolPanel.Controls.Add(ExportLVD);
             }
         }
 

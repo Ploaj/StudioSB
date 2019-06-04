@@ -19,5 +19,16 @@ namespace StudioSB.Scenes.LVD
             Top = r.ReadSingle();
             Bottom = r.ReadSingle();
         }
+
+        public override void Write(BinaryWriterExt writer)
+        {
+            base.Write(writer);
+
+            writer.Write((byte)1);
+            writer.Write(Left);
+            writer.Write(Right);
+            writer.Write(Top);
+            writer.Write(Bottom);
+        }
     }
 }

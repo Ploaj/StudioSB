@@ -35,7 +35,7 @@ namespace StudioSB.Scenes.LVD
                 r.Skip(1);
                 var shape = new LVDShape();
                 shape.Read(r);
-                Spawns.Add(shape);
+                Zones.Add(shape);
             }
 
             r.Skip(0x2); //x01 01
@@ -61,6 +61,55 @@ namespace StudioSB.Scenes.LVD
             {
                 r.Skip(1);
                 ZoneIDs.Add(r.ReadInt32());
+            }
+        }
+
+        public override void Write(BinaryWriterExt writer)
+        {
+            base.Write(writer);
+
+            writer.Write((byte)1);
+            writer.Write((byte)1);
+            writer.Write(Spawns.Count);
+            foreach (var v in Spawns)
+            {
+                writer.Write((byte)1);
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write((byte)1);
+            writer.Write(Zones.Count);
+            foreach (var v in Zones)
+            {
+                writer.Write((byte)1);
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write((byte)1);
+            writer.Write(0);
+            
+            writer.Write((byte)1);
+            writer.Write(ID);
+            
+            writer.Write((byte)1);
+            writer.Write(SpawnIDs.Count);
+            foreach (var v in SpawnIDs)
+            {
+                writer.Write((byte)1);
+                writer.Write(v);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(0);
+            
+            writer.Write((byte)1);
+            writer.Write(ZoneIDs.Count);
+            foreach (var v in ZoneIDs)
+            {
+                writer.Write((byte)1);
+                writer.Write(v);
             }
         }
     }

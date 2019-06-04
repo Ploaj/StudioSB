@@ -52,5 +52,35 @@ namespace StudioSB.Scenes.LVD
             Unknown1 = r.ReadByte();
             Unknown2 = r.ReadInt32();
         }
+
+        public override void Write(BinaryWriterExt writer)
+        {
+            base.Write(writer);
+
+            writer.Write((byte)1);
+            writer.Write((int)Type);
+
+            writer.Write(X);
+            writer.Write(Y);
+            writer.Write(Z);
+            
+            if (Type == LVDDamageShapeType.Sphere)
+            {
+                writer.Write(Radius);
+                writer.Write(Dx);
+                writer.Write(Dy);
+                writer.Write(Dz);
+            }
+            if (Type == LVDDamageShapeType.Capsule)
+            {
+                writer.Write(Dx);
+                writer.Write(Dy);
+                writer.Write(Dz);
+                writer.Write(Radius);
+            }
+
+            writer.Write(Unknown1);
+            writer.Write(Unknown2);
+        }
     }
 }
