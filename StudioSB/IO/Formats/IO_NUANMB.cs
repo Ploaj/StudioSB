@@ -187,6 +187,9 @@ namespace StudioSB.IO.Formats
 
             foreach (var node in animNodes)
             {
+                if (node.Name.StartsWith("H_") || node.Name.EndsWith("_null")) // skip helper bones and null swing bones
+                    continue;
+
                 List<object> transforms = new List<object>();
 
                 for(int i = 0; i < animation.FrameCount; i++)

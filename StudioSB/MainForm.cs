@@ -362,6 +362,11 @@ namespace StudioSB
                     }
                 }
             }
+            foreach (var type in AttachmentTypes)
+            {
+                Filter += $"*{type.Extension()};";
+                extensionToType.Add(type.Extension(), type.GetType());
+            }
 
             string FileName;
             if(Tools.FileTools.TryOpenFile(out FileName, "Supported Files|" + Filter))

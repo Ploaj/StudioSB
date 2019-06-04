@@ -580,6 +580,14 @@ namespace StudioSB.GUI.Attachments
                     Rendering.Shapes.VectorGraphic.RenderGraphic(graphic, Matrix4.CreateTranslation(point.X, point.Y, point.Z), col, 8);
                 }
 
+                foreach(var spawner in LVD.ItemSpawners)
+                {
+                    foreach(var shape in spawner.Sections)
+                    {
+                        RenderShape(shape);
+                    }
+                }
+
                 GL.PopAttrib();
             }
 
@@ -733,6 +741,30 @@ namespace StudioSB.GUI.Attachments
                 return Color.FromArgb(128, Color.Red);
             else
                 return Color.FromArgb(128, Color.Cyan);
+        }
+
+        /// <summary>
+        /// render lvd shape to the viewport
+        /// </summary>
+        /// <param name="shape"></param>
+        private void RenderShape(LVDShape shape)
+        {
+            switch (shape.Type)
+            {
+                case LVDShapeType.Circle:
+                    break;
+                case LVDShapeType.Path:
+                    GL.Color3(Color.Bisque);
+                    GL.Begin(PrimitiveType.LineStrip);
+                    foreach (var p in shape.Points)
+                        GL.Vertex3(p.X, p.Y, 0);
+                    GL.End();
+                    break;
+                case LVDShapeType.Point:
+                    break;
+                case LVDShapeType.Rectangle:
+                    break;
+            }
         }
 
         /// <summary>

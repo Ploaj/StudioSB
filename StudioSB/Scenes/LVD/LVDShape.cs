@@ -18,7 +18,12 @@ namespace StudioSB.Scenes.LVD
         public float Y { get; set; }
         public float Z { get; set; }
         public float W { get; set; }
-        public List<LVDVector2> points = new List<LVDVector2>();
+        public List<LVDVector2> Points { get; set; } = new List<LVDVector2>();
+
+        public override string ToString()
+        {
+            return Type.ToString();
+        }
 
         public void Read(BinaryReaderExt r)
         {
@@ -36,7 +41,7 @@ namespace StudioSB.Scenes.LVD
             for (int i = 0; i < pointCount; i++)
             {
                 r.Skip(1);
-                points.Add(new LVDVector2(r.ReadSingle(), r.ReadSingle()));
+                Points.Add(new LVDVector2(r.ReadSingle(), r.ReadSingle()));
             }
         }
 
@@ -51,8 +56,8 @@ namespace StudioSB.Scenes.LVD
 
             writer.Write((byte)1);
             writer.Write((byte)1);
-            writer.Write(points.Count);
-            foreach(var v in points)
+            writer.Write(Points.Count);
+            foreach(var v in Points)
             {
                 writer.Write((byte)1);
                 writer.Write(v.X);
