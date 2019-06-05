@@ -90,6 +90,80 @@ namespace StudioSB.Tools
             return new byte[0];
         }
 
+        public static byte[] CreateImageData(SBSurface surface, int target = 1)
+        {
+            var MipCount = surface.Mipmaps.Count;
+
+            List<byte> ImageData = new List<byte>();
+            uint bpp = TextureFormatInfo.GetBPP(surface.InternalFormat);
+            uint blkWidth = TextureFormatInfo.GetBlockWidth(surface.InternalFormat);
+            uint blkHeight = TextureFormatInfo.GetBlockHeight(surface.InternalFormat);
+            uint blkDepth = TextureFormatInfo.GetBlockDepth(surface.InternalFormat);
+
+            uint blockHeight = GetBlockHeight(DivRoundUp((uint)surface.Height, blkHeight));
+            uint BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
+
+            uint Pitch = 0;
+            uint DataAlignment = 512;
+            uint TileMode = 0;
+
+            int linesPerBlockHeight = (1 << (int)BlockHeightLog2) * 8;
+
+            //uint ArrayOffset = 0;
+            for (int arrayLevel = 0; arrayLevel < surface.ArrayCount; arrayLevel++)
+            {
+                uint SurfaceSize = 0;
+                int blockHeightShift = 0;
+
+                List<uint> MipOffsets = new List<uint>();
+
+                for (int mipLevel = 0; mipLevel < MipCount; mipLevel++)
+                {
+                    uint width = (uint)Math.Max(1, surface.Width >> mipLevel);
+                    uint height = (uint)Math.Max(1, surface.Height >> mipLevel);
+                    uint depth = (uint)Math.Max(1, surface.Depth >> mipLevel);
+
+                    uint size = DivRoundUp(width, blkWidth) * DivRoundUp(height, blkHeight) * bpp;
+
+                    if (Pow2RoundUp(DivRoundUp(height, blkWidth)) < linesPerBlockHeight)
+                        blockHeightShift += 1;
+
+
+                    uint width__ = DivRoundUp(width, blkWidth);
+                    uint height__ = DivRoundUp(height, blkHeight);
+
+                    //Calculate the mip size instead
+                    byte[] AlignedData = new byte[(RoundUp(SurfaceSize, DataAlignment) - SurfaceSize)];
+                    SurfaceSize += (uint)AlignedData.Length;
+                    MipOffsets.Add(SurfaceSize);
+
+                    //Get the first mip offset and current one and the total image size
+                    int msize = (int)((MipOffsets[0] + surface.Mipmaps[mipLevel].Length - MipOffsets[mipLevel]) / surface.ArrayCount);
+                    
+                    try
+                    {
+                        Pitch = RoundUp(width__ * bpp, 64);
+                        SurfaceSize += Pitch * RoundUp(height__, Math.Max(1, blockHeight >> blockHeightShift) * 8);
+
+                        //Console.WriteLine($"{width} {height} {blkWidth} {blkHeight} {target} {bpp} {TileMode} {(int)Math.Max(0, BlockHeightLog2 - blockHeightShift)} {data_.Length}");
+                        byte[] result = Swizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), surface.Mipmaps[mipLevel]);
+                        //Console.WriteLine(result.Length + " " + surface.Mipmaps[mipLevel].Length);
+                        ImageData.AddRange(result);
+                    }
+                    catch (Exception e)
+                    {
+                        System.Windows.Forms.MessageBox.Show($"Failed to swizzle texture {surface.Name}!");
+                        Console.WriteLine(e);
+
+                        return new byte[0];
+                    }
+                }
+
+                //ArrayOffset += (uint)(ImageData.Length / surface.ArrayCount);
+            }
+            return ImageData.ToArray();
+        }
+
         public static readonly Dictionary<NUTEX_FORMAT, Vector2> BlockDiminsions = new Dictionary<NUTEX_FORMAT, Vector2>()
         {
             { NUTEX_FORMAT.B8G8R8A8_UNORM, new Vector2(1, 1) },

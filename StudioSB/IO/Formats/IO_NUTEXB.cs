@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using StudioSB.Scenes;
+using StudioSB.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -72,6 +73,47 @@ namespace StudioSB.IO.Formats
             }
         }
 
+        public static void Export(string FileName, SBSurface surface)
+        {
+            using (BinaryWriter writer = new BinaryWriter(new FileStream(FileName, FileMode.Create)))
+            {
+                List<byte> mipData = new List<byte>();
+                foreach(var mip in surface.Mipmaps)
+                {
+                    mipData.AddRange(mip);
+                }
+                writer.Write(SwitchSwizzler.CreateImageData(surface));
+
+                uint ImageSize = (uint)writer.BaseStream.Position;
+
+                foreach (var mip in surface.Mipmaps)
+                {
+                    writer.Write(mip.Length);
+                }
+                for (int i = surface.Mipmaps.Count; i < 0x10; i++)
+                    writer.Write(0);
+
+                writer.Write(new char[] { ' ', 'X', 'N', 'T'});
+                writer.Write(surface.Name.ToCharArray());
+                writer.Write(new byte[0x40 - surface.Name.Length]);
+                writer.Write(surface.Width);
+                writer.Write(surface.Height);
+                writer.Write(surface.Depth);
+                writer.Write((byte)TexFormatByInternalFormat(surface.InternalFormat)); // format
+                writer.Write((byte)4); // unknown usually 4
+                writer.Write((short)0); // pad
+                writer.Write(4); // unknown usually 4
+                writer.Write(surface.Mipmaps.Count);
+                writer.Write(0x1000); // alignment
+                writer.Write(1); // array count
+                writer.Write(ImageSize);
+
+                writer.Write(new char[] { ' ', 'X', 'E', 'T' });
+                writer.Write((short)1); // version major
+                writer.Write((short)2); // version minor
+            }
+        }
+
         private static string ReadTexName(BinaryReader reader)
         {
             var result = "";
@@ -85,6 +127,13 @@ namespace StudioSB.IO.Formats
             return result;
         }
 
+        private static NUTEX_FORMAT TexFormatByInternalFormat(InternalFormat format)
+        {
+            foreach (var v in internalFormatByNuTexFormat)
+                if (v.Value == format)
+                    return v.Key;
+            return NUTEX_FORMAT.BC1_SRGB;
+        }
 
         public static readonly Dictionary<NUTEX_FORMAT, InternalFormat> internalFormatByNuTexFormat = new Dictionary<NUTEX_FORMAT, InternalFormat>()
         {

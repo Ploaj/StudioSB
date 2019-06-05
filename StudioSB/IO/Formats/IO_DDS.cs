@@ -1,39 +1,12 @@
 ﻿using StudioSB.Scenes;
 using StudioSB.Tools;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StudioSB.IO.Formats
 {
     public class IO_DDS
     {
-        public void Export(SBSurface surface)
-        {
-            DDS_Header header = new DDS_Header()
-            {
-                dwFlags = (DDSD.CAPS | DDSD.HEIGHT | DDSD.WIDTH | DDSD.PIXELFORMAT | DDSD.MIPMAPCOUNT | DDSD.LINEARSIZE),
-                dwHeight = surface.Height,
-                dwWidth = surface.Width,
-                dwPitchOrLinearSize = GetPitchOrLinearSize(),
-                dwDepth = surface.Depth,
-                dwMipMapCount = surface.Mipmaps.Count,
-                dwReserved1 = new uint[11],
-                ddspf = new DDS_PIXELFORMAT()
-                {
-
-                },
-                dwCaps = DDSCAPS.TEXTURE,
-                dwCaps2 = 0
-            };
-            header.ddspf.dwFlags = DDPF.FOURCC;
-            header.ddspf.dwFourCC = 0x30315844;
-
-
-        }
 
         public static SBSurface Import(string FileName)
         {
@@ -47,6 +20,7 @@ namespace StudioSB.IO.Formats
                 surface.Height = header.dwHeight;
                 surface.Depth = header.dwDepth;
 
+                //TODO: format
                 surface.InternalFormat = OpenTK.Graphics.OpenGL.InternalFormat.CompressedRgbaBptcUnorm;
 
                 // TODO: read other mips
@@ -64,6 +38,37 @@ namespace StudioSB.IO.Formats
             }
 
             return surface;
+        }
+
+        public static void Export(string fileName, SBSurface surface)
+        {
+            var Header = new DDS_Header()
+            {
+                dwFlags = (DDSD.CAPS | DDSD.HEIGHT | DDSD.WIDTH | DDSD.PIXELFORMAT | DDSD.MIPMAPCOUNT | DDSD.LINEARSIZE),
+                dwHeight = surface.Height,
+                dwWidth = surface.Width,
+                dwPitchOrLinearSize = GetPitchOrLinearSize(),
+                dwDepth = surface.Depth,
+                dwMipMapCount = surface.Mipmaps.Count,
+                dwReserved1 = new uint[11],
+                ddspf = new DDS_PIXELFORMAT()
+                {
+
+                },
+                dwCaps = DDSCAPS.TEXTURE,
+                dwCaps2 = 0
+            };
+            //TODO: format
+            Header.ddspf.dwFlags = DDPF.FOURCC;
+            Header.ddspf.dwFourCC = 0x30315844;
+
+            using (BinaryWriterExt writer = new BinaryWriterExt(new FileStream(fileName, FileMode.Create)))
+            {
+                Header.Write(writer);
+
+                foreach (var mip in surface.Mipmaps)
+                    writer.Write(mip);
+            }
         }
 
         private static int GetPitchOrLinearSize()

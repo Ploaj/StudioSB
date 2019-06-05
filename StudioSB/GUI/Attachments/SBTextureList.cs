@@ -38,6 +38,8 @@ namespace StudioSB.GUI.Attachments
         private SBButton B;
         private SBButton A;
         private TrackBar MipLevel;
+        private SBButton Export;
+        private SBButton Import;
 
         private Texture ScreenTexture { get; set; }
 
@@ -53,7 +55,7 @@ namespace StudioSB.GUI.Attachments
             TextureList.Dock = DockStyle.Top;
             TextureList.SelectedValueChanged += (sender, args) =>
             {
-                PropertyGrid.SelectedObject = TextureList.SelectedValue;
+                //PropertyGrid.SelectedObject = TextureList.SelectedValue;
             };
             
             PropertyGrid = new PropertyGrid();
@@ -68,6 +70,7 @@ namespace StudioSB.GUI.Attachments
             DisplayBox = new GroupBox();
             DisplayBox.Text = "Display Options";
             DisplayBox.Dock = DockStyle.Top;
+            DisplayBox.Size = new Size(400, 140);
             ApplicationSettings.SkinControl(DisplayBox);
 
             MipLevel = new TrackBar();
@@ -75,9 +78,27 @@ namespace StudioSB.GUI.Attachments
             MipLevel.Dock = DockStyle.Top;
             DisplayBox.Controls.Add(MipLevel);
 
+            DisplayBox.Controls.Add(new Label() { Text = "Mip Level", Dock = DockStyle.Top });
+
             SBHBox hungryBox = new SBHBox();
             hungryBox.Dock = DockStyle.Top;
             DisplayBox.Controls.Add(hungryBox);
+            
+            SBHBox buttons = new SBHBox();
+            buttons.Dock = DockStyle.Top;
+            DisplayBox.Controls.Add(buttons);
+
+            Export = new SBButton("Export Texture");
+            Export.Click += (sender, args) =>
+            {
+                string fileName;
+                string supported = string.Join(";*", Extension());
+                if (Tools.FileTools.TrySaveFile(out fileName, "Supported Formats|*" + supported))
+                {
+                    Save(fileName);
+                }
+            };
+            buttons.AddControl(Export);
 
             R = new SBButton("R");
             R.BackColor = Color.Red;
@@ -170,7 +191,15 @@ namespace StudioSB.GUI.Attachments
 
         public void Save(string FilePath)
         {
-
+            if (PropertyGrid.SelectedObject is SBSurface surface)
+            {
+                if (FilePath.EndsWith(".dds"))
+                {
+                    IO_DDS.Export(FilePath, surface);
+                }
+                else
+                    IO_NUTEXB.Export(FilePath, surface);
+            }
         }
 
         public void Pick(Ray ray)
