@@ -168,7 +168,7 @@ namespace StudioSB.GUI.Attachments
         
         public string[] Extension()
         {
-            return new string[] { ".nutexb" };//, ".dds"
+            return new string[] { ".nutexb", ".dds" };
         }
 
         public void Open(string FilePath)
@@ -183,7 +183,8 @@ namespace StudioSB.GUI.Attachments
             {
                 Surface = IO_DDS.Import(FilePath);
             }
-
+            if (Surface == null)
+                return;
             TextureList.Items.Add(Surface);
 
             PropertyGrid.SelectedObject = Surface;

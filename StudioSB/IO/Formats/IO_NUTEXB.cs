@@ -50,9 +50,7 @@ namespace StudioSB.IO.Formats
                 char[] Magic = reader.ReadChars(4);
                 int MajorVersion = reader.ReadInt16();
                 int MinorVersion = reader.ReadInt16();
-
-                // hack
-                surface.IsSRGB = Format.ToString().ToLower().Contains("srgb");
+                
 
                 if (pixelFormatByNuTexFormat.ContainsKey(Format))
                     surface.PixelFormat = pixelFormatByNuTexFormat[Format];

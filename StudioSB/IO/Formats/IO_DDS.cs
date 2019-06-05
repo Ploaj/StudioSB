@@ -2,6 +2,8 @@
 using StudioSB.Tools;
 using System;
 using System.IO;
+using OpenTK.Graphics.OpenGL;
+using System.Collections.Generic;
 
 namespace StudioSB.IO.Formats
 {
@@ -18,10 +20,28 @@ namespace StudioSB.IO.Formats
                 header.Read(reader);
                 surface.Width = header.dwWidth;
                 surface.Height = header.dwHeight;
-                surface.Depth = header.dwDepth;
+                if (header.dwFlags.HasFlag(DDSD.DEPTH))
+                    surface.Depth = header.dwDepth;
+                else
+                    surface.Depth = 1;
 
-                //TODO: format
-                surface.InternalFormat = OpenTK.Graphics.OpenGL.InternalFormat.CompressedRgbaBptcUnorm;
+                if(header.ddspf.dwFourCC == 0x30315844)
+                {
+                    surface.InternalFormat = DXGItoInternal(header.DXT10Header.dxgiFormat);
+                    if(surface.InternalFormat == 0)
+                    {
+                        System.Windows.Forms.MessageBox.Show("DDS format not supported " + header.DXT10Header.dxgiFormat);
+
+                        return null;
+                    }
+
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show("DDS format not supported " + header.ddspf.dwFourCC.ToString("X"));
+                    return null;
+                }
+
 
                 // TODO: read other mips
                 surface.Name = Path.GetFileNameWithoutExtension(FileName);
@@ -30,11 +50,13 @@ namespace StudioSB.IO.Formats
 
                 for(int i = 0; i < (header.dwFlags.HasFlag(DDSD.MIPMAPCOUNT) ? header.dwMipMapCount : 1); i++)
                 {
-                    surface.Mipmaps.Add(reader.ReadBytes(w * h * 2));
+                    var mipSize = w * h * (int)TextureFormatInfo.GetBPP(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockHeight(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockWidth(surface.InternalFormat);
+                    if (mipSize < TextureFormatInfo.GetBPP(surface.InternalFormat))
+                        mipSize = (int)TextureFormatInfo.GetBPP(surface.InternalFormat);
+                    surface.Mipmaps.Add(reader.ReadBytes(mipSize));
                     w /= 2;
                     h /= 2;
                 }
-                reader.PrintPosition();
             }
 
             return surface;
@@ -42,12 +64,17 @@ namespace StudioSB.IO.Formats
 
         public static void Export(string fileName, SBSurface surface)
         {
+            if (!internalFormatToDXGI.ContainsKey(surface.InternalFormat))
+            {
+                SBConsole.WriteLine("Unsupported DDS format " + surface.InternalFormat.ToString());
+                return;
+            }
             var Header = new DDS_Header()
             {
                 dwFlags = (DDSD.CAPS | DDSD.HEIGHT | DDSD.WIDTH | DDSD.PIXELFORMAT | DDSD.MIPMAPCOUNT | DDSD.LINEARSIZE),
                 dwHeight = surface.Height,
                 dwWidth = surface.Width,
-                dwPitchOrLinearSize = GetPitchOrLinearSize(),
+                dwPitchOrLinearSize = GetPitchOrLinearSize(surface.InternalFormat, surface.Width),
                 dwDepth = surface.Depth,
                 dwMipMapCount = surface.Mipmaps.Count,
                 dwReserved1 = new uint[11],
@@ -55,12 +82,16 @@ namespace StudioSB.IO.Formats
                 {
 
                 },
-                dwCaps = DDSCAPS.TEXTURE,
+                dwCaps = 0,
                 dwCaps2 = 0
             };
             //TODO: format
             Header.ddspf.dwFlags = DDPF.FOURCC;
             Header.ddspf.dwFourCC = 0x30315844;
+
+            Header.DXT10Header.dxgiFormat = internalFormatToDXGI[surface.InternalFormat];
+            Header.DXT10Header.resourceDimension = D3D10_RESOURCE_DIMENSION.D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+            Header.DXT10Header.arraySize = 1;
 
             using (BinaryWriterExt writer = new BinaryWriterExt(new FileStream(fileName, FileMode.Create)))
             {
@@ -71,11 +102,43 @@ namespace StudioSB.IO.Formats
             }
         }
 
-        private static int GetPitchOrLinearSize()
+        private static InternalFormat DXGItoInternal(DXGI_FORMAT format)
         {
+            foreach (var v in internalFormatToDXGI)
+                if (v.Value == format)
+                    return v.Key;
             return 0;
-            //TODO:
-            //max(1, ((width + 3) / 4)) * block - size;
+        }
+
+        private static readonly Dictionary<InternalFormat, DXGI_FORMAT> internalFormatToDXGI = new Dictionary<InternalFormat, DXGI_FORMAT>()
+        {
+            { InternalFormat.CompressedRgbaS3tcDxt1Ext, DXGI_FORMAT.DXGI_FORMAT_BC1_UNORM },
+            { InternalFormat.CompressedRgbaS3tcDxt3Ext, DXGI_FORMAT.DXGI_FORMAT_BC3_UNORM },
+            { InternalFormat.CompressedRgbaS3tcDxt5Ext, DXGI_FORMAT.DXGI_FORMAT_BC5_UNORM },
+            { InternalFormat.CompressedRgbaBptcUnorm, DXGI_FORMAT.DXGI_FORMAT_BC7_UNORM },
+            { InternalFormat.CompressedSrgbAlphaS3tcDxt1Ext, DXGI_FORMAT.DXGI_FORMAT_BC1_UNORM_SRGB },
+            { InternalFormat.CompressedSrgbAlphaS3tcDxt3Ext, DXGI_FORMAT.DXGI_FORMAT_BC3_UNORM_SRGB },
+            { InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext, DXGI_FORMAT.DXGI_FORMAT_BC5_SNORM },
+            { InternalFormat.CompressedSrgbAlphaBptcUnorm, DXGI_FORMAT.DXGI_FORMAT_BC7_UNORM_SRGB },
+        };
+        
+
+        private static readonly Dictionary<InternalFormat, int> internalFormatToFourCC = new Dictionary<InternalFormat, int>()
+        {
+            { InternalFormat.CompressedRgbaS3tcDxt1Ext, 0x31545844 },
+            { InternalFormat.CompressedRgbaS3tcDxt3Ext, 0x33545844 },
+            { InternalFormat.CompressedRgbaS3tcDxt5Ext, 0x35545844 },
+            { InternalFormat.CompressedRgbaBptcUnorm, 0x30315844 },
+        };
+        
+
+        private static int GetPitchOrLinearSize(InternalFormat format, int width)
+        {
+            if (format.ToString().Contains("Compressed"))
+            {
+                return Math.Max(1, ((width + 3) / 4)) * (int)TextureFormatInfo.GetBPP(format);
+            }
+            return (width * (int)TextureFormatInfo.GetBPP(format) + 7) / 8;
         }
 
         private class DDS_Header

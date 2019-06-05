@@ -35,7 +35,13 @@ namespace StudioSB.Scenes
         public int ArrayCount { get; set; } = 1;
 
         [ReadOnly(true), Category("Format")]
-        public bool IsSRGB { get; set; }
+        public bool IsSRGB
+        {
+            get
+            {
+                return (InternalFormat.ToString().ToLower().Contains("srgb"));
+            }
+        }
 
         private Texture renderTexture = null;
 
