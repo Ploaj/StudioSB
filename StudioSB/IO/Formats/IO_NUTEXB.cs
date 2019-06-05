@@ -1,25 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using StudioSB.Scenes;
+using System;
+using System.Collections.Generic;
 using System.IO;
 
-namespace StudioSB.Scenes.Ultimate
+namespace StudioSB.IO.Formats
 {
-    public class NUTEX_Loader
+    public class IO_NUTEXB
     {
-        public static void Open(string FilePath, SBScene Scene)
+        public static SBSurface Open(string FilePath)
         {
             using (BinaryReader reader = new BinaryReader(new FileStream(FilePath, FileMode.Open)))
             {
                 // TODO: Why are there empty streams?
                 if (reader.BaseStream.Length == 0)
-                    return;
+                    return null;
 
                 SBSurface surface = new SBSurface();
 
                 reader.BaseStream.Position = reader.BaseStream.Length - 0xB0;
-                
+
                 int[] mipmapSizes = new int[16];
                 for (int i = 0; i < mipmapSizes.Length; i++)
                     mipmapSizes[i] = reader.ReadInt32();
@@ -60,7 +61,7 @@ namespace StudioSB.Scenes.Ultimate
                 //TODO: Read mipmaps
                 reader.BaseStream.Position = 0;
                 int blockHeightShift = 0;
-                for (int i = 0; i < 1; i++)
+                for (int i = 0; i < 1; i++) // MipCount
                 {
                     int size = mipmapSizes[i];
 
@@ -84,9 +85,7 @@ namespace StudioSB.Scenes.Ultimate
                 if (internalFormatByNuTexFormat.ContainsKey(Format))
                     surface.InternalFormat = internalFormatByNuTexFormat[Format];
                 
-                Scene.Surfaces.Add(surface);
-
-                SBConsole.WriteLine($"Loaded NUTEX: {surface.Name} {surface.Width} {surface.Height} {surface.Mipmaps[0].Length.ToString("X")} {surface.PixelFormat} {surface.InternalFormat} Format: {Format.ToString()}");
+                return surface;
             }
         }
 

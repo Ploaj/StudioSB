@@ -185,9 +185,9 @@ namespace StudioSB.GUI.Attachments
             }
         }
 
-        public string Extension()
+        public string[] Extension()
         {
-            return ".lvd";
+            return new string[] { ".lvd" };
         }
 
         public bool AllowMultiple()
@@ -195,7 +195,12 @@ namespace StudioSB.GUI.Attachments
             return false;
         }
 
-        public void AttachToPanel(SBViewportPanel viewportPanel)
+        public bool OverlayScene()
+        {
+            return true;
+        }
+        
+        public void OnAttach(SBViewportPanel viewportPanel)
         {
             viewportPanel.TabPanel.AddTab("Level Data", this);
         }
@@ -299,7 +304,7 @@ namespace StudioSB.GUI.Attachments
                 PropertyGrid.SelectedObject = collisionMat;
         }
 
-        public void RemoveFromPanel(SBViewportPanel viewportPanel)
+        public void OnRemove(SBViewportPanel viewportPanel)
         {
         }
 
@@ -849,7 +854,6 @@ namespace StudioSB.GUI.Attachments
             else
                 return new Vector3(0f, 0f, 0f);
         }
-
-#endregion
+        #endregion
     }
 }

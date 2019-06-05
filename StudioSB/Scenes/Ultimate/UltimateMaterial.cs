@@ -227,6 +227,7 @@ namespace StudioSB.Scenes.Ultimate
             var ssbhScene = (SBSceneSSBH)scene;
 
             BindRasterizerState();
+            BindBlendState();
 
             int TextureUnit = 0;
             
@@ -270,6 +271,27 @@ namespace StudioSB.Scenes.Ultimate
         /// </summary>
         private void BindBlendState()
         {
+            BlendingFactor src = BlendingFactor.One; ;
+            BlendingFactor dst = BlendingFactor.One; ;
+            if (BlendState.BlendFactor1 == 1)
+                src = BlendingFactor.One;
+            else if (BlendState.BlendFactor1 == 6)
+                src = BlendingFactor.SrcAlpha;
+
+            if (BlendState.BlendFactor2 == 1)
+                dst = BlendingFactor.One;
+            else if (BlendState.BlendFactor2 == 6)
+                dst = BlendingFactor.OneMinusSrcAlpha;
+
+            if (BlendState.BlendFactor1 != 0 || BlendState.BlendFactor2 != 0)
+            {
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(src, dst);
+            }
+            else
+            {
+                GL.Disable(EnableCap.Blend);
+            }
         }
 
         /// <summary>

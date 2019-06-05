@@ -99,6 +99,9 @@
     </Compile>
     <Compile Include="GUI\Attachments\SBAnimAttachment.cs" />
     <Compile Include="GUI\Attachments\IAttachment.cs" />
+    <Compile Include="GUI\Attachments\SBTextureList.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GUI\Editors\SBMeshPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -166,6 +169,7 @@
     <Compile Include="IO\Formats\IO_FBX.cs" />
     <Compile Include="IO\Formats\IO_MayaAnim.cs" />
     <Compile Include="IO\Formats\IO_NUANMB.cs" />
+    <Compile Include="IO\Formats\IO_NUTEXB.cs" />
     <Compile Include="IO\Formats\IO_OBJ.cs" />
     <Compile Include="IO\Formats\IO_PLY.cs" />
     <Compile Include="IO\Formats\IO_SBAnimation.cs" />
@@ -223,7 +227,6 @@
     <Compile Include="Scenes\Ultimate\Loaders\MATL_Loader.cs" />
     <Compile Include="Scenes\Ultimate\Loaders\MESH_Loader.cs" />
     <Compile Include="Scenes\Ultimate\Loaders\MODL_Loader.cs" />
-    <Compile Include="Scenes\Ultimate\Loaders\NUTEX_Loader.cs" />
     <Compile Include="Scenes\SBSampler.cs" />
     <Compile Include="Scenes\Ultimate\SBUltimateImportSettings.cs" />
     <Compile Include="Scenes\Ultimate\UltimateMaterial.cs" />

@@ -19,7 +19,7 @@ namespace StudioSB.Rendering.Shapes
 
         private static ScreenTriangle triangle;
 
-        public static void RenderTexture(Texture renderTexture, bool IsSrgb = false)
+        public static void RenderTexture(Texture renderTexture, bool displayR, bool displayG, bool displayB, bool displayA, int LOD, bool IsSrgb = false)
         {
             if (triangle == null)
                 triangle = new ScreenTriangle();
@@ -33,7 +33,29 @@ namespace StudioSB.Rendering.Shapes
             // The colors need to be converted back to sRGB gamma.
             shader.SetBoolToInt("isSrgb", IsSrgb);
 
+            bool monoChannel = false;
+            if (displayR && !displayG && !displayB && !displayA)
+                monoChannel = true;
+            if (!displayR && displayG && !displayB && !displayA)
+                monoChannel = true;
+            if (!displayR && !displayG && displayB && !displayA)
+                monoChannel = true;
+            if (!displayR && !displayG && !displayB && displayA)
+                monoChannel = true;
+
+            shader.SetBoolToInt("enableR", displayR);
+            shader.SetBoolToInt("enableG", displayG);
+            shader.SetBoolToInt("enableB", displayB);
+            shader.SetBoolToInt("enableA", displayA);
+            shader.SetBoolToInt("monoChannel", monoChannel);
+            shader.SetInt("LOD", LOD);
+
             triangle.Draw(shader, null);
+        }
+
+        public static void RenderTexture(Texture renderTexture, bool IsSrgb = false)
+        {
+            RenderTexture(renderTexture, true, true, true, true, 0, IsSrgb);
         }
 
         public ScreenTriangle() : base(screenTrianglePositions, PrimitiveType.Triangles)

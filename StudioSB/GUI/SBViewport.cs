@@ -35,8 +35,6 @@ namespace StudioSB.GUI
 
                 UpdateSceneInformation();
 
-                ScreenTexture = null;
-
                 Updated = true;
 
                 if(_scene != null)
@@ -59,11 +57,6 @@ namespace StudioSB.GUI
             }
         }
         private SBScene _scene;
-
-        /// <summary>
-        /// Displays texture over screen
-        /// </summary>
-        public Texture ScreenTexture { get; set; }
 
         // cache information
         private int polyCount;
@@ -206,9 +199,6 @@ namespace StudioSB.GUI
             }
 
             GL.PopAttrib();
-
-            if(ScreenTexture != null)
-                StudioSB.Rendering.Shapes.ScreenTriangle.RenderTexture(ScreenTexture, false);
 
             // Cleanup unused gl objects
             GLObjectManager.DeleteUnusedGLObjects();

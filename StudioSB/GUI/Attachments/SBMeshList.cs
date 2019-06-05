@@ -57,6 +57,11 @@ namespace StudioSB.GUI
             MeshPanel.Dock = DockStyle.Fill;
         }
 
+        public bool OverlayScene()
+        {
+            return false;
+        }
+        
         /// <summary>
         /// for renaming a mesh
         /// </summary>
@@ -160,7 +165,7 @@ namespace StudioSB.GUI
 
         private Panel container;
 
-        public void AttachToPanel(SBViewportPanel viewportPanel)
+        public void OnAttach(SBViewportPanel viewportPanel)
         {
             if (container != null)
                 container.Dispose();
@@ -173,7 +178,7 @@ namespace StudioSB.GUI
             viewportPanel.TabPanel.AddTab("Objects", container);
         }
 
-        public void RemoveFromPanel(SBViewportPanel viewportPanel)
+        public void OnRemove(SBViewportPanel viewportPanel)
         {
 
         }
@@ -214,7 +219,7 @@ namespace StudioSB.GUI
             }*/
         }
 
-        public string Extension()
+        public string[] Extension()
         {
             return null;
         }

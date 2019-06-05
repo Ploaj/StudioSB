@@ -293,11 +293,17 @@ namespace StudioSB
             // Attachments
             foreach(var attachment in AttachmentTypes)
             {
-                if (FilePath.ToLower().EndsWith(attachment.Extension()))
+                if (attachment.OverlayScene() && viewportPanel.LoadedScene != null)
+                    continue;
+
+                foreach (var extension in attachment.Extension())
                 {
-                    attachment.Open(FilePath);
-                    viewportPanel.AddAttachment(attachment);
-                    return;
+                    if (FilePath.ToLower().EndsWith(extension))
+                    {
+                        attachment.Open(FilePath);
+                        viewportPanel.AddAttachment(attachment);
+                        return;
+                    }
                 }
             }
 
@@ -364,8 +370,11 @@ namespace StudioSB
             }
             foreach (var type in AttachmentTypes)
             {
-                Filter += $"*{type.Extension()};";
-                extensionToType.Add(type.Extension(), type.GetType());
+                foreach(var extension in type.Extension())
+                {
+                    Filter += $"*{extension};";
+                    extensionToType.Add(extension, type.GetType());
+                }
             }
 
             string FileName;
@@ -663,7 +672,7 @@ namespace StudioSB
                     if(importer.Extension() != null)
                     {
                         AttachmentTypes.Add(importer);
-                        OpenableExtensions.Add(importer.Extension());
+                        OpenableExtensions.AddRange(importer.Extension());
                     }
                 }
             }

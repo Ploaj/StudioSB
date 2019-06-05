@@ -10,6 +10,7 @@ using SFGraphics.GLObjects.Shaders;
 using SFGraphics.Cameras;
 using StudioSB.IO.Models;
 using SFGraphics.GLObjects.BufferObjects;
+using StudioSB.IO.Formats;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -58,7 +59,7 @@ namespace StudioSB.Scenes.Ultimate
                 // load textures
                 if (file.EndsWith(".nutexb"))
                 {
-                    NUTEX_Loader.Open(file, this);
+                    Surfaces.Add(IO_NUTEXB.Open(file));
                 }
 
                 string fileName = Path.GetFileName(file);

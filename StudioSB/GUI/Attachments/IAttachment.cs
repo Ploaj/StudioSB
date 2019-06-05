@@ -4,17 +4,19 @@ namespace StudioSB.GUI.Attachments
 {
     public interface IAttachment
     {
-        string Extension();
+        string[] Extension();
 
         bool AllowMultiple();
+
+        bool OverlayScene();
 
         void Open(string FilePath);
 
         void Save(string FilePath);
 
-        void AttachToPanel(SBViewportPanel viewportPanel);
+        void OnAttach(SBViewportPanel viewportPanel);
 
-        void RemoveFromPanel(SBViewportPanel viewportPanel);
+        void OnRemove(SBViewportPanel viewportPanel);
 
         void Pick(Ray ray);
 

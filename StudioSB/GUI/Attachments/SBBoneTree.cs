@@ -34,6 +34,11 @@ namespace StudioSB.GUI
             BoneEditor.Dock = DockStyle.Fill;
         }
 
+        public bool OverlayScene()
+        {
+            return false;
+        }
+        
         private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
             this.BeginInvoke(new Action(() => afterAfterEdit(e.Node)));
@@ -107,7 +112,7 @@ namespace StudioSB.GUI
 
         private Panel container;
 
-        public void AttachToPanel(SBViewportPanel viewportPanel)
+        public void OnAttach(SBViewportPanel viewportPanel)
         {
             if (container != null)
                 container.Dispose();
@@ -120,7 +125,7 @@ namespace StudioSB.GUI
             viewportPanel.TabPanel.AddTab("Bone", container);
         }
 
-        public void RemoveFromPanel(SBViewportPanel viewportPanel)
+        public void OnRemove(SBViewportPanel viewportPanel)
         {
 
         }
@@ -154,7 +159,7 @@ namespace StudioSB.GUI
             }
         }
         
-        public string Extension()
+        public string[] Extension()
         {
             return null;
         }

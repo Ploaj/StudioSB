@@ -2,6 +2,7 @@
 using OpenTK.Graphics.OpenGL;
 using SFGraphics.GLObjects.Textures;
 using SFGraphics.GLObjects.Textures.TextureFormats;
+using System.ComponentModel;
 
 namespace StudioSB.Scenes
 {
@@ -10,18 +11,27 @@ namespace StudioSB.Scenes
     /// </summary>
     public class SBSurface
     {
+        [ReadOnly(true), Category("Properties")]
         public string Name { get; set; }
 
+        [ReadOnly(true), Category("Properties")]
         public List<byte[]> Mipmaps = new List<byte[]>();
 
+        [ReadOnly(true), Category("Dimensions")]
         public int Width { get; set; }
+        [ReadOnly(true), Category("Dimensions")]
         public int Height { get; set; }
+        [ReadOnly(true), Category("Dimensions")]
         public int Depth { get; set; }
 
+        [ReadOnly(true), Category("Format")]
         public TextureTarget TextureTarget { get; set; }
+        [ReadOnly(true), Category("Format")]
         public PixelFormat PixelFormat { get; set; }
+        [ReadOnly(true), Category("Format")]
         public InternalFormat InternalFormat { get; set; }
 
+        [ReadOnly(true), Category("Format")]
         public bool IsSRGB { get; set; }
 
         private Texture renderTexture = null;
@@ -29,6 +39,11 @@ namespace StudioSB.Scenes
         public SBSurface()
         {
 
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
 
         /// <summary>

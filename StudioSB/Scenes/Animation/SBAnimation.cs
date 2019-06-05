@@ -4,6 +4,7 @@ namespace StudioSB.Scenes.Animation
 {
     public class SBAnimation 
     {
+        public string Name { get; set; }
         public float FrameCount { get; set; }
 
         public List<SBTransformAnimation> TransformNodes = new List<SBTransformAnimation>();

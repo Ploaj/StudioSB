@@ -161,7 +161,7 @@ namespace StudioSB.GUI
         public void Clear()
         {
             foreach (var att in Viewport.Attachments)
-                att.RemoveFromPanel(this);
+                att.OnRemove(this);
 
             Viewport.Attachments.Clear();
 
@@ -203,7 +203,7 @@ namespace StudioSB.GUI
                 if(LoadedScene.HasBones)
                     LoadedScene.Skeleton.Reset();
 
-            attachment.AttachToPanel(this);
+            attachment.OnAttach(this);
             Viewport.Attachments.Add(attachment);
         }
 
@@ -215,7 +215,7 @@ namespace StudioSB.GUI
         {
             if (!Viewport.Attachments.Contains(attachment))
                 return;
-            attachment.RemoveFromPanel(this);
+            attachment.OnRemove(this);
             Viewport.Attachments.Remove(attachment);
         }
 

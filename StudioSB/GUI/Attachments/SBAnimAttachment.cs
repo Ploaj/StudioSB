@@ -24,19 +24,25 @@ namespace StudioSB.GUI.Attachments
             return animation;
         }
 
+        public bool OverlayScene()
+        {
+            return true;
+        }
+
+
         public bool AllowMultiple()
         {
             return false;
         }
 
-        public void AttachToPanel(SBViewportPanel viewportPanel)
+        public void OnAttach(SBViewportPanel viewportPanel)
         {
             viewportPanel.EnableAnimationBar = true;
             viewportPanel.FrameCount = (int)animation.FrameCount;
 
         }
 
-        public void RemoveFromPanel(SBViewportPanel viewportPanel)
+        public void OnRemove(SBViewportPanel viewportPanel)
         {
             viewportPanel.EnableAnimationBar = false;
         }
@@ -66,7 +72,7 @@ namespace StudioSB.GUI.Attachments
 
         }
 
-        public string Extension()
+        public string[] Extension()
         {
             return null;
         }
