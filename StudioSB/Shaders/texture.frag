@@ -30,16 +30,16 @@ void main()
 		fragColor.a = 1;
 
 	if(enableR == 1 && monoChannel == 1)
-		fragColor = vec4(fragColor.r, fragColor.r, fragColor.r, 1);
+		fragColor = vec4(fragColor.rrr, 1);
 
 	if(enableG == 1 && monoChannel == 1)
-		fragColor = vec4(fragColor.g, fragColor.g, fragColor.g, 1);
+		fragColor = vec4(fragColor.ggg, 1);
 
 	if(enableB == 1 && monoChannel == 1)
-		fragColor = vec4(fragColor.b, fragColor.b, fragColor.b, 1);
+		fragColor = vec4(fragColor.bbb, 1);
 
 	if(enableA == 1 && monoChannel == 1)
-		fragColor = vec4(fragColor.a, fragColor.a, fragColor.a, 1);
+		fragColor = vec4(fragColor.aaa, 1);
 
     if (isSrgb == 1)
         fragColor.rgb = GetSrgb(fragColor.rgb);

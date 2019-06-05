@@ -9,6 +9,7 @@ namespace StudioSB.IO.Formats
 {
     public class IO_NUTEXB
     {
+        
         public static SBSurface Open(string FilePath)
         {
             using (BinaryReader reader = new BinaryReader(new FileStream(FilePath, FileMode.Open)))
@@ -49,33 +50,6 @@ namespace StudioSB.IO.Formats
                 int MajorVersion = reader.ReadInt16();
                 int MinorVersion = reader.ReadInt16();
 
-                uint blkWidth = (uint)BlockDiminsions[Format].X;
-                uint blkHeight = (uint)BlockDiminsions[Format].Y;
-
-                uint blockHeight = Tools.SwitchSwizzler.GetBlockHeight(Tools.SwitchSwizzler.DivRoundUp((uint)surface.Height, blkHeight));
-                uint BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
-                uint tileMode = 0;
-
-                uint bpp = GetBpps(Format);
-
-                //TODO: Read mipmaps
-                reader.BaseStream.Position = 0;
-                int blockHeightShift = 0;
-                for (int i = 0; i < 1; i++) // MipCount
-                {
-                    int size = mipmapSizes[i];
-
-                    if (i == 0 && size % Alignment != 0)
-                        size += Alignment - (size % Alignment);
-
-                    byte[] deswiz = Tools.SwitchSwizzler.Deswizzle((uint)surface.Width, (uint)surface.Height, blkWidth, blkHeight, 0, bpp, tileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), reader.ReadBytes(ImageSize));
-                    byte[] trimmed = new byte[mipmapSizes[0]];
-                    Array.Copy(deswiz, 0, trimmed, 0, trimmed.Length);
-
-                    surface.Mipmaps.Add(trimmed);
-                }
-
-
                 // hack
                 surface.IsSRGB = Format.ToString().ToLower().Contains("srgb");
 
@@ -84,6 +58,15 @@ namespace StudioSB.IO.Formats
 
                 if (internalFormatByNuTexFormat.ContainsKey(Format))
                     surface.InternalFormat = internalFormatByNuTexFormat[Format];
+
+                reader.BaseStream.Position = 0;
+                byte[] ImageData = reader.ReadBytes(ImageSize);
+
+                for (int i = 0; i < MipCount; i++) // 
+                {
+                    byte[] deswiz = Tools.SwitchSwizzler.GetImageData(surface, ImageData, 0, i, MipCount);
+                    surface.Mipmaps.Add(deswiz);
+                }
                 
                 return surface;
             }
@@ -102,63 +85,6 @@ namespace StudioSB.IO.Formats
             return result;
         }
 
-        public static readonly Dictionary<NUTEX_FORMAT, Vector2> BlockDiminsions = new Dictionary<NUTEX_FORMAT, Vector2>()
-        {
-            { NUTEX_FORMAT.B8G8R8A8_UNORM, new Vector2(1, 1) },
-            { NUTEX_FORMAT.B8G8R8A8_SRGB, new Vector2(1, 1) },
-            { NUTEX_FORMAT.R8G8B8A8_UNORM, new Vector2(1, 1) },
-            { NUTEX_FORMAT.R8G8B8A8_SRGB, new Vector2(1, 1) },
-            { NUTEX_FORMAT.R32G32B32A32_FLOAT, new Vector2(1, 1) },
-            { NUTEX_FORMAT.BC1_UNORM, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC1_SRGB, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC2_UNORM, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC2_SRGB, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC3_UNORM, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC3_SRGB, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC4_UNORM, new Vector2(1, 1) },
-            { NUTEX_FORMAT.BC4_SNORM, new Vector2(1, 1) },
-            { NUTEX_FORMAT.BC5_UNORM, new Vector2(1, 1) },
-            { NUTEX_FORMAT.BC5_SNORM, new Vector2(1, 1) },
-            { NUTEX_FORMAT.BC6_UFLOAT, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC7_SRGB, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC7_UNORM, new Vector2(4, 4) },
-        };
-
-        public static uint GetBpps(NUTEX_FORMAT format)
-        {
-            switch (format)
-            {
-                case NUTEX_FORMAT.R8G8B8A8_UNORM:
-                case NUTEX_FORMAT.R8G8B8A8_SRGB:
-                case NUTEX_FORMAT.B8G8R8A8_UNORM:
-                    return 4;
-                case NUTEX_FORMAT.BC1_UNORM:
-                    return 8;
-                case NUTEX_FORMAT.BC1_SRGB:
-                    return 8;
-                case NUTEX_FORMAT.BC4_UNORM:
-                    return 8;
-                case NUTEX_FORMAT.BC4_SNORM:
-                    return 8;
-                case NUTEX_FORMAT.R32G32B32A32_FLOAT:
-                case NUTEX_FORMAT.BC2_UNORM:
-                    return 8;
-                case NUTEX_FORMAT.BC2_SRGB:
-                    return 8;
-                case NUTEX_FORMAT.BC3_UNORM:
-                    return 16;
-                case NUTEX_FORMAT.BC3_SRGB:
-                    return 16;
-                case NUTEX_FORMAT.BC5_UNORM:
-                case NUTEX_FORMAT.BC5_SNORM:
-                case NUTEX_FORMAT.BC6_UFLOAT:
-                case NUTEX_FORMAT.BC7_UNORM:
-                case NUTEX_FORMAT.BC7_SRGB:
-                    return 16;
-                default:
-                    return 0;
-            }
-        }
 
         public static readonly Dictionary<NUTEX_FORMAT, InternalFormat> internalFormatByNuTexFormat = new Dictionary<NUTEX_FORMAT, InternalFormat>()
         {

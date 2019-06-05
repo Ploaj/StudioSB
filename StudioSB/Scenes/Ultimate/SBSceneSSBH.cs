@@ -499,7 +499,9 @@ namespace StudioSB.Scenes.Ultimate
             Matrix4 mvp = camera.MvpMatrix;
             shader.SetMatrix4x4("mvp", ref mvp);
 
-            shader.SetVector3("V", camera.ViewVector);
+            var ViewVector = new Vector3(0, 0, 1) * new Matrix3(camera.ModelViewMatrix).Inverted();
+            ViewVector = ViewVector.Normalized();
+            shader.SetVector3("V", ViewVector);
         }
 
         private void SetShaderUniforms(Shader shader)

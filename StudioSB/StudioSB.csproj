@@ -166,6 +166,7 @@
     </Compile>
     <Compile Include="IO\Formats\DAE_Writer.cs" />
     <Compile Include="IO\Formats\IO_DAE.cs" />
+    <Compile Include="IO\Formats\IO_DDS.cs" />
     <Compile Include="IO\Formats\IO_FBX.cs" />
     <Compile Include="IO\Formats\IO_MayaAnim.cs" />
     <Compile Include="IO\Formats\IO_NUANMB.cs" />
@@ -275,6 +276,7 @@
     <Compile Include="Tools\CrossMath.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\SwitchSwizzler.cs" />
+    <Compile Include="Tools\TextureFormatInfo.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

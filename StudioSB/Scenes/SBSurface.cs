@@ -32,6 +32,9 @@ namespace StudioSB.Scenes
         public InternalFormat InternalFormat { get; set; }
 
         [ReadOnly(true), Category("Format")]
+        public int ArrayCount { get; set; } = 1;
+
+        [ReadOnly(true), Category("Format")]
         public bool IsSRGB { get; set; }
 
         private Texture renderTexture = null;
@@ -63,13 +66,24 @@ namespace StudioSB.Scenes
 
                 if (TextureFormatTools.IsCompressed(InternalFormat))
                 {
-                    sfTex.LoadImageData(Width, Height, Mipmaps, InternalFormat);
+                    // hack
+                    // trying to load mipmaps with similar sizes seems to not work
+                    var mipTest = new List<byte[]>();
+                    int prevsize = 0;
+                    foreach(var v in Mipmaps)
+                    {
+                        if (v.Length == prevsize)
+                            continue;
+                        mipTest.Add(v);
+                        prevsize = v.Length;
+                    }
+                    sfTex.LoadImageData(Width, Height, mipTest, InternalFormat);
                 }
                 else
                 {
-                    // TODO: Uncompressed mipmaps.
+                    // TODO: Uncompressed mipmaps
                     var format = new TextureFormatUncompressed((PixelInternalFormat)PixelFormat, PixelFormat, PixelType.UnsignedByte);
-                    sfTex.LoadImageData(Width, Height, Mipmaps[0], format);
+                    sfTex.LoadImageData(Width, Height, Mipmaps, format);
                 }
                 renderTexture = sfTex;
             }

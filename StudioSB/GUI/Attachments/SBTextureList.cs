@@ -59,6 +59,11 @@ namespace StudioSB.GUI.Attachments
             PropertyGrid = new PropertyGrid();
             PropertyGrid.Dock = DockStyle.Top;
             PropertyGrid.Size = new Size(200, 500);
+            PropertyGrid.SelectedObjectsChanged += (sender, agrs) =>
+            {
+                if (PropertyGrid.SelectedObject is SBSurface surface)
+                    MipLevel.Maximum = surface.Mipmaps.Count;
+            };
 
             DisplayBox = new GroupBox();
             DisplayBox.Text = "Display Options";
@@ -68,7 +73,7 @@ namespace StudioSB.GUI.Attachments
             MipLevel = new TrackBar();
             MipLevel.Maximum = 20;
             MipLevel.Dock = DockStyle.Top;
-            //DisplayBox.Controls.Add(MipLevel);
+            DisplayBox.Controls.Add(MipLevel);
 
             SBHBox hungryBox = new SBHBox();
             hungryBox.Dock = DockStyle.Top;
@@ -142,14 +147,24 @@ namespace StudioSB.GUI.Attachments
         
         public string[] Extension()
         {
-            return new string[] { ".nutexb" };
+            return new string[] { ".nutexb" };//, ".dds"
         }
 
         public void Open(string FilePath)
         {
             TextureList.Items.Clear();
-            Surface = IO_NUTEXB.Open(FilePath);
+
+            if (FilePath.EndsWith(".nutexb"))
+            {
+                Surface = IO_NUTEXB.Open(FilePath);
+            }
+            if (FilePath.EndsWith(".dds"))
+            {
+                Surface = IO_DDS.Import(FilePath);
+            }
+
             TextureList.Items.Add(Surface);
+
             PropertyGrid.SelectedObject = Surface;
         }
 
