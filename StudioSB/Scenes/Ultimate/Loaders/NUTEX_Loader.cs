@@ -27,23 +27,13 @@ namespace StudioSB.Scenes.Ultimate
                 reader.ReadChars(4); // TNX magic
 
                 string texName = ReadTexName(reader);
-                surface.Name = texName;
+                surface.Name = texName.ToLower();
 
                 surface.Width = reader.ReadInt32();
                 surface.Height = reader.ReadInt32();
                 surface.Depth = reader.ReadInt32();
 
                 var Format = (NUTEX_FORMAT)reader.ReadByte();
-
-                // hack
-                surface.IsSRGB = Format.ToString().ToLower().Contains("srgb");
-
-                SBConsole.WriteLine($"Loaded NUTEX: {surface.Name} Format: {Format.ToString()}");
-
-                if(pixelFormatByNuTexFormat.ContainsKey(Format))
-                    surface.PixelFormat = pixelFormatByNuTexFormat[Format];
-                if (internalFormatByNuTexFormat.ContainsKey(Format))
-                    surface.InternalFormat = internalFormatByNuTexFormat[Format];
 
                 reader.ReadByte();
 
@@ -58,8 +48,8 @@ namespace StudioSB.Scenes.Ultimate
                 int MajorVersion = reader.ReadInt16();
                 int MinorVersion = reader.ReadInt16();
 
-                uint blkWidth = (uint)blkDims[Format].X;
-                uint blkHeight = (uint)blkDims[Format].Y;
+                uint blkWidth = (uint)BlockDiminsions[Format].X;
+                uint blkHeight = (uint)BlockDiminsions[Format].Y;
 
                 uint blockHeight = Tools.SwitchSwizzler.GetBlockHeight(Tools.SwitchSwizzler.DivRoundUp((uint)surface.Height, blkHeight));
                 uint BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
@@ -84,7 +74,19 @@ namespace StudioSB.Scenes.Ultimate
                     surface.Mipmaps.Add(trimmed);
                 }
 
+
+                // hack
+                surface.IsSRGB = Format.ToString().ToLower().Contains("srgb");
+
+                if (pixelFormatByNuTexFormat.ContainsKey(Format))
+                    surface.PixelFormat = pixelFormatByNuTexFormat[Format];
+
+                if (internalFormatByNuTexFormat.ContainsKey(Format))
+                    surface.InternalFormat = internalFormatByNuTexFormat[Format];
+                
                 Scene.Surfaces.Add(surface);
+
+                SBConsole.WriteLine($"Loaded NUTEX: {surface.Name} {surface.Width} {surface.Height} {surface.Mipmaps[0].Length.ToString("X")} {surface.PixelFormat} {surface.InternalFormat} Format: {Format.ToString()}");
             }
         }
 
@@ -101,7 +103,7 @@ namespace StudioSB.Scenes.Ultimate
             return result;
         }
 
-        public static readonly Dictionary<NUTEX_FORMAT, Vector2> blkDims = new Dictionary<NUTEX_FORMAT, Vector2>()
+        public static readonly Dictionary<NUTEX_FORMAT, Vector2> BlockDiminsions = new Dictionary<NUTEX_FORMAT, Vector2>()
         {
             { NUTEX_FORMAT.B8G8R8A8_UNORM, new Vector2(1, 1) },
             { NUTEX_FORMAT.B8G8R8A8_SRGB, new Vector2(1, 1) },
@@ -114,10 +116,10 @@ namespace StudioSB.Scenes.Ultimate
             { NUTEX_FORMAT.BC2_SRGB, new Vector2(4, 4) },
             { NUTEX_FORMAT.BC3_UNORM, new Vector2(4, 4) },
             { NUTEX_FORMAT.BC3_SRGB, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC4_UNORM, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC4_SNORM, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC5_UNORM, new Vector2(4, 4) },
-            { NUTEX_FORMAT.BC5_SNORM, new Vector2(4, 4) },
+            { NUTEX_FORMAT.BC4_UNORM, new Vector2(1, 1) },
+            { NUTEX_FORMAT.BC4_SNORM, new Vector2(1, 1) },
+            { NUTEX_FORMAT.BC5_UNORM, new Vector2(1, 1) },
+            { NUTEX_FORMAT.BC5_SNORM, new Vector2(1, 1) },
             { NUTEX_FORMAT.BC6_UFLOAT, new Vector2(4, 4) },
             { NUTEX_FORMAT.BC7_SRGB, new Vector2(4, 4) },
             { NUTEX_FORMAT.BC7_UNORM, new Vector2(4, 4) },
@@ -149,13 +151,9 @@ namespace StudioSB.Scenes.Ultimate
                 case NUTEX_FORMAT.BC3_SRGB:
                     return 16;
                 case NUTEX_FORMAT.BC5_UNORM:
-                    return 16;
                 case NUTEX_FORMAT.BC5_SNORM:
-                    return 16;
                 case NUTEX_FORMAT.BC6_UFLOAT:
-                    return 16;
                 case NUTEX_FORMAT.BC7_UNORM:
-                    return 16;
                 case NUTEX_FORMAT.BC7_SRGB:
                     return 16;
                 default:

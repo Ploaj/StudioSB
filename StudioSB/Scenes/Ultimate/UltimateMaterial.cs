@@ -324,7 +324,6 @@ namespace StudioSB.Scenes.Ultimate
                     return;
                 }
             }
-
             shader.SetTexture(attributeName, DefaultTextures.Instance.GetTextureByName(surfaceInfo.DefaultTexture), TextureUnit);
 
         }
