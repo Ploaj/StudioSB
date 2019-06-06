@@ -28,6 +28,7 @@ uniform int hasInkNorMap;
 uniform sampler2D inkNorMap;
 
 // TODO: Cubemap loading doesn't work yet.
+uniform int hasBlending;
 uniform int hasDifCubemap;
 uniform sampler2D difCubemap;
 
@@ -384,6 +385,9 @@ void main()
     // Alpha testing.
     if ((fragColor.a + param98.x) < 0.1)
         discard;
+
+	if(hasBlending == 0)
+		fragColor.a = 1;
 
     // TODO: Transparency seems to use some sort of stipple pattern.
     // int x = int(mod(gl_FragCoord.x - 0.5, 4));

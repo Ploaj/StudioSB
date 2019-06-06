@@ -69,7 +69,7 @@ namespace StudioSB.Scenes
                     TextureWrapS = TextureWrapMode.Repeat,
                     TextureWrapT = TextureWrapMode.Repeat
                 };
-
+                
                 if (TextureFormatTools.IsCompressed(InternalFormat))
                 {
                     // hack

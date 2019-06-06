@@ -11,6 +11,7 @@ using SFGraphics.Cameras;
 using StudioSB.IO.Models;
 using SFGraphics.GLObjects.BufferObjects;
 using StudioSB.IO.Formats;
+using System.Linq;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -435,7 +436,24 @@ namespace StudioSB.Scenes.Ultimate
             SetShaderUniforms(shader);
             SetShaderCamera(shader, camera);
 
-            foreach (var mesh in Model.Meshes)
+            var opaqueZSorted = new List<ISBMesh>();
+            var transparentZSorted = new List<ISBMesh>();
+
+            foreach (var m in Model.Meshes)
+            {
+                if (((UltimateMaterial)m.Material).HasBlending)
+                    transparentZSorted.Add(m);
+                else
+                    opaqueZSorted.Add(m);
+            }
+
+            // TODO: Account for bounding sphere center and transform in depth sorting.
+            opaqueZSorted = opaqueZSorted.OrderBy(m => m.BoundingSphere.Radius).ToList();
+            transparentZSorted = transparentZSorted.OrderBy(m => m.BoundingSphere.Radius).ToList();
+
+            opaqueZSorted.AddRange(transparentZSorted);
+
+            foreach (SBUltimateMesh mesh in opaqueZSorted)
             {
                 if (!mesh.Visible) continue;
                 

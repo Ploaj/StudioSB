@@ -177,6 +177,8 @@ namespace StudioSB.Scenes.Ultimate
         [MATLLoaderAttributeName("Texture13"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> projMap { get; } = new SBMatAttrib<string>("Texture13", "");
 
+        public bool HasBlending { get { return (BlendState.BlendFactor1 != 0 || BlendState.BlendFactor2 != 0); } }
+
         public bool emissionOverride
         {
             get
@@ -260,6 +262,8 @@ namespace StudioSB.Scenes.Ultimate
                 }
             }
 
+            shader.SetBoolToInt("hasBlending", HasBlending);
+
             shader.SetTexture("diffusePbrCube", DefaultTextures.Instance.diffusePbr, TextureUnit++);
             shader.SetTexture("specularPbrCube", DefaultTextures.Instance.specularPbr, TextureUnit++);
             shader.SetTexture("iblLut", DefaultTextures.Instance.iblLut, TextureUnit++);
@@ -291,6 +295,7 @@ namespace StudioSB.Scenes.Ultimate
             else
             {
                 GL.Disable(EnableCap.Blend);
+                GL.Disable(EnableCap.AlphaTest);
             }
         }
 
