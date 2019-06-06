@@ -342,8 +342,8 @@ void main()
     float metalness = prmColor.r;
 
     // Image based lighting.
-    vec3 diffuseIbl = textureLod(diffusePbrCube, N, 0).rgb; // TODO: what is the intensity?
     int maxLod = 6;
+    vec3 diffuseIbl = textureLod(specularPbrCube, N, maxLod / 2).rgb; // TODO: what is the intensity?
     vec3 specularIbl = textureLod(specularPbrCube, R, roughness * maxLod).rgb * iblIntensity;
     vec3 refractionIbl = textureLod(specularPbrCube, refractionVector, 0.075 * maxLod).rgb * iblIntensity;
 

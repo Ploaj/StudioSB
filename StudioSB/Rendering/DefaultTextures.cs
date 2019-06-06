@@ -62,8 +62,8 @@ namespace StudioSB.Rendering
                 blackCube.LoadImageData(bmp, 8);
             TextureByName.Add("defaultBlackCube", blackCube);
 
-            LoadDiffusePbr();
-            LoadSpecularPbr();         
+            LoadSpecularPbr();
+            TextureByName.Add("defaultSpecCube", specularPbr);
         }
 
         public Texture GetTextureByName(string Name)

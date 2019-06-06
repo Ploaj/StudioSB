@@ -127,44 +127,36 @@ namespace StudioSB.Scenes.Ultimate
 
         [MATLLoaderAttributeName("Texture0"), DefaultTextureName("defaultBlack")]
         public SBMatAttrib<string> colMap { get; } = new SBMatAttrib<string>("Texture0", "");
-
         public bool hasColMap { get => colMap.Used; }
         
         [MATLLoaderAttributeName("Texture1"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> col2Map { get; } = new SBMatAttrib<string>("Texture1", "");
-
         public bool hasCol2Map { get => col2Map.Used; }
         
-        [MATLLoaderAttributeName("Texture6"), DefaultTextureName("defaultPrm")]
-        public SBMatAttrib<string> prmMap { get; } = new SBMatAttrib<string>("Texture6", "");
+        [MATLLoaderAttributeName("Texture3"), DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> gaoMap { get; } = new SBMatAttrib<string>("Texture3", "");
 
-        public bool hasPrmMap { get => prmMap.Used; }
-        
         [MATLLoaderAttributeName("Texture4"), DefaultTextureName("defaultNormal")]
         public SBMatAttrib<string> norMap { get; } = new SBMatAttrib<string>("Texture4", "");
 
         [MATLLoaderAttributeName("Texture5"), DefaultTextureName("defaultBlack")]
         public SBMatAttrib<string> emiMap { get; } = new SBMatAttrib<string>("Texture5", "");
         public bool hasEmi { get => emiMap != null; }
-    
-        [MATLLoaderAttributeName("Texture14"), DefaultTextureName("defaultBlack")]
-        public SBMatAttrib<string> emi2Map { get; } = new SBMatAttrib<string>("Texture14", "");
-        public bool hasEmi2 { get => emi2Map!= null; }
-        
-        [MATLLoaderAttributeName("Texture9"), DefaultTextureName("defaultBlack")]
-        public SBMatAttrib<string> bakeLitMap { get; } = new SBMatAttrib<string>("Texture9", "");
 
-        [MATLLoaderAttributeName("Texture3"), DefaultTextureName("defaultWhite")]
-        public SBMatAttrib<string> gaoMap { get; } = new SBMatAttrib<string>("Texture3", "");
+        [MATLLoaderAttributeName("Texture6"), DefaultTextureName("defaultPrm")]
+        public SBMatAttrib<string> prmMap { get; } = new SBMatAttrib<string>("Texture6", "");
+        public bool hasPrmMap { get => prmMap.Used; }
 
-        [MATLLoaderAttributeName("Texture16"), DefaultTextureName("defaultWhite")]
-        public SBMatAttrib<string> inkNorMap { get; } = new SBMatAttrib<string>("Texture16", "");
-        public bool hasInkNorMap { get => inkNorMap.Used; }
-        
+        [MATLLoaderAttributeName("Texture7"), DefaultTextureName("defaultSpecCube")]
+        public SBMatAttrib<string> specularPbrCube { get; } = new SBMatAttrib<string>("Texture7", "");
+
         [MATLLoaderAttributeName("Texture8"), DefaultTextureName("defaultBlackCube")]
         public SBMatAttrib<string> difCubemap { get; } = new SBMatAttrib<string>("Texture8", "");
         public bool hasDifCubemap { get => difCubemap.Used; }
-        
+
+        [MATLLoaderAttributeName("Texture9"), DefaultTextureName("defaultBlack")]
+        public SBMatAttrib<string> bakeLitMap { get; } = new SBMatAttrib<string>("Texture9", "");
+
         [MATLLoaderAttributeName("Texture10"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> difMap { get; } = new SBMatAttrib<string>("Texture10", "");
         public bool hasDiffuse { get => difMap.Used; }
@@ -179,6 +171,14 @@ namespace StudioSB.Scenes.Ultimate
 
         [MATLLoaderAttributeName("Texture13"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> projMap { get; } = new SBMatAttrib<string>("Texture13", "");
+
+        [MATLLoaderAttributeName("Texture14"), DefaultTextureName("defaultBlack")]
+        public SBMatAttrib<string> emi2Map { get; } = new SBMatAttrib<string>("Texture14", "");
+        public bool hasEmi2 { get => emi2Map != null; }
+
+        [MATLLoaderAttributeName("Texture16"), DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> inkNorMap { get; } = new SBMatAttrib<string>("Texture16", "");
+        public bool hasInkNorMap { get => inkNorMap.Used; }
 
         public bool HasBlending { get { return (BlendState.BlendFactor1 != 0 || BlendState.BlendFactor2 != 0); } }
 
@@ -266,7 +266,7 @@ namespace StudioSB.Scenes.Ultimate
             }
 
             shader.SetTexture("diffusePbrCube", DefaultTextures.Instance.diffusePbr, TextureUnit++);
-            shader.SetTexture("specularPbrCube", DefaultTextures.Instance.specularPbr, TextureUnit++);
+            //shader.SetTexture("specularPbrCube", DefaultTextures.Instance.specularPbr, TextureUnit++);
             shader.SetTexture("iblLut", DefaultTextures.Instance.iblLut, TextureUnit++);
             shader.SetTexture("uvPattern", DefaultTextures.Instance.uvPattern, TextureUnit++);
         }
