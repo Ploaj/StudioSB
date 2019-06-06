@@ -78,7 +78,7 @@ namespace StudioSB.IO.Formats
                 dwWidth = surface.Width,
                 dwPitchOrLinearSize = GetPitchOrLinearSize(surface.InternalFormat, surface.Width),
                 dwDepth = surface.Depth,
-                dwMipMapCount = surface.Arrays.Count,
+                dwMipMapCount = surface.Arrays[0].Mipmaps.Count,
                 dwReserved1 = new uint[11],
                 ddspf = new DDS_PIXELFORMAT()
                 {

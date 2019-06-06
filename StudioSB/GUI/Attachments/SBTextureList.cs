@@ -41,6 +41,7 @@ namespace StudioSB.GUI.Attachments
         private TrackBar MipLevel;
         private SBButton Export;
         private SBButton Import;
+        private SBButton Replace;
 
         private Texture ScreenTexture { get; set; }
 
@@ -65,8 +66,8 @@ namespace StudioSB.GUI.Attachments
             PropertyGrid.Size = new Size(200, 500);
             PropertyGrid.SelectedObjectsChanged += (sender, agrs) =>
             {
-                if (PropertyGrid.SelectedObject is SBSurface surface)
-                    MipLevel.Maximum = surface.Arrays.Count;
+                if (PropertyGrid.SelectedObject is SBSurface surface && surface.Arrays.Count > 0)
+                    MipLevel.Maximum = surface.Arrays[0].Mipmaps.Count;
             };
 
             DisplayBox = new GroupBox();
@@ -101,6 +102,33 @@ namespace StudioSB.GUI.Attachments
                 }
             };
             buttons.AddControl(Export);
+
+            Replace = new SBButton("Replace");
+            Replace.Click += (sender, args) =>
+            {
+                string fileName;
+                string supported = string.Join(";*", Extension());
+                if (Tools.FileTools.TryOpenFile(out fileName, "Supported Formats|*" + supported))
+                {
+                    var sur = OpenFile(fileName);
+                    if(sur != null)
+                    {
+                        if(PropertyGrid.SelectedObject is SBSurface surface)
+                        {
+                            surface.Arrays = sur.Arrays;
+                            surface.Width = sur.Width;
+                            surface.Height = sur.Height;
+                            surface.PixelFormat = sur.PixelFormat;
+                            surface.InternalFormat = sur.InternalFormat;
+                            surface.Depth = sur.Depth;
+                            surface.TextureTarget = sur.TextureTarget;
+                            surface.RefreshRendering();
+                            PropertyGrid.SelectedObject = surface;
+                        }
+                    }
+                }
+            };
+            buttons.AddControl(Replace);
 
             R = new SBButton("R");
             R.BackColor = Color.Red;
@@ -177,6 +205,20 @@ namespace StudioSB.GUI.Attachments
         {
             TextureList.Items.Clear();
 
+            Surface = OpenFile(FilePath);
+
+            if (Surface == null)
+                return;
+
+            TextureList.Items.Add(Surface);
+
+            PropertyGrid.SelectedObject = Surface;
+        }
+
+        private SBSurface OpenFile(string FilePath)
+        {
+            SBSurface Surface = null;
+
             if (FilePath.EndsWith(".nutexb"))
             {
                 Surface = IO_NUTEXB.Open(FilePath);
@@ -185,11 +227,8 @@ namespace StudioSB.GUI.Attachments
             {
                 Surface = IO_DDS.Import(FilePath);
             }
-            if (Surface == null)
-                return;
-            TextureList.Items.Add(Surface);
 
-            PropertyGrid.SelectedObject = Surface;
+            return Surface;
         }
 
         public void Save(string FilePath)
@@ -228,13 +267,13 @@ namespace StudioSB.GUI.Attachments
 
                 if (surface.IsCubeMap)
                 {
-                    SkyBox.RenderSkyBox(viewport.Camera, (TextureCubeMap)surface.CreateRenderTexture(), MipLevel.Value);
+                    SkyBox.RenderSkyBox(viewport.Camera, (TextureCubeMap)surface.GetRenderTexture(), MipLevel.Value);
                 }
                 else
                 {
                     ScreenTriangle.RenderTexture(DefaultTextures.Instance.defaultWhite);
 
-                    ScreenTriangle.RenderTexture(surface.CreateRenderTexture(),
+                    ScreenTriangle.RenderTexture(surface.GetRenderTexture(),
                         R.BackColor != Color.Gray, G.BackColor != Color.Gray, B.BackColor != Color.Gray, A.BackColor != Color.Gray,
                         MipLevel.Value, surface.IsSRGB);
                 }

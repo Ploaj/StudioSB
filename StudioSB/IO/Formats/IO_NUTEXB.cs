@@ -30,7 +30,7 @@ namespace StudioSB.IO.Formats
                 reader.ReadChars(4); // TNX magic
 
                 string texName = ReadTexName(reader);
-                surface.Name = texName.ToLower();
+                surface.Name = texName;
 
                 surface.Width = reader.ReadInt32();
                 surface.Height = reader.ReadInt32();
@@ -85,7 +85,7 @@ namespace StudioSB.IO.Formats
                     foreach(var m in mip.Mipmaps)
                         mipData.AddRange(m);
                 }
-                writer.Write(SwitchSwizzler.CreateImageData(surface));
+                writer.Write(SwitchSwizzler.CreateBuffer(surface));
 
                 uint ImageSize = (uint)writer.BaseStream.Position;
 
@@ -106,10 +106,10 @@ namespace StudioSB.IO.Formats
                 writer.Write((byte)TexFormatByInternalFormat(surface.InternalFormat)); // format
                 writer.Write((byte)4); // unknown usually 4
                 writer.Write((short)0); // pad
-                writer.Write(4); // unknown usually 4
-                writer.Write(surface.Arrays.Count);
+                writer.Write(surface.IsCubeMap ? 9 : 4); // unknown usually 4 9 for cubemap
+                writer.Write(surface.Arrays[0].Mipmaps.Count);
                 writer.Write(0x1000); // alignment
-                writer.Write(1); // array count
+                writer.Write(surface.Arrays.Count); // array count
                 writer.Write(ImageSize);
 
                 writer.Write(new char[] { ' ', 'X', 'E', 'T' });

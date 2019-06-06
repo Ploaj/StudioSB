@@ -91,11 +91,14 @@ namespace StudioSB.Tools
             return new byte[0];
         }
 
-        public static byte[] CreateImageData(SBSurface surface, int target = 1)
+        public static byte[] CreateBuffer(SBSurface surface, int target = 1)
         {
-            var MipCount = surface.Arrays.Count;
-
             List<byte> ImageData = new List<byte>();
+
+            if (surface.Arrays.Count == 0)
+                return ImageData.ToArray();
+
+            var MipCount = surface.Arrays[0].Mipmaps.Count;
             uint bpp = TextureFormatInfo.GetBPP(surface.InternalFormat);
             uint blkWidth = TextureFormatInfo.GetBlockWidth(surface.InternalFormat);
             uint blkHeight = TextureFormatInfo.GetBlockHeight(surface.InternalFormat);

@@ -23,11 +23,8 @@ namespace StudioSB.Scenes.Ultimate
         
         public ISBModel<SBUltimateMesh> Model { get; set; }
 
-        public Dictionary<string, SBSurface> nameToSurface = new Dictionary<string, SBSurface>();
-
         // Rendering
         public Dictionary<SBUltimateMesh, UltimateRenderMesh> sbMeshToRenderMesh = new Dictionary<SBUltimateMesh, UltimateRenderMesh>();
-        public Dictionary<SBSurface, Texture> surfaceToRenderTexture = new Dictionary<SBSurface, Texture>();
         private BufferObject boneUniformBuffer;
         private Matrix4[] boneBinds = new Matrix4[200];
 
@@ -408,13 +405,11 @@ namespace StudioSB.Scenes.Ultimate
                 }
             }
 
-            nameToSurface.Clear();
-            surfaceToRenderTexture.Clear();
+            /*nameToSurface.Clear();
             foreach(var tex in Surfaces)
             {
-                nameToSurface.Add(tex.Name, tex);
-                surfaceToRenderTexture.Add(tex, tex.CreateRenderTexture());
-            }
+                nameToSurface.Add(tex.Name.ToLower(), tex);
+            }*/
         }
 
         /// <summary>

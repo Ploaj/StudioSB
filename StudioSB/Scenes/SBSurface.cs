@@ -63,11 +63,17 @@ namespace StudioSB.Scenes
             return Name;
         }
 
+        public void RefreshRendering()
+        {
+            // settings this to null with make the texture reload next time the GetRenderTexture is called
+            renderTexture = null;
+        }
+
         /// <summary>
         /// Gets the SFTexture of this surface
         /// </summary>
         /// <returns></returns>
-        public Texture CreateRenderTexture()
+        public Texture GetRenderTexture()
         {
             if(renderTexture == null)
             {
