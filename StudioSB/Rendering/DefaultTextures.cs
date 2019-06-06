@@ -60,7 +60,7 @@ namespace StudioSB.Rendering
 
             using (var bmp = new Bitmap("DefaultTextures/default_cube_black.png"))
                 blackCube.LoadImageData(bmp, 8);
-            TextureByName.Add("blackCube", blackCube);
+            TextureByName.Add("defaultBlackCube", blackCube);
 
             LoadDiffusePbr();
             LoadSpecularPbr();         
@@ -68,10 +68,9 @@ namespace StudioSB.Rendering
 
         public Texture GetTextureByName(string Name)
         {
-            if (TextureByName.ContainsKey(Name))
-                return TextureByName[Name];
-            else
-                return defaultWhite;
+            // Don't silence this error.
+            // It could cause texture type binding mismatches later.
+            return TextureByName[Name];
         }
 
         private void LoadBitmap(string name, Texture2D texture, string path)

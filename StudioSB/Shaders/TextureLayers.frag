@@ -15,7 +15,7 @@ uniform sampler2D inkNorMap;
 
 // TODO: Cubemap loading doesn't work yet.
 uniform int hasDifCubemap;
-uniform sampler2D difCubemap;
+uniform samplerCube difCubemap;
 
 uniform int hasDiffuse;
 uniform sampler2D difMap;
@@ -99,8 +99,8 @@ vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec4 transform1, vec4 transfor
         albedoColor.rgb = Blend(albedoColor, albedoColor2 * vec4(vec3(1), colorSet5.a));
 
     // Materials won't have col and diffuse cubemaps.
-    if (hasDifCubemap == 1)
-        albedoColor.rgb = texture(difCubemap, uvLayer1).rgb;
+    // if (hasDifCubemap == 1)
+    //     albedoColor.rgb = texture(difCubemap, uvLayer1).rgb;
 
     if (hasDiffuse == 1)
         albedoColor.rgb = Blend(albedoColor, diffuseColor);

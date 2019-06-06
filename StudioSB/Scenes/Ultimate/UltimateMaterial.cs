@@ -161,7 +161,7 @@ namespace StudioSB.Scenes.Ultimate
         public SBMatAttrib<string> inkNorMap { get; } = new SBMatAttrib<string>("Texture16", "");
         public bool hasInkNorMap { get => inkNorMap.Used; }
         
-        [MATLLoaderAttributeName("Texture8"), DefaultTextureName("defaultBlack")]
+        [MATLLoaderAttributeName("Texture8"), DefaultTextureName("defaultBlackCube")]
         public SBMatAttrib<string> difCubemap { get; } = new SBMatAttrib<string>("Texture8", "");
         public bool hasDifCubemap { get => difCubemap.Used; }
         
@@ -346,9 +346,8 @@ namespace StudioSB.Scenes.Ultimate
         private void BindSurface(Shader shader, SBSceneSSBH ssbhScene, SBSurface surface, DefaultTextureName surfaceInfo, string attributeName, int TextureUnit)
         {
             if (surface != null)
-            {
                 shader.SetTexture(attributeName, surface.GetRenderTexture(), TextureUnit);
-            }else
+            else
                 shader.SetTexture(attributeName, DefaultTextures.Instance.GetTextureByName(surfaceInfo.DefaultTexture), TextureUnit);
         }
 
