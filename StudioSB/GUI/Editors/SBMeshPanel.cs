@@ -83,6 +83,13 @@ namespace StudioSB.GUI.Editors
             Controls.Add(meshName);
         }
 
+        public void Clear()
+        {
+            meshName.Text = "";
+            parentBoneSelector.Items.Clear();
+            materialSelector.Items.Clear();
+        }
+
         /// <summary>
         /// Adds the selected mesh from the Scene to the editor
         /// </summary>

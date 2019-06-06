@@ -126,7 +126,7 @@ namespace StudioSB.GUI
 
         public void OnRemove(SBViewportPanel viewportPanel)
         {
-
+            BoneEditor.Visible = false;
         }
 
         public void Pick(Ray ray)

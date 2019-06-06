@@ -179,7 +179,7 @@ namespace StudioSB.GUI
 
         public void OnRemove(SBViewportPanel viewportPanel)
         {
-
+            MeshPanel.Clear();
         }
 
         public void Update(SBViewport viewport)

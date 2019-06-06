@@ -276,7 +276,7 @@ namespace StudioSB.GUI.Attachments
         public void OnRemove(SBViewportPanel viewportPanel)
         {
             TextureBank = null;
-            
+            PropertyGrid.SelectedObject = null;
         }
 
         public void Render(SBViewport viewport, float frame = 0)
