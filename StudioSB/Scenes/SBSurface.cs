@@ -34,6 +34,8 @@ namespace StudioSB.Scenes
         [ReadOnly(true), Category("Format")]
         public PixelFormat PixelFormat { get; set; }
         [ReadOnly(true), Category("Format")]
+        public PixelType PixelType { get; set; }
+        [ReadOnly(true), Category("Format")]
         public InternalFormat InternalFormat { get; set; }
 
         [ReadOnly(true), Category("Format")]
@@ -79,11 +81,23 @@ namespace StudioSB.Scenes
             {
                 if(Arrays.Count == 6)
                 {
-                    var cube = new TextureCubeMap();
-                    cube.LoadImageData(Width, InternalFormat, 
-                        Arrays[0].Mipmaps, Arrays[1].Mipmaps, Arrays[2].Mipmaps,
-                        Arrays[3].Mipmaps, Arrays[4].Mipmaps, Arrays[5].Mipmaps);
-                    renderTexture = cube;
+                    if (TextureFormatTools.IsCompressed(InternalFormat))
+                    {
+                        var cube = new TextureCubeMap();
+                        cube.LoadImageData(Width, InternalFormat,
+                            Arrays[0].Mipmaps, Arrays[1].Mipmaps, Arrays[2].Mipmaps,
+                            Arrays[3].Mipmaps, Arrays[4].Mipmaps, Arrays[5].Mipmaps);
+                        renderTexture = cube;
+                    }
+                    else
+                    {
+                        var format = new TextureFormatUncompressed((PixelInternalFormat)PixelFormat, PixelFormat, PixelType);
+                        var cube = new TextureCubeMap();
+                        cube.LoadImageData(Width, format,
+                            Arrays[0].Mipmaps, Arrays[1].Mipmaps, Arrays[2].Mipmaps,
+                            Arrays[3].Mipmaps, Arrays[4].Mipmaps, Arrays[5].Mipmaps);
+                        renderTexture = cube;
+                    }
                 }
                 else
                 {

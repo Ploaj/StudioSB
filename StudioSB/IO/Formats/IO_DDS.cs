@@ -18,6 +18,8 @@ namespace StudioSB.IO.Formats
             {
                 DDS_Header header = new DDS_Header();
                 header.Read(reader);
+
+                surface.Name = Path.GetFileNameWithoutExtension(FileName);
                 surface.Width = header.dwWidth;
                 surface.Height = header.dwHeight;
                 if (header.dwFlags.HasFlag(DDSD.DEPTH))
@@ -38,37 +40,57 @@ namespace StudioSB.IO.Formats
                 }
                 else
                 {
-                    System.Windows.Forms.MessageBox.Show("DDS format not supported " + header.ddspf.dwFourCC.ToString("X"));
-                    return null;
+
+                    if(((FourCC_DXGI)header.ddspf.dwFourCC) == FourCC_DXGI.D3DFMT_A32B32G32R32F)
+                    {
+                        surface.InternalFormat = InternalFormat.Rgba32f;
+                        surface.PixelFormat = PixelFormat.Rgba;
+                        surface.PixelType = PixelType.Float;
+                    }
+                    else
+                    {
+                        System.Windows.Forms.MessageBox.Show("DDS format not supported " + header.ddspf.dwFourCC.ToString("X"));
+                        return null;
+                    }
                 }
 
 
                 // TODO: read other mips
-                surface.Name = Path.GetFileNameWithoutExtension(FileName);
                 int w = surface.Width;
                 int h = surface.Height;
-
-                var mip = new MipArray();
-                for(int i = 0; i < (header.dwFlags.HasFlag(DDSD.MIPMAPCOUNT) ? header.dwMipMapCount : 1); i++)
+                //SBConsole.WriteLine(header.dwCaps.ToString() + " " + header.dwCaps2.ToString() + " " + header.dwFlags.ToString());
+                for(int array = 0; array < (header.dwCaps2.HasFlag(DDSCAPS2.CUBEMAP_ALLFACES) ? 6 : 1); array++)
                 {
-                    var mipSize = w * h * (int)TextureFormatInfo.GetBPP(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockHeight(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockWidth(surface.InternalFormat);
-                    if (mipSize < TextureFormatInfo.GetBPP(surface.InternalFormat))
-                        mipSize = (int)TextureFormatInfo.GetBPP(surface.InternalFormat);
-                    mip.Mipmaps.Add(reader.ReadBytes(mipSize));
-                    w /= 2;
-                    h /= 2;
+                    w = surface.Width;
+                    h = surface.Height;
+                    var mip = new MipArray();
+
+                    for (int i = 0; i < (header.dwFlags.HasFlag(DDSD.MIPMAPCOUNT) ? header.dwMipMapCount : 1); i++)
+                    {
+                        var mipSize = w * h * (int)TextureFormatInfo.GetBPP(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockHeight(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockWidth(surface.InternalFormat);
+                        if (mipSize < TextureFormatInfo.GetBPP(surface.InternalFormat))
+                            mipSize = (int)TextureFormatInfo.GetBPP(surface.InternalFormat);
+                        mip.Mipmaps.Add(reader.ReadBytes(mipSize));
+                        w /= 2;
+                        h /= 2;
+                    }
+
+                    surface.Arrays.Add(mip);
                 }
-                surface.Arrays.Add(mip);
+                if (reader.Position != reader.BaseStream.Length)
+                    SBConsole.WriteLine("Warning: error reading dds " + reader.Position.ToString("X"));
             }
+
+            
 
             return surface;
         }
 
         public static void Export(string fileName, SBSurface surface)
         {
-            if (!internalFormatToDXGI.ContainsKey(surface.InternalFormat))
+            if (!internalFormatToDXGI.ContainsKey(surface.InternalFormat) && !internalFormatToD3D.ContainsKey(surface.InternalFormat))
             {
-                SBConsole.WriteLine("Unsupported DDS format " + surface.InternalFormat.ToString());
+                System.Windows.Forms.MessageBox.Show("Unsupported DDS export format " + surface.InternalFormat.ToString());
                 return;
             }
             var Header = new DDS_Header()
@@ -87,21 +109,32 @@ namespace StudioSB.IO.Formats
                 dwCaps = 0,
                 dwCaps2 = 0
             };
+
+            if (surface.IsCubeMap)
+            {
+                Header.dwCaps |= DDSCAPS.TEXTURE | DDSCAPS.COMPLEX;
+                Header.dwCaps2 |= DDSCAPS2.CUBEMAP_ALLFACES;
+            }
             //TODO: format
             Header.ddspf.dwFlags = DDPF.FOURCC;
             Header.ddspf.dwFourCC = 0x30315844;
+            if (internalFormatToD3D.ContainsKey(surface.InternalFormat))
+                Header.ddspf.dwFourCC = (int)internalFormatToD3D[surface.InternalFormat];
 
-            Header.DXT10Header.dxgiFormat = internalFormatToDXGI[surface.InternalFormat];
-            Header.DXT10Header.resourceDimension = D3D10_RESOURCE_DIMENSION.D3D10_RESOURCE_DIMENSION_TEXTURE2D;
-            Header.DXT10Header.arraySize = 1;
+            if (internalFormatToDXGI.ContainsKey(surface.InternalFormat))
+            {
+                Header.DXT10Header.dxgiFormat = internalFormatToDXGI[surface.InternalFormat];
+                Header.DXT10Header.resourceDimension = D3D10_RESOURCE_DIMENSION.D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+                Header.DXT10Header.arraySize = (uint)surface.Arrays.Count;
+            }
 
             using (BinaryWriterExt writer = new BinaryWriterExt(new FileStream(fileName, FileMode.Create)))
             {
                 Header.Write(writer);
                  
-                //TODO: cubemaps
-                foreach (var mip in surface.Arrays[0].Mipmaps)
-                    writer.Write(mip);
+                foreach(var arr in surface.Arrays)
+                    foreach (var mip in arr.Mipmaps)
+                        writer.Write(mip);
             }
         }
 
@@ -123,8 +156,15 @@ namespace StudioSB.IO.Formats
             { InternalFormat.CompressedSrgbAlphaS3tcDxt3Ext, DXGI_FORMAT.DXGI_FORMAT_BC3_UNORM_SRGB },
             { InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext, DXGI_FORMAT.DXGI_FORMAT_BC5_SNORM },
             { InternalFormat.CompressedSrgbAlphaBptcUnorm, DXGI_FORMAT.DXGI_FORMAT_BC7_UNORM_SRGB },
+            { InternalFormat.CompressedRgbBptcUnsignedFloat, DXGI_FORMAT.DXGI_FORMAT_BC7_TYPELESS },
+            { InternalFormat.Rgba32f, DXGI_FORMAT.DXGI_FORMAT_R32G32B32A32_FLOAT },
+            { InternalFormat.Rgba8, DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM },
         };
-        
+
+        private static readonly Dictionary<InternalFormat, FourCC_DXGI> internalFormatToD3D = new Dictionary<InternalFormat, FourCC_DXGI>()
+        {
+            { InternalFormat.Rgba32f, FourCC_DXGI.D3DFMT_A32B32G32R32F },
+        };
 
         private static readonly Dictionary<InternalFormat, int> internalFormatToFourCC = new Dictionary<InternalFormat, int>()
         {
@@ -286,6 +326,19 @@ namespace StudioSB.IO.Formats
             D3D10_RESOURCE_DIMENSION_TEXTURE2D,
             D3D10_RESOURCE_DIMENSION_TEXTURE3D
         };
+
+        public enum FourCC_DXGI
+        {
+            D3DFMT_A16B16G16R16 = 36,
+            D3DFMT_Q16W16V16U16 = 110,
+            D3DFMT_R16F = 111,
+            D3DFMT_G16R16F = 112,
+            D3DFMT_A16B16G16R16F = 113,
+            D3DFMT_R32F = 114,
+            D3DFMT_G32R32F = 115,
+            D3DFMT_A32B32G32R32F = 116,
+            D3DFMT_CxV8U8 = 117
+        }
 
         public enum DXGI_FORMAT
         {

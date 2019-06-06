@@ -57,6 +57,8 @@ namespace StudioSB.IO.Formats
                 if (internalFormatByNuTexFormat.ContainsKey(Format))
                     surface.InternalFormat = internalFormatByNuTexFormat[Format];
 
+                surface.PixelType = GetPixelType(Format);
+
                 reader.BaseStream.Position = 0;
                 byte[] ImageData = reader.ReadBytes(ImageSize);
 
@@ -136,10 +138,10 @@ namespace StudioSB.IO.Formats
         public static readonly Dictionary<NUTEX_FORMAT, InternalFormat> internalFormatByNuTexFormat = new Dictionary<NUTEX_FORMAT, InternalFormat>()
         {
             { NUTEX_FORMAT.R8G8B8A8_SRGB, InternalFormat.SrgbAlpha },
-            { NUTEX_FORMAT.R8G8B8A8_UNORM, InternalFormat.Rgba },
-            { NUTEX_FORMAT.R32G32B32A32_FLOAT, InternalFormat.Rgba },
-            { NUTEX_FORMAT.B8G8R8A8_UNORM, InternalFormat.Rgba },
-            { NUTEX_FORMAT.B8G8R8A8_SRGB, InternalFormat.Srgb },
+            { NUTEX_FORMAT.R8G8B8A8_UNORM, InternalFormat.Rgba8 },
+            { NUTEX_FORMAT.R32G32B32A32_FLOAT, InternalFormat.Rgba32f },
+            { NUTEX_FORMAT.B8G8R8A8_UNORM, InternalFormat.Rgba8 },
+            { NUTEX_FORMAT.B8G8R8A8_SRGB, InternalFormat.Rgba8Snorm },
             { NUTEX_FORMAT.BC1_UNORM, InternalFormat.CompressedRgbaS3tcDxt1Ext },
             { NUTEX_FORMAT.BC1_SRGB, InternalFormat.CompressedSrgbAlphaS3tcDxt1Ext },
             { NUTEX_FORMAT.BC2_UNORM, InternalFormat.CompressedRgbaS3tcDxt3Ext },
@@ -156,11 +158,22 @@ namespace StudioSB.IO.Formats
         };
 
 
+        private static PixelType GetPixelType(NUTEX_FORMAT format)
+        {
+            switch (format)
+            {
+                case NUTEX_FORMAT.R32G32B32A32_FLOAT:
+                    return PixelType.Float;
+                default:
+                    return PixelType.Byte;
+            }
+        }
         /// <summary>
         /// Channel information for uncompressed formats.
         /// </summary>
         public static readonly Dictionary<NUTEX_FORMAT, PixelFormat> pixelFormatByNuTexFormat = new Dictionary<NUTEX_FORMAT, PixelFormat>()
         {
+            { NUTEX_FORMAT.R32G32B32A32_FLOAT, PixelFormat.Rgba },
             { NUTEX_FORMAT.R8G8B8A8_SRGB, PixelFormat.Rgba },
             { NUTEX_FORMAT.R8G8B8A8_UNORM, PixelFormat.Rgba },
             { NUTEX_FORMAT.B8G8R8A8_UNORM, PixelFormat.Bgra },
@@ -174,6 +187,7 @@ namespace StudioSB.IO.Formats
         R8G8B8A8_SRGB = 0x05,
         R32G32B32A32_FLOAT = 0x34,
         B8G8R8A8_UNORM = 0x50,
+        //53
         B8G8R8A8_SRGB = 0x55,
         BC1_UNORM = 0x80,
         BC1_SRGB = 0x85,
@@ -187,6 +201,7 @@ namespace StudioSB.IO.Formats
         BC5_SNORM = 0xc5,
         BC6_UFLOAT = 0xd7,
         BC7_UNORM = 0xe0,
-        BC7_SRGB = 0xe5
+        BC7_SRGB = 0xe5,
+        //FF
     }
 }

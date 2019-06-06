@@ -54,8 +54,8 @@ namespace StudioSB.Tools
             { InternalFormat.Rgba8i,        new FormatInfo(4,  1,  1, 1) },
             { InternalFormat.Rgba8Snorm,       new FormatInfo(4,  1,  1, 1) },
             { InternalFormat.Rgba8ui,        new FormatInfo(4,  1,  1, 1) },
-            //{ InternalFormat.Rgba8,       new FormatInfo(4,  1,  1, 1) }, // TEX_FORMAT.R8G8B8A8_UNORM
-            //{ InternalFormat.Rgba8Snorm,  new FormatInfo(4,  1,  1, 1) }, // TEX_FORMAT.R8G8B8A8_UNORM_SRGB
+            { InternalFormat.Rgba8,       new FormatInfo(4,  1,  1, 1) }, // TEX_FORMAT.R8G8B8A8_UNORM
+            { InternalFormat.SrgbAlpha,  new FormatInfo(4,  1,  1, 1) }, // TEX_FORMAT.R8G8B8A8_UNORM_SRGB
             { InternalFormat.R32f,       new FormatInfo(4,  1,  1, 1) }, // TEX_FORMAT.R32G8X24_FLOAT???
             //{ InternalFormat.Rgb8,      new FormatInfo(4, 1,  1, 1) }, // TEX_FORMAT.R8G8_B8G8_UNORM
             //{ InternalFormat.Rgb8,       new FormatInfo(4, 1,  1, 1) }, //TEX_FORMAT.B8G8R8X8_UNORM

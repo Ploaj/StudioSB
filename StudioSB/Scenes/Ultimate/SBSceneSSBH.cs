@@ -3,7 +3,6 @@ using OpenTK.Graphics.OpenGL;
 using System.IO;
 using StudioSB.Rendering;
 using System.Collections.Generic;
-using SFGraphics.GLObjects.Textures;
 using SSBHLib;
 using SSBHLib.Formats;
 using SFGraphics.GLObjects.Shaders;
@@ -404,12 +403,6 @@ namespace StudioSB.Scenes.Ultimate
                     sbMeshToRenderMesh.Add(mesh, rmesh);
                 }
             }
-
-            /*nameToSurface.Clear();
-            foreach(var tex in Surfaces)
-            {
-                nameToSurface.Add(tex.Name.ToLower(), tex);
-            }*/
         }
 
         /// <summary>
@@ -434,15 +427,21 @@ namespace StudioSB.Scenes.Ultimate
                 boneBinds = Skeleton.GetBindTransforms();
             }
             boneUniformBuffer.SetData(boneBinds, BufferUsageHint.DynamicDraw);
-
+            
+            // set uniforms
             SetShaderUniforms(shader);
             SetShaderCamera(shader, camera);
-
+            
+            // sort mesh
             var opaqueZSorted = new List<ISBMesh>();
             var transparentZSorted = new List<ISBMesh>();
 
             foreach (var m in Model.Meshes)
             {
+                // no need to sort invisible meshes
+                if (!m.Visible) 
+                    continue;
+
                 if (((UltimateMaterial)m.Material).HasBlending)
                     transparentZSorted.Add(m);
                 else
@@ -450,15 +449,14 @@ namespace StudioSB.Scenes.Ultimate
             }
 
             // TODO: Account for bounding sphere center and transform in depth sorting.
-            opaqueZSorted = opaqueZSorted.OrderBy(m => m.BoundingSphere.Radius).ToList();
+            // do we need to sort opaque?
+            //opaqueZSorted = opaqueZSorted.OrderBy(m => m.BoundingSphere.Radius).ToList();
             transparentZSorted = transparentZSorted.OrderBy(m => m.BoundingSphere.Radius).ToList();
 
             opaqueZSorted.AddRange(transparentZSorted);
 
             foreach (SBUltimateMesh mesh in opaqueZSorted)
             {
-                if (!mesh.Visible) continue;
-                
                 shader.SetBoolToInt("renderWireframe", mesh.Selected || ApplicationSettings.EnableWireframe);
 
                 // refresh rendering if this not is not setup
@@ -497,12 +495,6 @@ namespace StudioSB.Scenes.Ultimate
                 mesh.OrientedBoundingBox.Render(camera, transform);
             }
 # endif
-
-            //Vector3 size = ((SBUltimateModel)Model).VolumeSize;
-            //StudioSB.Rendering.Shapes.Sphere.DrawRectangularPrism(((SBUltimateModel)Model).VolumeCenter, size.X, size.Y, size.Z, true);
-
-            //StudioSB.Rendering.Shapes.RectangularPrism.DrawRectangularPrism(camera, ((SBUltimateModel)Model).OBBPosition, ((SBUltimateModel)Model).OBBSize * 2, ((SBUltimateModel)Model).OBBTransform);
-            //StudioSB.Rendering.Shapes.Sphere.DrawSphereLegacy(Model.BoundingSphere.Xyz, Model.BoundingSphere.W, 20, true);
         }
 
         private Shader GetShader()
@@ -529,7 +521,7 @@ namespace StudioSB.Scenes.Ultimate
             //TODO:
             // this is smash ultimate specific
             shader.SetInt("transitionEffect", 0);
-            shader.SetFloat("transitionFactor", 0);
+            shader.SetFloat("transitionFactor", 0f);
 
             shader.SetBoolToInt("renderDiffuse", ApplicationSettings.EnableDiffuse);
             shader.SetBoolToInt("renderSpecular", ApplicationSettings.EnableSpecular);
