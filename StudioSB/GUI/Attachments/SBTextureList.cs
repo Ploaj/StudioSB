@@ -67,7 +67,7 @@ namespace StudioSB.GUI.Attachments
             PropertyGrid.SelectedObjectsChanged += (sender, agrs) =>
             {
                 if (PropertyGrid.SelectedObject is SBSurface surface && surface.Arrays.Count > 0)
-                    MipLevel.Maximum = surface.Arrays[0].Mipmaps.Count;
+                    MipLevel.Maximum = surface.Arrays[0].Mipmaps.Count - 1;
             };
 
             DisplayBox = new GroupBox();

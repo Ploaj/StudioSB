@@ -129,7 +129,7 @@ namespace StudioSB.Scenes.Ultimate
 
         [MATLLoaderAttributeName("Texture2"), DefaultTextureName("defaultBlackCube")]
         public SBMatAttrib<string> irrCubemap { get; } = new SBMatAttrib<string>("Texture2", "");
-        public bool hasIrrCubemap { get => irrCubemap != null; }
+        public bool hasIrrCubemap { get => irrCubemap.Used; }
 
         [MATLLoaderAttributeName("Texture3"), DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> gaoMap { get; } = new SBMatAttrib<string>("Texture3", "");

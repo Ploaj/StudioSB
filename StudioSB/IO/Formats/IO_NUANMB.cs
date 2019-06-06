@@ -39,6 +39,7 @@ namespace StudioSB.IO.Formats
             {
                 if (File is ANIM animation)
                 {
+                    anim.Name = animation.Name;
                     anim.FrameCount = animation.FrameCount;
 
                     foreach (var group in animation.Animations)
