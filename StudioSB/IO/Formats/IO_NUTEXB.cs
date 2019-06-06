@@ -201,7 +201,6 @@ namespace StudioSB.IO.Formats
         BC5_SNORM = 0xc5,
         BC6_UFLOAT = 0xd7,
         BC7_UNORM = 0xe0,
-        BC7_SRGB = 0xe5,
-        //FF
+        BC7_SRGB = 0xe5
     }
 }

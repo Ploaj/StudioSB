@@ -25,7 +25,8 @@ uniform int hasInkNorMap;
 uniform sampler2D inkNorMap;
 
 // TODO: Cubemap loading doesn't work yet.
-uniform sampler2D difCubemap;
+uniform int hasDifCubemap;
+uniform samplerCube difCubemap;
 
 uniform int hasDiffuse;
 uniform sampler2D difMap;
@@ -116,6 +117,8 @@ void main()
 
     // Get texture colors.
 	vec4 albedoColor = GetAlbedoColor(map1, uvSet, uvSet, param9E, param146, param147, colorSet5);
+    if (hasDifCubemap == 1)
+        albedoColor = texture(difCubemap, R);
 	vec4 prmColor = texture(prmMap, map1).xyzw;
 	vec4 emiColor = GetEmissionColor(map1, uvSet, param9E, param146);
 	vec4 bakeLitColor = texture(bakeLitMap, bake1).rgba;

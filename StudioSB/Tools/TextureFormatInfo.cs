@@ -42,15 +42,15 @@ namespace StudioSB.Tools
         private static readonly Dictionary<InternalFormat, FormatInfo> FormatTable =
                             new Dictionary<InternalFormat, FormatInfo>()
            {
-            { InternalFormat.Rgba32f,   new FormatInfo(16, 1,  1, 1) },
-            { InternalFormat.Rgba32i,    new FormatInfo(16, 1,  1, 1) },
-            { InternalFormat.Rgba32ui,    new FormatInfo(16, 1,  1, 1) },
-            { InternalFormat.Rgba16f,   new FormatInfo(8,  1,  1, 1) },
-            { InternalFormat.Rgba16i,    new FormatInfo(8,  1,  1, 1) },
-            { InternalFormat.Rgba16ui,   new FormatInfo(8,  1,  1, 1) }, // _SNORM
+            { InternalFormat.Rgba32f,       new FormatInfo(16, 1,  1, 1) },
+            { InternalFormat.Rgba32i,       new FormatInfo(16, 1,  1, 1) },
+            { InternalFormat.Rgba32ui,      new FormatInfo(16, 1,  1, 1) },
+            { InternalFormat.Rgba16f,       new FormatInfo(8,  1,  1, 1) },
+            { InternalFormat.Rgba16i,       new FormatInfo(8,  1,  1, 1) },
+            { InternalFormat.Rgba16ui,      new FormatInfo(8,  1,  1, 1) }, // _SNORM
             { InternalFormat.Rg32f,         new FormatInfo(8,  1,  1, 1) },
-            { InternalFormat.Rg32i,          new FormatInfo(8,  1,  1, 1) },
-            { InternalFormat.Rg32ui,          new FormatInfo(8,  1,  1, 1) },
+            { InternalFormat.Rg32i,         new FormatInfo(8,  1,  1, 1) },
+            { InternalFormat.Rg32ui,        new FormatInfo(8,  1,  1, 1) },
             { InternalFormat.Rgba8i,        new FormatInfo(4,  1,  1, 1) },
             { InternalFormat.Rgba8Snorm,       new FormatInfo(4,  1,  1, 1) },
             { InternalFormat.Rgba8ui,        new FormatInfo(4,  1,  1, 1) },
