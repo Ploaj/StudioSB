@@ -49,11 +49,14 @@ namespace StudioSB.Rendering
             Shader sphShader = CreateSphereShader();
             shaderByName.Add("Sphere", sphShader);
 
-            Shader capShader = CreateCapsuleShader();
-            shaderByName.Add("Capsule", capShader);
+            //Shader capShader = CreateCapsuleShader();
+            //shaderByName.Add("Capsule", capShader);
 
             Shader primShader = CreatePrismShader();
             shaderByName.Add("Prism", primShader);
+
+            Shader cubeShader = CreateCubeShader();
+            shaderByName.Add("CubeMap", cubeShader);
 
             foreach (var pair in shaderByName)
             {
@@ -84,6 +87,13 @@ namespace StudioSB.Rendering
             Shader textShader = new Shader();
             textShader.LoadShaders(File.ReadAllText("Shaders/Text.vert"), File.ReadAllText("Shaders/Text.frag"));
             return textShader;
+        }
+
+        private static Shader CreateCubeShader()
+        {
+            Shader cubeShader = new Shader();
+            cubeShader.LoadShaders(File.ReadAllText("Shaders/CubeMap.vert"), File.ReadAllText("Shaders/CubeMap.frag"));
+            return cubeShader;
         }
 
         private static Shader CreateBoneShader()

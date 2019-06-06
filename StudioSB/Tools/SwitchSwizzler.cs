@@ -58,9 +58,10 @@ namespace StudioSB.Tools
                     //Get the first mip offset and current one and the total image size
                     int msize = (int)((MipOffsets[0] + ImageData.Length - MipOffsets[mipLevel]) / surface.ArrayCount);
 
+                    if (msize > ImageData.Length - (ArrayOffset + MipOffsets[mipLevel]))
+                        msize = (int)(ImageData.Length - (ArrayOffset + MipOffsets[mipLevel]));
                     byte[] data_ = new byte[msize];
                     Array.Copy(ImageData, ArrayOffset + MipOffsets[mipLevel], data_, 0, msize);
-
                     try
                     {
                         Pitch = RoundUp(width__ * bpp, 64);
@@ -92,7 +93,7 @@ namespace StudioSB.Tools
 
         public static byte[] CreateImageData(SBSurface surface, int target = 1)
         {
-            var MipCount = surface.Mipmaps.Count;
+            var MipCount = surface.Arrays.Count;
 
             List<byte> ImageData = new List<byte>();
             uint bpp = TextureFormatInfo.GetBPP(surface.InternalFormat);
@@ -110,7 +111,7 @@ namespace StudioSB.Tools
             int linesPerBlockHeight = (1 << (int)BlockHeightLog2) * 8;
 
             //uint ArrayOffset = 0;
-            for (int arrayLevel = 0; arrayLevel < surface.ArrayCount; arrayLevel++)
+            for (int arrayLevel = 0; arrayLevel < surface.Arrays.Count; arrayLevel++)
             {
                 uint SurfaceSize = 0;
                 int blockHeightShift = 0;
@@ -138,7 +139,7 @@ namespace StudioSB.Tools
                     MipOffsets.Add(SurfaceSize);
 
                     //Get the first mip offset and current one and the total image size
-                    int msize = (int)((MipOffsets[0] + surface.Mipmaps[mipLevel].Length - MipOffsets[mipLevel]) / surface.ArrayCount);
+                    int msize = (int)((MipOffsets[0] + surface.Arrays[arrayLevel].Mipmaps[mipLevel].Length - MipOffsets[mipLevel]) / surface.ArrayCount);
                     
                     try
                     {
@@ -146,7 +147,7 @@ namespace StudioSB.Tools
                         SurfaceSize += Pitch * RoundUp(height__, Math.Max(1, blockHeight >> blockHeightShift) * 8);
 
                         //Console.WriteLine($"{width} {height} {blkWidth} {blkHeight} {target} {bpp} {TileMode} {(int)Math.Max(0, BlockHeightLog2 - blockHeightShift)} {data_.Length}");
-                        byte[] result = Swizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), surface.Mipmaps[mipLevel]);
+                        byte[] result = Swizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), surface.Arrays[arrayLevel].Mipmaps[mipLevel]);
                         //Console.WriteLine(result.Length + " " + surface.Mipmaps[mipLevel].Length);
                         ImageData.AddRange(result);
                     }

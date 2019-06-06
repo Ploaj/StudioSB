@@ -7,6 +7,7 @@ using System.Drawing;
 using StudioSB.IO.Formats;
 using StudioSB.Scenes;
 using StudioSB.Rendering;
+using StudioSB.Rendering.Shapes;
 
 namespace StudioSB.GUI.Attachments
 {
@@ -64,7 +65,7 @@ namespace StudioSB.GUI.Attachments
             PropertyGrid.SelectedObjectsChanged += (sender, agrs) =>
             {
                 if (PropertyGrid.SelectedObject is SBSurface surface)
-                    MipLevel.Maximum = surface.Mipmaps.Count;
+                    MipLevel.Maximum = surface.Arrays.Count;
             };
 
             DisplayBox = new GroupBox();
@@ -224,11 +225,18 @@ namespace StudioSB.GUI.Attachments
             {
                 OpenTK.Graphics.OpenGL.GL.Disable(OpenTK.Graphics.OpenGL.EnableCap.DepthTest);
 
-                Rendering.Shapes.ScreenTriangle.RenderTexture(DefaultTextures.Instance.defaultWhite);
+                if (surface.IsCubeMap)
+                {
+                    SkyBox.RenderSkyBox(viewport.Camera, (TextureCubeMap)surface.CreateRenderTexture(), MipLevel.Value);
+                }
+                else
+                {
+                    ScreenTriangle.RenderTexture(DefaultTextures.Instance.defaultWhite);
 
-                Rendering.Shapes.ScreenTriangle.RenderTexture(surface.CreateRenderTexture(),
-                    R.BackColor != Color.Gray, G.BackColor != Color.Gray, B.BackColor != Color.Gray, A.BackColor != Color.Gray,
-                    MipLevel.Value, surface.IsSRGB);
+                    ScreenTriangle.RenderTexture(surface.CreateRenderTexture(),
+                        R.BackColor != Color.Gray, G.BackColor != Color.Gray, B.BackColor != Color.Gray, A.BackColor != Color.Gray,
+                        MipLevel.Value, surface.IsSRGB);
+                }
             }
         }
 

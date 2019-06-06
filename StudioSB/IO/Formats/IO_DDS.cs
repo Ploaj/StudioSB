@@ -48,15 +48,17 @@ namespace StudioSB.IO.Formats
                 int w = surface.Width;
                 int h = surface.Height;
 
+                var mip = new MipArray();
                 for(int i = 0; i < (header.dwFlags.HasFlag(DDSD.MIPMAPCOUNT) ? header.dwMipMapCount : 1); i++)
                 {
                     var mipSize = w * h * (int)TextureFormatInfo.GetBPP(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockHeight(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockWidth(surface.InternalFormat);
                     if (mipSize < TextureFormatInfo.GetBPP(surface.InternalFormat))
                         mipSize = (int)TextureFormatInfo.GetBPP(surface.InternalFormat);
-                    surface.Mipmaps.Add(reader.ReadBytes(mipSize));
+                    mip.Mipmaps.Add(reader.ReadBytes(mipSize));
                     w /= 2;
                     h /= 2;
                 }
+                surface.Arrays.Add(mip);
             }
 
             return surface;
@@ -76,7 +78,7 @@ namespace StudioSB.IO.Formats
                 dwWidth = surface.Width,
                 dwPitchOrLinearSize = GetPitchOrLinearSize(surface.InternalFormat, surface.Width),
                 dwDepth = surface.Depth,
-                dwMipMapCount = surface.Mipmaps.Count,
+                dwMipMapCount = surface.Arrays.Count,
                 dwReserved1 = new uint[11],
                 ddspf = new DDS_PIXELFORMAT()
                 {
@@ -96,8 +98,9 @@ namespace StudioSB.IO.Formats
             using (BinaryWriterExt writer = new BinaryWriterExt(new FileStream(fileName, FileMode.Create)))
             {
                 Header.Write(writer);
-
-                foreach (var mip in surface.Mipmaps)
+                 
+                //TODO: cubemaps
+                foreach (var mip in surface.Arrays[0].Mipmaps)
                     writer.Write(mip);
             }
         }

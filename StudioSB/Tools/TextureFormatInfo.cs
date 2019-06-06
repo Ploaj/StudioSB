@@ -99,8 +99,8 @@ namespace StudioSB.Tools
             //{ TEX_FORMAT.BC4_SNORM,             new FormatInfo(8,  4,  4, 1) },
             { InternalFormat.CompressedRgbaS3tcDxt5Ext,             new FormatInfo(16, 4,  4, 1) },
             { InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext,             new FormatInfo(16, 4,  4, 1) },
-            /*{ TEX_FORMAT.BC6H_SF16,             new FormatInfo(16, 4,  4, 1) },
-            { TEX_FORMAT.BC6H_UF16,             new FormatInfo(16, 4,  4, 1) },*/
+            /*{ TEX_FORMAT.BC6H_SF16,             new FormatInfo(16, 4,  4, 1) },*/
+            { InternalFormat.CompressedRgbBptcUnsignedFloat,             new FormatInfo(16, 4,  4, 1) },
             { InternalFormat.CompressedRgbaBptcUnorm,             new FormatInfo(16, 4,  4, 1) },
             { InternalFormat.CompressedSrgbAlphaBptcUnorm,        new FormatInfo(16, 4,  4, 1) },
 

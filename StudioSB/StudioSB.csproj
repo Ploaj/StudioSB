@@ -189,6 +189,7 @@
     <Compile Include="Rendering\Shapes\Capsule.cs" />
     <Compile Include="Rendering\Shapes\RectangularPrism.cs" />
     <Compile Include="Rendering\Shapes\ScreenTriangle.cs" />
+    <Compile Include="Rendering\Shapes\SkyBox.cs" />
     <Compile Include="Rendering\Shapes\Spawn.cs" />
     <Compile Include="Rendering\Shapes\Sphere.cs" />
     <Compile Include="Rendering\Shapes\VectorGraphic.cs" />
@@ -446,6 +447,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="Shaders\Bone.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\CubeMap.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\CubeMap.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\SolidColor.frag">

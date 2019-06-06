@@ -45,12 +45,11 @@ namespace StudioSB.IO.Formats
 
                 int MipCount = reader.ReadInt32();
                 int Alignment = reader.ReadInt32();
-                int ArrayCount = reader.ReadInt32();
+                surface.ArrayCount = reader.ReadInt32();
                 int ImageSize = reader.ReadInt32();
                 char[] Magic = reader.ReadChars(4);
                 int MajorVersion = reader.ReadInt16();
                 int MinorVersion = reader.ReadInt16();
-                
 
                 if (pixelFormatByNuTexFormat.ContainsKey(Format))
                     surface.PixelFormat = pixelFormatByNuTexFormat[Format];
@@ -61,10 +60,15 @@ namespace StudioSB.IO.Formats
                 reader.BaseStream.Position = 0;
                 byte[] ImageData = reader.ReadBytes(ImageSize);
 
-                for (int i = 0; i < MipCount; i++) // 
+                for(int array = 0; array < surface.ArrayCount; array++)
                 {
-                    byte[] deswiz = Tools.SwitchSwizzler.GetImageData(surface, ImageData, 0, i, MipCount);
-                    surface.Mipmaps.Add(deswiz);
+                    MipArray arr = new MipArray();
+                    for (int i = 0; i < MipCount; i++)
+                    {
+                        byte[] deswiz = SwitchSwizzler.GetImageData(surface, ImageData, array, i, MipCount);
+                        arr.Mipmaps.Add(deswiz);
+                    }
+                    surface.Arrays.Add(arr);
                 }
                 
                 return surface;
@@ -76,20 +80,22 @@ namespace StudioSB.IO.Formats
             using (BinaryWriter writer = new BinaryWriter(new FileStream(FileName, FileMode.Create)))
             {
                 List<byte> mipData = new List<byte>();
-                foreach(var mip in surface.Mipmaps)
+                foreach(var mip in surface.Arrays)
                 {
-                    mipData.AddRange(mip);
+                    foreach(var m in mip.Mipmaps)
+                        mipData.AddRange(m);
                 }
                 writer.Write(SwitchSwizzler.CreateImageData(surface));
 
                 uint ImageSize = (uint)writer.BaseStream.Position;
 
-                foreach (var mip in surface.Mipmaps)
+                foreach (var mip in surface.Arrays)
                 {
-                    writer.Write(mip.Length);
+                    foreach(var m in mip.Mipmaps)
+                        writer.Write(m.Length);
+                    for (int i = mip.Mipmaps.Count; i < 0x10; i++)
+                        writer.Write(0);
                 }
-                for (int i = surface.Mipmaps.Count; i < 0x10; i++)
-                    writer.Write(0);
 
                 writer.Write(new char[] { ' ', 'X', 'N', 'T'});
                 writer.Write(surface.Name.ToCharArray());
@@ -101,7 +107,7 @@ namespace StudioSB.IO.Formats
                 writer.Write((byte)4); // unknown usually 4
                 writer.Write((short)0); // pad
                 writer.Write(4); // unknown usually 4
-                writer.Write(surface.Mipmaps.Count);
+                writer.Write(surface.Arrays.Count);
                 writer.Write(0x1000); // alignment
                 writer.Write(1); // array count
                 writer.Write(ImageSize);
