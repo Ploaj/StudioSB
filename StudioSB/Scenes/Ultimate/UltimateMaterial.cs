@@ -62,9 +62,9 @@ namespace StudioSB.Scenes.Ultimate
 
         [MATLLoaderAttributeName("CustomVector18")]
         public SBMatAttrib<Vector4> paramAA { get; } = new SBMatAttrib<Vector4>("CustomVector18", new Vector4(1), description: "Sprite sheet UV parameters.");
-
+        
         [MATLLoaderAttributeName("CustomVector30")]
-        public SBMatAttrib<Vector4> param145 { get; } = new SBMatAttrib<Vector4>("CustomVector30", new Vector4(0, 0, 0, 0), description: "");
+        public SBMatAttrib<Vector4> param145 { get; } = new SBMatAttrib<Vector4>("CustomVector30", new Vector4(1, 0, 0, 0), description: "");
 
         [MATLLoaderAttributeName("CustomVector31")]
         public SBMatAttrib<Vector4> param146 { get; } = new SBMatAttrib<Vector4>("CustomVector31", new Vector4(1, 1, 0, 0), description: "UV transform");
@@ -117,6 +117,9 @@ namespace StudioSB.Scenes.Ultimate
 
         [MATLLoaderAttributeName("CustomFloat10")]
         public SBMatAttrib<float> paramCA { get; } = new SBMatAttrib<float>("CustomFloat10", 0.0f, description: "Controls anisotropic specular");
+
+        [MATLLoaderAttributeName("CustomFloat19")]
+        public SBMatAttrib<float> paramD3 { get; } = new SBMatAttrib<float>("CustomFloat19", 0.0f, description: "");
 
         #endregion
 
@@ -262,8 +265,6 @@ namespace StudioSB.Scenes.Ultimate
                 }
             }
 
-            shader.SetBoolToInt("hasBlending", HasBlending);
-
             shader.SetTexture("diffusePbrCube", DefaultTextures.Instance.diffusePbr, TextureUnit++);
             shader.SetTexture("specularPbrCube", DefaultTextures.Instance.specularPbr, TextureUnit++);
             shader.SetTexture("iblLut", DefaultTextures.Instance.iblLut, TextureUnit++);
@@ -275,8 +276,9 @@ namespace StudioSB.Scenes.Ultimate
         /// </summary>
         private void BindBlendState()
         {
-            BlendingFactor src = BlendingFactor.One; ;
-            BlendingFactor dst = BlendingFactor.One; ;
+            BlendingFactor src = BlendingFactor.One;
+            BlendingFactor dst = BlendingFactor.OneMinusSrcAlpha;
+
             if (BlendState.BlendFactor1 == 1)
                 src = BlendingFactor.One;
             else if (BlendState.BlendFactor1 == 6)
@@ -292,11 +294,6 @@ namespace StudioSB.Scenes.Ultimate
                 GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(src, dst);
             }
-            else
-            {
-                GL.Disable(EnableCap.Blend);
-                GL.Disable(EnableCap.AlphaTest);
-            }
         }
 
         /// <summary>
@@ -306,6 +303,7 @@ namespace StudioSB.Scenes.Ultimate
         {
             MaterialFace mf = MaterialFace.Back;
             PolygonMode pm = PolygonMode.Fill;
+            CullFaceMode cullMode = CullFaceMode.Back;
 
             if(RasterizerState != null)
             {
@@ -322,13 +320,17 @@ namespace StudioSB.Scenes.Ultimate
                 {
                     case 1:
                         mf = MaterialFace.Front;
+                        cullMode = CullFaceMode.Front;
                         break;
                     case 2:
                         mf = MaterialFace.FrontAndBack;
+                        cullMode = CullFaceMode.FrontAndBack;
                         break;
                 }
             }
 
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(cullMode);
             GL.PolygonMode(mf, pm);
         }
 

@@ -58,6 +58,8 @@ namespace StudioSB.Rendering
                 
                 shader.SetMatrix4x4("transform", ref Transform);
 
+                shader.SetMatrix4x4("mvpMatrix", camera.MvpMatrix);
+
                 shader.SetFloat("letterSize", Size);
                 shader.SetVector2("windowSize", new Vector2(camera.RenderHeight, camera.RenderWidth));
                 shader.SetVector2("windowPosition", WindowPosition);
@@ -75,12 +77,12 @@ namespace StudioSB.Rendering
 
                     shader.SetVector3("letterColor", Color);
                     shader.SetVector2("letterPosition", new Vector2(offset, 0));
-                    characterShape.Draw(shader, camera);
+                    characterShape.Draw(shader);
 
                     //Drop shadow
                     shader.SetVector3("letterColor", new Vector3(0, 0, 0));
                     shader.SetVector2("letterPosition", new Vector2(offset + 1, -1));
-                    characterShape.Draw(shader, camera);
+                    characterShape.Draw(shader);
 
                     offset += LetterSize;
                 }
@@ -115,7 +117,7 @@ namespace StudioSB.Rendering
         {
             return new List<VertexAttribute>()
             {
-                new VertexFloatAttribute("point", ValueCount.Four, VertexAttribPointerType.Float),
+                new VertexFloatAttribute("point", ValueCount.Four, VertexAttribPointerType.Float, false),
             };
         }
     }

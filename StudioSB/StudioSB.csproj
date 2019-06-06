@@ -290,202 +290,148 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="DefaultTextures\diffuseSdr00.bin">
+    <None Include="DefaultTextures\irr x+.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\diffuseSdr10.bin">
+    <None Include="DefaultTextures\irr x-.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\diffuseSdr20.bin">
+    <None Include="DefaultTextures\irr y+.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\diffuseSdr30.bin">
+    <None Include="DefaultTextures\irr y-.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\diffuseSdr40.bin">
+    <None Include="DefaultTextures\irr z+.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\diffuseSdr50.bin">
+    <None Include="DefaultTextures\irr z-.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr00.bin">
+    <None Include="DefaultTextures\spec x+ 0.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr01.bin">
+    <None Include="DefaultTextures\spec x+ 1.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr02.bin">
+    <None Include="DefaultTextures\spec x+ 2.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr03.bin">
+    <None Include="DefaultTextures\spec x+ 3.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr04.bin">
+    <None Include="DefaultTextures\spec x+ 4.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr05.bin">
+    <None Include="DefaultTextures\spec x+ 5.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr06.bin">
+    <None Include="DefaultTextures\spec x+ 6.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr07.bin">
+    <None Include="DefaultTextures\spec x- 0.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr08.bin">
+    <None Include="DefaultTextures\spec x- 1.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr09.bin">
+    <None Include="DefaultTextures\spec x- 2.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr10.bin">
+    <None Include="DefaultTextures\spec x- 3.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr11.bin">
+    <None Include="DefaultTextures\spec x- 4.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr12.bin">
+    <None Include="DefaultTextures\spec x- 5.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr13.bin">
+    <None Include="DefaultTextures\spec x- 6.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr14.bin">
+    <None Include="DefaultTextures\spec y+ 0.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr15.bin">
+    <None Include="DefaultTextures\spec y+ 1.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr16.bin">
+    <None Include="DefaultTextures\spec y+ 2.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr17.bin">
+    <None Include="DefaultTextures\spec y+ 3.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr18.bin">
+    <None Include="DefaultTextures\spec y+ 4.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr19.bin">
+    <None Include="DefaultTextures\spec y+ 5.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr20.bin">
+    <None Include="DefaultTextures\spec y+ 6.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr21.bin">
+    <None Include="DefaultTextures\spec y- 0.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr22.bin">
+    <None Include="DefaultTextures\spec y- 1.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr23.bin">
+    <None Include="DefaultTextures\spec y- 2.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr24.bin">
+    <None Include="DefaultTextures\spec y- 3.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr25.bin">
+    <None Include="DefaultTextures\spec y- 4.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr26.bin">
+    <None Include="DefaultTextures\spec y- 5.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr27.bin">
+    <None Include="DefaultTextures\spec y- 6.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr28.bin">
+    <None Include="DefaultTextures\spec z+ 0.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr29.bin">
+    <None Include="DefaultTextures\spec z+ 1.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr30.bin">
+    <None Include="DefaultTextures\spec z+ 2.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr31.bin">
+    <None Include="DefaultTextures\spec z+ 3.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr32.bin">
+    <None Include="DefaultTextures\spec z+ 4.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr33.bin">
+    <None Include="DefaultTextures\spec z+ 5.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr34.bin">
+    <None Include="DefaultTextures\spec z+ 6.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr35.bin">
+    <None Include="DefaultTextures\spec z- 0.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr36.bin">
+    <None Include="DefaultTextures\spec z- 1.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr37.bin">
+    <None Include="DefaultTextures\spec z- 2.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr38.bin">
+    <None Include="DefaultTextures\spec z- 3.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr39.bin">
+    <None Include="DefaultTextures\spec z- 4.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr40.bin">
+    <None Include="DefaultTextures\spec z- 5.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="DefaultTextures\specularSdr41.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr42.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr43.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr44.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr45.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr46.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr47.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr48.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr49.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr50.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr51.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr52.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr53.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr54.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr55.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr56.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr57.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr58.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DefaultTextures\specularSdr59.bin">
+    <None Include="DefaultTextures\spec z- 6.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="OpenTK.dll.config" />

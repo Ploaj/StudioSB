@@ -8,7 +8,7 @@ namespace StudioSB.Scenes.Ultimate
     {
         public UltimateRenderMesh(List<UltimateVertex> vertices, List<uint> indices) : base(vertices, indices, PrimitiveType.Triangles)
         {
-
+            
         }
 
         /*public void SetRenderState(Material material)

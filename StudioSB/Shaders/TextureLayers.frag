@@ -34,7 +34,11 @@ uniform int paramEE;
 uniform int paramED;
 uniform float currentFrame;
 
+uniform float paramC4;
+
 uniform int emissionOverride;
+
+uniform int renderExperimental;
 
 vec3 Blend(vec4 a, vec4 b)
 {
@@ -50,7 +54,14 @@ vec2 TransformUv(vec2 uv, vec4 transform)
         translate *= currentFrame / 60.0;
 
     vec2 scale = transform.xy;
-    return (uv + translate) * scale;
+    vec2 result = (uv + translate) * scale;
+
+    // TODO: du dv map?
+    vec2 textureOffset = vec2(1) - texture(norMap, uv).xy;
+    textureOffset = textureOffset * 2 - 1; // Remap [0,1] to [-1,1]
+    result = result + (textureOffset * paramC4 * renderExperimental);
+
+    return result;
 }
 
 vec4 GetEmissionColor(vec2 uv1, vec2 uv2, vec4 transform1, vec4 transform2)

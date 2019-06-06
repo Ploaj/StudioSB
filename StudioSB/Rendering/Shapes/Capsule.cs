@@ -48,7 +48,7 @@ namespace StudioSB.Rendering.Shapes
         {
             return new List<VertexAttribute>()
             {
-                new VertexFloatAttribute("Position", ValueCount.Four, VertexAttribPointerType.Float),
+                new VertexFloatAttribute("Position", ValueCount.Four, VertexAttribPointerType.Float, false),
             };
         }
 
@@ -88,7 +88,7 @@ namespace StudioSB.Rendering.Shapes
             
             shader.SetFloat("Size", Size);
             GL.PointSize(5f);
-            UnitCapsule.Draw(shader, Camera);
+            UnitCapsule.Draw(shader);
         }
     }
 }

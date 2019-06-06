@@ -351,6 +351,12 @@ namespace StudioSB.Scenes.Ultimate
             if(Model != null)
             foreach(var mesh in Model.Meshes)
                 {
+                    if (!mesh.Visible)
+                        continue;
+
+                    GL.Enable(EnableCap.CullFace);
+                    GL.CullFace(CullFaceMode.Back);
+
                     GL.PushMatrix();
                     Matrix4 transform = Matrix4.Identity;
                     if (Skeleton != null && mesh.ParentBone != "" && Skeleton.ContainsBone(mesh.ParentBone))
@@ -361,7 +367,8 @@ namespace StudioSB.Scenes.Ultimate
                     foreach(var index in mesh.Indices)
                     {
                         var vertex = mesh.Vertices[(int)index];
-                        GL.Color3(vertex.Normal0);
+                        var color = new Vector3(0.5f) + vertex.Normal0 / 2;
+                        GL.Color3(color);
                         GL.Vertex3(vertex.Position0);
                     }
                     GL.End();
@@ -474,11 +481,10 @@ namespace StudioSB.Scenes.Ultimate
                 if (Skeleton != null && mesh.ParentBone != "" && Skeleton.ContainsBone(mesh.ParentBone))
                     transform = Skeleton[mesh.ParentBone].AnimatedWorldTransform;
                 shader.SetMatrix4x4("transform", ref transform);
-
+                
                 // draw mesh
                 var rmesh = sbMeshToRenderMesh[mesh];
-                rmesh.Draw(shader, null);
-
+                rmesh.Draw(shader);
             }
 
 #if DEBUG
@@ -516,10 +522,8 @@ namespace StudioSB.Scenes.Ultimate
         {
             Matrix4 mvp = camera.MvpMatrix;
             shader.SetMatrix4x4("mvp", ref mvp);
-
-            var ViewVector = new Vector3(0, 0, 1) * new Matrix3(camera.ModelViewMatrix).Inverted();
-            ViewVector = ViewVector.Normalized();
-            shader.SetVector3("V", ViewVector);
+            
+            shader.SetVector3("cameraPos", camera.Position);
         }
 
         private void SetShaderUniforms(Shader shader)

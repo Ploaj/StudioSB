@@ -116,6 +116,8 @@ namespace StudioSB.Scenes
 
             boneShader.UseProgram();
 
+            boneShader.SetMatrix4x4("mvpMatrix", camera.MvpMatrix);
+
             boneShader.SetVector4("color", new Vector4(ApplicationSettings.BoneColor.R / 255f, ApplicationSettings.BoneColor.G / 255f, ApplicationSettings.BoneColor.B / 255f, ApplicationSettings.BoneColor.A / 255f));
             
             boneShader.SetMatrix4x4("rotation", ref prismRotation);
@@ -130,11 +132,11 @@ namespace StudioSB.Scenes
                     Matrix4 parenttransform = b.Parent.AnimatedWorldTransform;
                     boneShader.SetMatrix4x4("parent", ref parenttransform);
                 }
-                bonePrism.Draw(boneShader, camera);
+                bonePrism.Draw(boneShader);
 
                 // leaf node
                 boneShader.SetInt("hasParent", 0);
-                bonePrism.Draw(boneShader, null);
+                bonePrism.Draw(boneShader);
             }
 
             if(ApplicationSettings.RenderBoneNames)

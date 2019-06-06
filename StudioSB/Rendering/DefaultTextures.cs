@@ -1,5 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using SFGraphics.GLObjects.Textures;
+using SFGraphics.GLObjects.Textures.TextureFormats;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -87,33 +88,54 @@ namespace StudioSB.Rendering
             diffusePbr = new TextureCubeMap();
 
             var surfaceData = new List<List<byte[]>>();
-            for (int surface = 0; surface < 6; surface++)
-            {
-                var mipData = System.IO.File.ReadAllBytes($"DefaultTextures/diffuseSdr{surface}{0}.bin");
-                surfaceData.Add(new List<byte[]>() { mipData });
-            }
-            diffusePbr.LoadImageData(128, InternalFormat.CompressedRgbaS3tcDxt1Ext, surfaceData[0], surfaceData[1], surfaceData[2], surfaceData[3], surfaceData[4], surfaceData[5]);
+
+            AddIrrFace(surfaceData, "x+");
+            AddIrrFace(surfaceData, "x-");
+            AddIrrFace(surfaceData, "y+");
+            AddIrrFace(surfaceData, "y-");
+            AddIrrFace(surfaceData, "z+");
+            AddIrrFace(surfaceData, "z-");
+
+
+            var format = new TextureFormatUncompressed(PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float);
+            diffusePbr.LoadImageData(64, format, surfaceData[0], surfaceData[1], surfaceData[2], surfaceData[3], surfaceData[4], surfaceData[5]);
 
             // Don't Use mipmaps.
             diffusePbr.MagFilter = TextureMagFilter.Linear;
             diffusePbr.MinFilter = TextureMinFilter.Linear;
         }
 
+        private static void AddIrrFace(List<List<byte[]>> surfaceData, string surface)
+        {
+            var mipData = System.IO.File.ReadAllBytes($"DefaultTextures/irr {surface}.bin");
+            surfaceData.Add(new List<byte[]>() { mipData });
+        }
+
         private void LoadSpecularPbr()
         {
             specularPbr = new TextureCubeMap();
             var surfaceData = new List<List<byte[]>>();
-            for (int surface = 0; surface < 6; surface++)
+
+            AddCubeMipmaps(surfaceData, "x+");
+            AddCubeMipmaps(surfaceData, "x-");
+            AddCubeMipmaps(surfaceData, "y+");
+            AddCubeMipmaps(surfaceData, "y-");
+            AddCubeMipmaps(surfaceData, "z+");
+            AddCubeMipmaps(surfaceData, "z-");
+
+            var format = new TextureFormatUncompressed(PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float);
+            specularPbr.LoadImageData(64, format, surfaceData[0], surfaceData[1], surfaceData[2], surfaceData[3], surfaceData[4], surfaceData[5]);
+        }
+
+        private static void AddCubeMipmaps(List<List<byte[]>> surfaceData, string surface)
+        {
+            var mipmaps = new List<byte[]>();
+            for (int mip = 0; mip < 7; mip++)
             {
-                var mipmaps = new List<byte[]>();
-                for (int mip = 0; mip < 10; mip++)
-                {
-                    var mipData = System.IO.File.ReadAllBytes($"DefaultTextures/specularSdr{surface}{mip}.bin");
-                    mipmaps.Add(mipData);
-                }
-                surfaceData.Add(mipmaps);
+                var mipData = System.IO.File.ReadAllBytes($"DefaultTextures/spec {surface} {mip}.bin");
+                mipmaps.Add(mipData);
             }
-            specularPbr.LoadImageData(512, InternalFormat.CompressedRgbaS3tcDxt1Ext, surfaceData[0], surfaceData[1], surfaceData[2], surfaceData[3], surfaceData[4], surfaceData[5]);
+            surfaceData.Add(mipmaps);
         }
     }
 }

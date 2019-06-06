@@ -47,7 +47,7 @@ namespace StudioSB.Rendering.Shapes
         {
             return new List<VertexAttribute>()
             {
-                new VertexFloatAttribute("point", ValueCount.Four, VertexAttribPointerType.Float),
+                new VertexFloatAttribute("point", ValueCount.Four, VertexAttribPointerType.Float, false),
             };
         }
 
@@ -74,7 +74,7 @@ namespace StudioSB.Rendering.Shapes
             shader.SetVector3("offset", Position);
             
             GL.LineWidth(5f);
-            UnitPrism.Draw(shader, Camera);
+            UnitPrism.Draw(shader);
         }
     }
 }

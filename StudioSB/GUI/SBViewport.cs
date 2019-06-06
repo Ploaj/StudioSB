@@ -37,15 +37,12 @@ namespace StudioSB.GUI
 
                 Updated = true;
 
-                if(_scene != null)
+                if (_scene != null)
                 {
                     float Extent = 0;
                     var io = value.GetIOModel();
-                    foreach (var mesh in io.Meshes)
-                        foreach (var vert in mesh.Vertices)
-                        {
-                            Extent = Math.Max(Extent, vert.Position.Y);
-                        }
+                    foreach (var mesh in Scene.GetMeshObjects())
+                        Extent = Math.Max(Extent, mesh.BoundingSphere.Y);
                     if (Extent > 0)
                     {
                         Camera.RotationXDegrees = 0;
@@ -67,7 +64,7 @@ namespace StudioSB.GUI
 
         public bool Updated { get; set; } = true;
         
-        public Camera Camera { get; set; } = new Camera() { FarClipPlane = 500000 };
+        public Camera Camera { get; set; } = new Camera() { FarClipPlane = 50000 };
 
         private Vector2 mousePosition = new Vector2();
         private float mouseScrollWheel = 0;

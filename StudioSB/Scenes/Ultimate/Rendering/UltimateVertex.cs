@@ -14,44 +14,44 @@ namespace StudioSB.Scenes.Ultimate
 
     public struct UltimateVertex
     {
-        [VertexFloat("Position0", ValueCount.Three, VertexAttribPointerType.Float)]
+        [VertexFloat("Position0", ValueCount.Three, VertexAttribPointerType.Float, false)]
         public Vector3 Position0 { get; }
 
-        [VertexFloat("Normal0", ValueCount.Three, VertexAttribPointerType.Float)]
+        [VertexFloat("Normal0", ValueCount.Three, VertexAttribPointerType.Float, false)]
         public Vector3 Normal0 { get; }
 
-        [VertexFloat("Tangent0", ValueCount.Three, VertexAttribPointerType.Float)]
+        [VertexFloat("Tangent0", ValueCount.Three, VertexAttribPointerType.Float, false)]
         public Vector3 Tangent0 { get; }
 
         // Generated value.
-        [VertexFloat("Bitangent0", ValueCount.Three, VertexAttribPointerType.Float)]
+        [VertexFloat("Bitangent0", ValueCount.Three, VertexAttribPointerType.Float, false)]
         public Vector3 Bitangent0 { get; }
 
-        [VertexFloat("map1", ValueCount.Two, VertexAttribPointerType.Float)]
+        [VertexFloat("map1", ValueCount.Two, VertexAttribPointerType.Float, false)]
         public Vector2 Map1 { get; }
 
-        [VertexFloat("uvSet", ValueCount.Two, VertexAttribPointerType.Float)]
+        [VertexFloat("uvSet", ValueCount.Two, VertexAttribPointerType.Float, false)]
         public Vector2 UvSet { get; }
 
-        [VertexFloat("uvSet1", ValueCount.Two, VertexAttribPointerType.Float)]
+        [VertexFloat("uvSet1", ValueCount.Two, VertexAttribPointerType.Float, false)]
         public Vector2 UvSet1 { get; }
 
         [VertexInt("boneIndices", ValueCount.Four, VertexAttribIntegerType.UnsignedInt)]
         public IVec4 BoneIndices { get; }
 
-        [VertexFloat("boneWeights", ValueCount.Four, VertexAttribPointerType.Float)]
+        [VertexFloat("boneWeights", ValueCount.Four, VertexAttribPointerType.Float, false)]
         public Vector4 BoneWeights { get; }
 
-        [VertexFloat("bake1", ValueCount.Two, VertexAttribPointerType.Float)]
+        [VertexFloat("bake1", ValueCount.Two, VertexAttribPointerType.Float, false)]
         public Vector2 Bake1 { get; }
 
-        [VertexFloat("colorSet1", ValueCount.Four, VertexAttribPointerType.Float)]
+        [VertexFloat("colorSet1", ValueCount.Four, VertexAttribPointerType.Float, false)]
         public Vector4 ColorSet1 { get; }
 
-        [VertexFloat("colorSet2", ValueCount.Four, VertexAttribPointerType.Float)]
+        [VertexFloat("colorSet2", ValueCount.Four, VertexAttribPointerType.Float, false)]
         public Vector4 ColorSet2 { get; }
 
-        [VertexFloat("colorSet5", ValueCount.Four, VertexAttribPointerType.Float)]
+        [VertexFloat("colorSet5", ValueCount.Four, VertexAttribPointerType.Float, false)]
         public Vector4 ColorSet5 { get; }
 
         public UltimateVertex(Vector3 position0, Vector3 normal0, Vector3 tangent0, Vector3 bitangent0, Vector2 map1, Vector2 uvSet, Vector2 uvSet1, IVec4 boneIndices, Vector4 boneWeights, Vector2 bake1, Vector4 colorSet1, Vector4 colorSet2, Vector4 colorSet5)

@@ -50,7 +50,7 @@ namespace StudioSB.Rendering.Shapes
             shader.SetBoolToInt("monoChannel", monoChannel);
             shader.SetInt("LOD", LOD);
 
-            triangle.Draw(shader, null);
+            triangle.Draw(shader);
         }
 
         public static void RenderTexture(Texture renderTexture, bool IsSrgb = false)
@@ -67,7 +67,7 @@ namespace StudioSB.Rendering.Shapes
         {
             return new List<VertexAttribute>()
             {
-                new VertexFloatAttribute("position", ValueCount.Three, VertexAttribPointerType.Float),
+                new VertexFloatAttribute("position", ValueCount.Three, VertexAttribPointerType.Float, false),
             };
         }
     }
