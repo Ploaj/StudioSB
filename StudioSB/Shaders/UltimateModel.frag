@@ -45,6 +45,9 @@ uniform sampler2D iblLut;
 uniform samplerCube diffusePbrCube;
 uniform samplerCube specularPbrCube;
 
+uniform int hasIrrCubemap;
+uniform samplerCube irrCubemap;
+
 uniform int emissionOverride;
 
 uniform int renderDiffuse;
@@ -344,6 +347,9 @@ void main()
     // Image based lighting.
     int maxLod = 6;
     vec3 diffuseIbl = textureLod(specularPbrCube, N, maxLod / 2).rgb; // TODO: what is the intensity?
+    if (hasIrrCubemap == 1)
+        diffuseIbl = textureLod(irrCubemap, N, 0).rgb;
+        
     vec3 specularIbl = textureLod(specularPbrCube, R, roughness * maxLod).rgb * iblIntensity;
     vec3 refractionIbl = textureLod(specularPbrCube, refractionVector, 0.075 * maxLod).rgb * iblIntensity;
 

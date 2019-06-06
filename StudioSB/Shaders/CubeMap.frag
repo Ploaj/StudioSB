@@ -1,4 +1,4 @@
-﻿#version 330
+#version 330
 
 in vec3 TexCoords;
 
@@ -8,6 +8,6 @@ uniform samplerCube skybox;
 uniform int mipLevel;
 
 void main()
-{    
+{
     FragColor = textureLod(skybox, TexCoords, mipLevel);
 }
