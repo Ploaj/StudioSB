@@ -28,6 +28,8 @@ namespace StudioSB.GUI
 
         private SBMeshPanel MeshPanel { get; set; }
 
+        private Panel container { get; set; }
+
         public SBMeshList() : base()
         {
             CheckBoxes = true;
@@ -55,6 +57,13 @@ namespace StudioSB.GUI
 
             MeshPanel = new SBMeshPanel();
             MeshPanel.Dock = DockStyle.Fill;
+
+            container = new Panel();
+            container.AutoScroll = true;
+            container.Dock = DockStyle.Fill;
+            container.Controls.Add(MeshPanel);
+            container.Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
+            container.Controls.Add(this);
         }
 
         public bool OverlayScene()
@@ -163,18 +172,8 @@ namespace StudioSB.GUI
             }
         }
 
-        private Panel container;
-
         public void OnAttach(SBViewportPanel viewportPanel)
         {
-            if (container != null)
-                container.Dispose();
-            container = new Panel();
-            container.AutoScroll = true;
-            container.Dock = DockStyle.Fill;
-            container.Controls.Add(MeshPanel);
-            container.Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
-            container.Controls.Add(this);
             viewportPanel.TabPanel.AddTab("Objects", container);
         }
 

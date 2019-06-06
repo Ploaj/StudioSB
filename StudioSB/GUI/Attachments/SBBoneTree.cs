@@ -32,6 +32,13 @@ namespace StudioSB.GUI
 
             BoneEditor = new SBBoneEditor();
             BoneEditor.Dock = DockStyle.Fill;
+
+            container = new Panel();
+            container.AutoScroll = true;
+            container.Dock = DockStyle.Fill;
+            container.Controls.Add(BoneEditor);
+            container.Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
+            container.Controls.Add(this);
         }
 
         public bool OverlayScene()
@@ -114,14 +121,6 @@ namespace StudioSB.GUI
 
         public void OnAttach(SBViewportPanel viewportPanel)
         {
-            if (container != null)
-                container.Dispose();
-            container = new Panel();
-            container.AutoScroll = true;
-            container.Dock = DockStyle.Fill;
-            container.Controls.Add(BoneEditor);
-            container.Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
-            container.Controls.Add(this);
             viewportPanel.TabPanel.AddTab("Bone", container);
         }
 

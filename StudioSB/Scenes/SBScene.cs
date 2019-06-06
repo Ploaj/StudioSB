@@ -1,5 +1,8 @@
 ﻿using SFGraphics.Cameras;
+using StudioSB.GUI;
+using StudioSB.GUI.Attachments;
 using StudioSB.IO.Models;
+using System;
 using System.Collections.Generic;
 
 namespace StudioSB.Scenes
@@ -23,6 +26,8 @@ namespace StudioSB.Scenes
         public List<SBSurface> Surfaces = new List<SBSurface>();
 
         public List<ISBMaterial> Materials = new List<ISBMaterial>();
+
+        public List<Type> AttachmentTypes = new List<Type>() { typeof(SBMeshList), typeof(SBBoneTree), typeof(SBTextureList) };
 
         /// <summary>
         /// Renders the scene to the current gl context

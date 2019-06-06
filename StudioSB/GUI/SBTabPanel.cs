@@ -17,6 +17,7 @@ namespace StudioSB.GUI
         public void ClearTabs()
         {
             TabPages.Clear();
+            controlToTab.Clear();
             GC.Collect();
         }
 

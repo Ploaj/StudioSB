@@ -50,7 +50,7 @@ namespace StudioSB
         private List<IImportableAnimation> AnimationImporters = new List<IImportableAnimation>();
         private List<IExportableAnimation> AnimationExporters = new List<IExportableAnimation>();
 
-        private List<IAttachment> AttachmentTypes = new List<IAttachment>();
+        public static List<IAttachment> AttachmentTypes = new List<IAttachment>();
 
         public MainForm()
         {
@@ -293,7 +293,8 @@ namespace StudioSB
             // Attachments
             foreach(var attachment in AttachmentTypes)
             {
-                if (attachment.OverlayScene() && viewportPanel.LoadedScene != null)
+                if ((!attachment.OverlayScene() && viewportPanel.LoadedScene != null) 
+                    || attachment.Extension() == null)
                     continue;
 
                 foreach (var extension in attachment.Extension())
@@ -669,9 +670,9 @@ namespace StudioSB
                 if (type != typeof(IAttachment))
                 {
                     var importer = (IAttachment)Activator.CreateInstance(type);
-                    if(importer.Extension() != null)
+                    AttachmentTypes.Add(importer);
+                    if (importer.Extension() != null)
                     {
-                        AttachmentTypes.Add(importer);
                         OpenableExtensions.AddRange(importer.Extension());
                     }
                 }

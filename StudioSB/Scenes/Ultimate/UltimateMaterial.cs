@@ -242,7 +242,7 @@ namespace StudioSB.Scenes.Ultimate
                 {
                     if(p.PropertyType == typeof(SBMatAttrib<string>))
                     {
-                        var value = ((SBMatAttrib<string>)MatAttribs[p.Name]).AnimatedValue;
+                        var value = ((SBMatAttrib<string>)MatAttribs[p.Name]).AnimatedValue.ToLower();
                         SBSurface surface = ssbhScene.nameToSurface.ContainsKey(value) ? ssbhScene.nameToSurface[value] : null;
                         var surfaceInfo = nameToDefaultTexture[p.Name]; 
                         BindSurface(shader, ssbhScene, surface, surfaceInfo, p.Name, TextureUnit++);

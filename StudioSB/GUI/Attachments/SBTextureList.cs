@@ -54,9 +54,10 @@ namespace StudioSB.GUI.Attachments
 
             TextureList = new ListBox();
             TextureList.Dock = DockStyle.Top;
-            TextureList.SelectedValueChanged += (sender, args) =>
+            TextureList.SelectedIndexChanged += (sender, args) =>
             {
-                //PropertyGrid.SelectedObject = TextureList.SelectedValue;
+                if(TextureList.SelectedIndex != -1)
+                PropertyGrid.SelectedObject = TextureList.Items[TextureList.SelectedIndex];
             };
             
             PropertyGrid = new PropertyGrid();
@@ -247,7 +248,8 @@ namespace StudioSB.GUI.Attachments
 
         public void Update(SBViewport viewport)
         {
-
+            TextureList.Items.Clear();
+            TextureList.Items.AddRange(viewport.Scene.Surfaces.ToArray());
         }
     }
 }

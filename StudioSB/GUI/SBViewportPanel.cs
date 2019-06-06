@@ -168,8 +168,6 @@ namespace StudioSB.GUI
             TabPanel.ClearTabs();
 
             Viewport.Scene = null;
-            
-            GC.Collect();
         }
 
         /// <summary>
@@ -179,8 +177,7 @@ namespace StudioSB.GUI
         {
             Controls.Clear();
             Controls.Add(Viewport);
-            //if (TabPanel.TabPages.Count > 0)
-                Controls.Add(RightPane);
+            Controls.Add(RightPane);
         }
 
         /// <summary>
@@ -244,17 +241,14 @@ namespace StudioSB.GUI
             Viewport.Scene = scene;
 
             // basic attachments
-            if (scene.HasMesh)
+            foreach(var v in scene.AttachmentTypes)
             {
-                var boneattachment = new SBMeshList();
-                boneattachment.Update(Viewport);
-                AddAttachment(boneattachment);
-            }
-            if (scene.HasBones)
-            {
-                var boneattachment = new SBBoneTree();
-                boneattachment.Update(Viewport);
-                AddAttachment(boneattachment);
+                var attachment = MainForm.AttachmentTypes.Find(e => e.GetType() == v);
+                if(attachment != null)
+                {
+                    attachment.Update(Viewport);
+                    AddAttachment(attachment);
+                }
             }
 
             Setup();

@@ -59,7 +59,7 @@ uniform vec4 param147;
 uniform vec4 param9E;
 
 uniform mat4 mvp;
-uniform vec3 V;
+uniform vec3 cameraPos;
 
 out vec4 fragColor;
 
@@ -111,6 +111,7 @@ void main()
     if (renderNormalMaps == 1)
         newNormal = GetBumpMapNormal(N, tangent, bitangent, norColor);
 
+	vec3 V = normalize(position - cameraPos);
 	vec3 R = reflect(V, newNormal);
 
     // Get texture colors.
