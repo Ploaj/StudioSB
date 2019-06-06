@@ -135,24 +135,24 @@ namespace StudioSB.IO.Formats
 
         public static readonly Dictionary<NUTEX_FORMAT, InternalFormat> internalFormatByNuTexFormat = new Dictionary<NUTEX_FORMAT, InternalFormat>()
         {
-            { NUTEX_FORMAT.R8G8B8A8_SRGB, InternalFormat.SrgbAlpha },
-            { NUTEX_FORMAT.R8G8B8A8_UNORM, InternalFormat.Rgba },
-            { NUTEX_FORMAT.R32G32B32A32_FLOAT, InternalFormat.Rgba },
-            { NUTEX_FORMAT.B8G8R8A8_UNORM, InternalFormat.Rgba },
-            { NUTEX_FORMAT.B8G8R8A8_SRGB, InternalFormat.Srgb },
-            { NUTEX_FORMAT.BC1_UNORM, InternalFormat.CompressedRgbaS3tcDxt1Ext },
-            { NUTEX_FORMAT.BC1_SRGB, InternalFormat.CompressedSrgbAlphaS3tcDxt1Ext },
-            { NUTEX_FORMAT.BC2_UNORM, InternalFormat.CompressedRgbaS3tcDxt3Ext },
-            { NUTEX_FORMAT.BC2_SRGB, InternalFormat.CompressedSrgbAlphaS3tcDxt3Ext },
-            { NUTEX_FORMAT.BC3_UNORM, InternalFormat.CompressedRgbaS3tcDxt5Ext },
-            { NUTEX_FORMAT.BC3_SRGB, InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext },
-            { NUTEX_FORMAT.BC4_UNORM, InternalFormat.Rgba },
-            { NUTEX_FORMAT.BC4_SNORM, InternalFormat.Rgba },
-            { NUTEX_FORMAT.BC5_UNORM, InternalFormat.Rgba },
-            { NUTEX_FORMAT.BC5_SNORM, InternalFormat.Rgba },
-            { NUTEX_FORMAT.BC6_UFLOAT, InternalFormat.CompressedRgbBptcUnsignedFloat },
-            { NUTEX_FORMAT.BC7_UNORM, InternalFormat.CompressedRgbaBptcUnorm },
-            { NUTEX_FORMAT.BC7_SRGB, InternalFormat.CompressedSrgbAlphaBptcUnorm }
+            { NUTEX_FORMAT.R8G8B8A8_SRGB,       InternalFormat.SrgbAlpha },
+            { NUTEX_FORMAT.R8G8B8A8_UNORM,      InternalFormat.Rgba },
+            { NUTEX_FORMAT.R32G32B32A32_FLOAT,  InternalFormat.Rgba },
+            { NUTEX_FORMAT.B8G8R8A8_UNORM,      InternalFormat.Rgba },
+            { NUTEX_FORMAT.B8G8R8A8_SRGB,       InternalFormat.Srgb },
+            { NUTEX_FORMAT.BC1_UNORM,           InternalFormat.CompressedRgbaS3tcDxt1Ext },
+            { NUTEX_FORMAT.BC1_SRGB,            InternalFormat.CompressedSrgbAlphaS3tcDxt1Ext },
+            { NUTEX_FORMAT.BC2_UNORM,           InternalFormat.CompressedRgbaS3tcDxt3Ext },
+            { NUTEX_FORMAT.BC2_SRGB,            InternalFormat.CompressedSrgbAlphaS3tcDxt3Ext },
+            { NUTEX_FORMAT.BC3_UNORM,           InternalFormat.CompressedRgbaS3tcDxt5Ext },
+            { NUTEX_FORMAT.BC3_SRGB,            InternalFormat.CompressedSrgbAlphaS3tcDxt5Ext },
+            { NUTEX_FORMAT.BC4_UNORM,           InternalFormat.Rgba },
+            { NUTEX_FORMAT.BC4_SNORM,           InternalFormat.Rgba },
+            { NUTEX_FORMAT.BC5_UNORM,           InternalFormat.Rgba },
+            { NUTEX_FORMAT.BC5_SNORM,           InternalFormat.Rgba },
+            { NUTEX_FORMAT.BC6_UFLOAT,          InternalFormat.CompressedRgbBptcUnsignedFloat },
+            { NUTEX_FORMAT.BC7_UNORM,           InternalFormat.CompressedRgbaBptcUnorm },
+            { NUTEX_FORMAT.BC7_SRGB,            InternalFormat.CompressedSrgbAlphaBptcUnorm }
         };
 
 

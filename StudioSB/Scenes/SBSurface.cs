@@ -80,9 +80,20 @@ namespace StudioSB.Scenes
                 if(Arrays.Count == 6)
                 {
                     var cube = new TextureCubeMap();
-                    cube.LoadImageData(Width, InternalFormat, 
-                        Arrays[0].Mipmaps, Arrays[1].Mipmaps, Arrays[2].Mipmaps,
-                        Arrays[3].Mipmaps, Arrays[4].Mipmaps, Arrays[5].Mipmaps);
+                    if (TextureFormatTools.IsCompressed(InternalFormat))
+                    {
+                        cube.LoadImageData(Width, InternalFormat,
+                            Arrays[0].Mipmaps, Arrays[1].Mipmaps, Arrays[2].Mipmaps,
+                            Arrays[3].Mipmaps, Arrays[4].Mipmaps, Arrays[5].Mipmaps);
+                    }
+                    else
+                    {
+                        // TODO: Mipmaps?
+                        cube.LoadImageData(Width, new TextureFormatUncompressed((PixelInternalFormat)InternalFormat, PixelFormat, PixelType.UnsignedByte),
+                            Arrays[0].Mipmaps[0], Arrays[1].Mipmaps[0], Arrays[2].Mipmaps[0],
+                            Arrays[3].Mipmaps[0], Arrays[4].Mipmaps[0], Arrays[5].Mipmaps[0]);
+                    }
+
                     renderTexture = cube;
                 }
                 else

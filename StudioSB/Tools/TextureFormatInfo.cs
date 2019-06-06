@@ -42,24 +42,25 @@ namespace StudioSB.Tools
         private static readonly Dictionary<InternalFormat, FormatInfo> FormatTable =
                             new Dictionary<InternalFormat, FormatInfo>()
            {
-            { InternalFormat.Rgba32f,   new FormatInfo(16, 1,  1, 1) },
-            { InternalFormat.Rgba32i,    new FormatInfo(16, 1,  1, 1) },
-            { InternalFormat.Rgba32ui,    new FormatInfo(16, 1,  1, 1) },
-            { InternalFormat.Rgba16f,   new FormatInfo(8,  1,  1, 1) },
-            { InternalFormat.Rgba16i,    new FormatInfo(8,  1,  1, 1) },
-            { InternalFormat.Rgba16ui,   new FormatInfo(8,  1,  1, 1) }, // _SNORM
+            { InternalFormat.Rgba32f,       new FormatInfo(16, 1,  1, 1) },
+            { InternalFormat.Rgba32i,       new FormatInfo(16, 1,  1, 1) },
+            { InternalFormat.Rgba32ui,      new FormatInfo(16, 1,  1, 1) },
+            { InternalFormat.Rgba16f,       new FormatInfo(8,  1,  1, 1) },
+            { InternalFormat.Rgba16i,       new FormatInfo(8,  1,  1, 1) },
+            { InternalFormat.Rgba16ui,      new FormatInfo(8,  1,  1, 1) }, // _SNORM
             { InternalFormat.Rg32f,         new FormatInfo(8,  1,  1, 1) },
-            { InternalFormat.Rg32i,          new FormatInfo(8,  1,  1, 1) },
-            { InternalFormat.Rg32ui,          new FormatInfo(8,  1,  1, 1) },
+            { InternalFormat.Rg32i,         new FormatInfo(8,  1,  1, 1) },
+            { InternalFormat.Rg32ui,        new FormatInfo(8,  1,  1, 1) },
             { InternalFormat.Rgba8i,        new FormatInfo(4,  1,  1, 1) },
-            { InternalFormat.Rgba8Snorm,       new FormatInfo(4,  1,  1, 1) },
-            { InternalFormat.Rgba8ui,        new FormatInfo(4,  1,  1, 1) },
+            { InternalFormat.Rgba8Snorm,    new FormatInfo(4,  1,  1, 1) },
+            { InternalFormat.Rgba8ui,       new FormatInfo(4,  1,  1, 1) },
+            { InternalFormat.Rgba,          new FormatInfo(4, 1, 1, 1) },
             //{ InternalFormat.Rgba8,       new FormatInfo(4,  1,  1, 1) }, // TEX_FORMAT.R8G8B8A8_UNORM
             //{ InternalFormat.Rgba8Snorm,  new FormatInfo(4,  1,  1, 1) }, // TEX_FORMAT.R8G8B8A8_UNORM_SRGB
-            { InternalFormat.R32f,       new FormatInfo(4,  1,  1, 1) }, // TEX_FORMAT.R32G8X24_FLOAT???
-            //{ InternalFormat.Rgb8,      new FormatInfo(4, 1,  1, 1) }, // TEX_FORMAT.R8G8_B8G8_UNORM
-            //{ InternalFormat.Rgb8,       new FormatInfo(4, 1,  1, 1) }, //TEX_FORMAT.B8G8R8X8_UNORM
-            { InternalFormat.Rgb5A1,       new FormatInfo(2, 1,  1, 1) }, // TEX_FORMAT.B5G5R5A1_UNORM
+            { InternalFormat.R32f,          new FormatInfo(4,  1,  1, 1) }, // TEX_FORMAT.R32G8X24_FLOAT???
+            //{ InternalFormat.Rgb8,        new FormatInfo(4, 1,  1, 1) }, // TEX_FORMAT.R8G8_B8G8_UNORM
+            //{ InternalFormat.Rgb8,        new FormatInfo(4, 1,  1, 1) }, //TEX_FORMAT.B8G8R8X8_UNORM
+            { InternalFormat.Rgb5A1,        new FormatInfo(2, 1,  1, 1) }, // TEX_FORMAT.B5G5R5A1_UNORM
             //{ InternalFormat.Rgba8,       new FormatInfo(4, 1,  1, 1) }, // TEX_FORMAT.B8G8R8A8_UNORM
             //{ InternalFormat.Rgba8Snorm,  new FormatInfo(4, 1,  1, 1) }, // TEX_FORMAT.B8G8R8A8_UNORM_SRGB
 
