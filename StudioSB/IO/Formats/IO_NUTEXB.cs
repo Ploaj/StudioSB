@@ -79,12 +79,6 @@ namespace StudioSB.IO.Formats
         {
             using (BinaryWriter writer = new BinaryWriter(new FileStream(FileName, FileMode.Create)))
             {
-                List<byte> mipData = new List<byte>();
-                foreach(var mip in surface.Arrays)
-                {
-                    foreach(var m in mip.Mipmaps)
-                        mipData.AddRange(m);
-                }
                 writer.Write(SwitchSwizzler.CreateBuffer(surface));
 
                 uint ImageSize = (uint)writer.BaseStream.Position;

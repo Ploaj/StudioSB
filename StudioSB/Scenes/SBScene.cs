@@ -23,11 +23,11 @@ namespace StudioSB.Scenes
         // common for all scenes
         public ISBSkeleton Skeleton { get; set; }
 
-        public List<SBSurface> Surfaces = new List<SBSurface>();
+        public List<SBSurface> Surfaces { get; } = new List<SBSurface>();
 
-        public List<ISBMaterial> Materials = new List<ISBMaterial>();
+        public List<ISBMaterial> Materials { get; } = new List<ISBMaterial>();
 
-        public List<Type> AttachmentTypes = new List<Type>() { typeof(SBMeshList), typeof(SBBoneTree), typeof(SBTextureList) };
+        public List<Type> AttachmentTypes { get; } = new List<Type>() { typeof(SBMeshList), typeof(SBBoneTree), typeof(SBTextureList) };
 
         /// <summary>
         /// Renders the scene to the current gl context

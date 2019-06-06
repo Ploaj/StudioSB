@@ -163,7 +163,8 @@ namespace StudioSB.Tools
                     }
                 }
 
-                //ArrayOffset += (uint)(ImageData.Length / surface.ArrayCount);
+                // alignment
+                ImageData.AddRange(new byte[0x1000 - (ImageData.Count % 0x1000)]);
             }
             return ImageData.ToArray();
         }

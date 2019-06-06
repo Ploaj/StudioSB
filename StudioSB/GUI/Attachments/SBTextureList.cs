@@ -45,7 +45,7 @@ namespace StudioSB.GUI.Attachments
 
         private Texture ScreenTexture { get; set; }
 
-        private SBSurface Surface { get; set; }
+        private List<SBSurface> TextureBank { get; set; }
 
         public SBTextureList()
         {
@@ -71,7 +71,7 @@ namespace StudioSB.GUI.Attachments
             };
 
             DisplayBox = new GroupBox();
-            DisplayBox.Text = "Display Options";
+            DisplayBox.Text = "Texture Options";
             DisplayBox.Dock = DockStyle.Top;
             DisplayBox.Size = new Size(400, 140);
             ApplicationSettings.SkinControl(DisplayBox);
@@ -129,6 +129,24 @@ namespace StudioSB.GUI.Attachments
                 }
             };
             buttons.AddControl(Replace);
+
+            Import = new SBButton("Import");
+            Import.Click += (sender, args) =>
+            {
+                string fileName;
+                string supported = string.Join(";*", Extension());
+                if (Tools.FileTools.TryOpenFile(out fileName, "Supported Formats|*" + supported))
+                {
+                    var surface = OpenFile(fileName);
+                    if(surface != null)
+                    {
+                        if (TextureBank != null)
+                            TextureBank.Add(surface);
+                        TextureList.Items.Add(surface);
+                    }
+                }
+            };
+            buttons.AddControl(Import);
 
             R = new SBButton("R");
             R.BackColor = Color.Red;
@@ -205,7 +223,7 @@ namespace StudioSB.GUI.Attachments
         {
             TextureList.Items.Clear();
 
-            Surface = OpenFile(FilePath);
+            var Surface = OpenFile(FilePath);
 
             if (Surface == null)
                 return;
@@ -252,11 +270,13 @@ namespace StudioSB.GUI.Attachments
         public void OnAttach(SBViewportPanel viewportPanel)
         {
             viewportPanel.TabPanel.AddTab("Textures", this);
+            Import.Enabled = (TextureBank != null);
         }
 
         public void OnRemove(SBViewportPanel viewportPanel)
         {
-
+            TextureBank = null;
+            
         }
 
         public void Render(SBViewport viewport, float frame = 0)
@@ -288,7 +308,9 @@ namespace StudioSB.GUI.Attachments
         public void Update(SBViewport viewport)
         {
             TextureList.Items.Clear();
-            TextureList.Items.AddRange(viewport.Scene.Surfaces.ToArray());
+            TextureBank = viewport.Scene.Surfaces;
+            Import.Enabled = true;
+            TextureList.Items.AddRange(TextureBank.ToArray());
         }
     }
 }
