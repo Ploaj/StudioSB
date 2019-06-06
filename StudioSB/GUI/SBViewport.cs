@@ -86,6 +86,8 @@ namespace StudioSB.GUI
 
             readyToRender = true;
 
+            GL.Enable(EnableCap.TextureCubeMapSeamless); // pretty cubemaps
+
             ShaderManager.SetUpShaders();
 
             OnRenderFrame += RenderViewport;
