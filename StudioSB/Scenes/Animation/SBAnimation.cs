@@ -4,8 +4,18 @@ namespace StudioSB.Scenes.Animation
 {
     public class SBAnimation 
     {
-        public string Name { get; set; }
+        public string Name
+        {
+            get => _name; set
+            {
+                _name = value;
+                RotationOnly = _name.ToLower().Contains("thrown"); // hack to make thrown animations play correctly
+            }
+        }
+        private string _name;
         public float FrameCount { get; set; }
+
+        private bool RotationOnly { get; set; } = false;
 
         public List<SBTransformAnimation> TransformNodes = new List<SBTransformAnimation>();
         public List<SBVisibilityAnimation> VisibilityNodes = new List<SBVisibilityAnimation>();
@@ -51,6 +61,14 @@ namespace StudioSB.Scenes.Animation
                 if (bone != null)
                 {
                     bone.AnimatedTransform = a.GetTransformAt(Frame, bone);
+                    if (RotationOnly)
+                    {
+                        var temp = new SBBone();
+                        temp.Transform = bone.AnimatedTransform;
+                        temp.Translation = bone.Translation;
+                        temp.Scale = bone.Scale;
+                        bone.AnimatedTransform = temp.Transform;
+                    }
                     if (a.GetTrackValueAt(Frame, SBTrackType.CompensateScale) > 0)
                     {
                         bone.EnableAnimatedCompensateScale = true;
