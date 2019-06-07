@@ -81,23 +81,26 @@ namespace StudioSB.Scenes
             {
                 if(Arrays.Count == 6)
                 {
+                    var cube = new TextureCubeMap()
+                    {
+                        MinFilter = TextureMinFilter.Linear,
+                        MagFilter = TextureMagFilter.Linear
+                    };
                     if (TextureFormatTools.IsCompressed(InternalFormat))
                     {
-                        var cube = new TextureCubeMap();
                         cube.LoadImageData(Width, InternalFormat,
                             Arrays[0].Mipmaps, Arrays[1].Mipmaps, Arrays[2].Mipmaps,
                             Arrays[3].Mipmaps, Arrays[4].Mipmaps, Arrays[5].Mipmaps);
-                        renderTexture = cube;
                     }
                     else
                     {
                         var format = new TextureFormatUncompressed((PixelInternalFormat)PixelFormat, PixelFormat, PixelType);
-                        var cube = new TextureCubeMap();
+                        
                         cube.LoadImageData(Width, format,
                             Arrays[0].Mipmaps[0], Arrays[1].Mipmaps[0], Arrays[2].Mipmaps[0],
                             Arrays[3].Mipmaps[0], Arrays[4].Mipmaps[0], Arrays[5].Mipmaps[0]);
-                        renderTexture = cube;
                     }
+                    renderTexture = cube;
                 }
                 else
                 {
@@ -105,7 +108,7 @@ namespace StudioSB.Scenes
                     {
                         // Set defaults until all the sampler parameters are added.
                         TextureWrapS = TextureWrapMode.Repeat,
-                        TextureWrapT = TextureWrapMode.Repeat
+                        TextureWrapT = TextureWrapMode.Repeat,
                     };
 
                     if (TextureFormatTools.IsCompressed(InternalFormat))
