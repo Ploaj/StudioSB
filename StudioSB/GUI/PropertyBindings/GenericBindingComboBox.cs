@@ -33,6 +33,7 @@ namespace StudioSB.GUI
         public void Bind(object Object, string PropertyName)
         {
             _value.Bind(Object, PropertyName);
+            Items.Clear();
 
             if (_value.IsBound)
             {

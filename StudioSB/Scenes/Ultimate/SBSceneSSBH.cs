@@ -11,9 +11,17 @@ using StudioSB.IO.Models;
 using SFGraphics.GLObjects.BufferObjects;
 using StudioSB.IO.Formats;
 using System.Linq;
+using StudioSB.GUI.Attachments;
 
 namespace StudioSB.Scenes.Ultimate
 {
+    public enum UltimateMaterialTransitionMode
+    {
+        Ditto,
+        Ink,
+        Gold,
+        Metal
+    }
     [SceneFileInformation("NU Model File Binary", ".numdlb", "The model specification for Smash Ultimate models", sceneCode: "SSBU")]
     public class SBSceneSSBH : SBScene
     {
@@ -27,11 +35,15 @@ namespace StudioSB.Scenes.Ultimate
         private BufferObject boneUniformBuffer;
         private Matrix4[] boneBinds = new Matrix4[200];
 
+        public float MaterialBlend { get; set; } = 0;
+        public UltimateMaterialTransitionMode MaterialMode { get; set; } = UltimateMaterialTransitionMode.Metal;
+
         public SBSceneSSBH()
         {
             HasMesh = true;
             HasBones = true;
             boneUniformBuffer = new BufferObject(BufferTarget.UniformBuffer);
+            AttachmentTypes.Add(typeof(SBUltimateSettingsAttachment));
         }
 
         /// <summary>
@@ -520,8 +532,8 @@ namespace StudioSB.Scenes.Ultimate
 
             //TODO:
             // this is smash ultimate specific
-            shader.SetInt("transitionEffect", 0);
-            shader.SetFloat("transitionFactor", 0f);
+            shader.SetInt("transitionEffect", (int)MaterialMode);
+            shader.SetFloat("transitionFactor", MaterialBlend);
 
             shader.SetBoolToInt("renderDiffuse", ApplicationSettings.EnableDiffuse);
             shader.SetBoolToInt("renderSpecular", ApplicationSettings.EnableSpecular);

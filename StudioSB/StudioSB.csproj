@@ -102,6 +102,9 @@
     <Compile Include="GUI\Attachments\SBTextureList.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="GUI\Attachments\SBUltimateSettingsAttachment.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GUI\Editors\SBMeshPanel.cs">
       <SubType>Component</SubType>
     </Compile>
