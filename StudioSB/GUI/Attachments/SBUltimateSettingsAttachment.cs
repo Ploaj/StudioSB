@@ -43,8 +43,8 @@ namespace StudioSB.GUI.Attachments
             materialMode = new GenericBindingComboBox<UltimateMaterialTransitionMode>("Material Mode");
             materialMode.Dock = DockStyle.Top;
 
-            renderSettings.Controls.Add(materialMode);
             renderSettings.Controls.Add(materialBlend);
+            renderSettings.Controls.Add(materialMode);
 
             Controls.Add(renderSettings);
 

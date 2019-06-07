@@ -4,11 +4,10 @@ using StudioSB.Scenes;
 using System;
 using System.Windows.Forms;
 using StudioSB.Rendering.Bounding;
-using OpenTK;
 
 namespace StudioSB.GUI
 {
-    public class SBMeshList : SBListView, IAttachment
+    public class SBMeshList : GroupBox, IAttachment
     {
         private SBViewportPanel ParentViewportPanel
         {
@@ -27,43 +26,45 @@ namespace StudioSB.GUI
         }
 
         private SBMeshPanel MeshPanel { get; set; }
-
-        private Panel container { get; set; }
+        
+        private SBListView meshObjectList { get; set; }
 
         public SBMeshList() : base()
         {
-            CheckBoxes = true;
-            View = View.Details;
-            Scrollable = true;
-            HeaderStyle = ColumnHeaderStyle.None;
+            Text = "Object List";
+            Dock = DockStyle.Fill;
+            ApplicationSettings.SkinControl(this);
+
+            meshObjectList = new SBListView();
+            meshObjectList.CheckBoxes = true;
+            meshObjectList.View = View.Details;
+            meshObjectList.Scrollable = true;
+            meshObjectList.HeaderStyle = ColumnHeaderStyle.None;
 
             ColumnHeader header = new ColumnHeader();
             header.Text = "";
             header.Name = "Meshes";
             header.Width = 1000;
-            Columns.Add(header);
+            meshObjectList.Columns.Add(header);
 
-            LabelEdit = true;
-            HideSelection = false;
+            meshObjectList.LabelEdit = true;
+            meshObjectList.HideSelection = false;
 
-            AfterLabelEdit += listview_AfterLabelEdit;
+            meshObjectList.AfterLabelEdit += listview_AfterLabelEdit;
 
-            ItemChecked += CheckChanged;
-            MouseUp += SelectedChanged;
+            meshObjectList.ItemChecked += CheckChanged;
+            meshObjectList.MouseUp += SelectedChanged;
 
-            Dock = DockStyle.Top;
+            meshObjectList.Dock = DockStyle.Top;
 
-            Size = new System.Drawing.Size(400, 400);
+            meshObjectList.Size = new System.Drawing.Size(400, 300);
 
             MeshPanel = new SBMeshPanel();
             MeshPanel.Dock = DockStyle.Fill;
-
-            container = new Panel();
-            container.AutoScroll = true;
-            container.Dock = DockStyle.Fill;
-            container.Controls.Add(MeshPanel);
-            container.Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
-            container.Controls.Add(this);
+            
+            Controls.Add(MeshPanel);
+            Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
+            Controls.Add(meshObjectList);
         }
 
         public bool OverlayScene()
@@ -78,7 +79,7 @@ namespace StudioSB.GUI
         /// <param name="e"></param>
         private void listview_AfterLabelEdit(object sender, LabelEditEventArgs e)
         {
-            if (Items[e.Item].Tag is ISBMesh mesh)
+            if (meshObjectList.Items[e.Item].Tag is ISBMesh mesh)
                 if(e.Label != null)
                     mesh.Name = e.Label;
         }
@@ -91,20 +92,20 @@ namespace StudioSB.GUI
         private void SelectedChanged(object sender, EventArgs args)
         {
             //deselect all nodes
-            foreach (var item in Items)
+            foreach (var item in meshObjectList.Items)
                 if (((ListViewItem)item).Tag is ISBMesh mesh)
                     mesh.Selected = false;
 
-            if (SelectedItems == null || SelectedItems.Count == 0)
+            if (meshObjectList.SelectedItems == null || meshObjectList.SelectedItems.Count == 0)
             {
                 //ParentForm.SelectMesh(null);
                 return;
             }
 
             //select selected nodes
-            ISBMesh[] selected = new ISBMesh[SelectedItems.Count];
+            ISBMesh[] selected = new ISBMesh[meshObjectList.SelectedItems.Count];
             int meshIndex = 0;
-            foreach (var item in SelectedItems)
+            foreach (var item in meshObjectList.SelectedItems)
             {
                 if (((ListViewItem)item).Tag is ISBMesh mesh)
                 {
@@ -138,9 +139,9 @@ namespace StudioSB.GUI
                     mesh.Visible = itemargs.Item.Checked;
             }
             
-            if (SelectedItems == null || SelectedItems.Count == 0) return;
+            if (meshObjectList.SelectedItems == null || meshObjectList.SelectedItems.Count == 0) return;
 
-            foreach(var item in SelectedItems)
+            foreach(var item in meshObjectList.SelectedItems)
             {
                 var tag = ((ListViewItem)item).Tag;
                 if (tag is ISBMesh mesh)
@@ -155,7 +156,7 @@ namespace StudioSB.GUI
         /// <param name="Scene"></param>
         private void LoadFromScene(SBScene Scene)
         {
-            Items.Clear();
+            meshObjectList.Items.Clear();
             var meshes = Scene.GetMeshObjects();
             if(meshes != null)
             {
@@ -167,14 +168,14 @@ namespace StudioSB.GUI
                         Tag = mesh,
                         Checked = mesh.Visible
                     };
-                    Items.Add(item);
+                    meshObjectList.Items.Add(item);
                 }
             }
         }
 
         public void OnAttach(SBViewportPanel viewportPanel)
         {
-            viewportPanel.TabPanel.AddTab("Objects", container);
+            viewportPanel.TabPanel.AddTab("Objects", this);
         }
 
         public void OnRemove(SBViewportPanel viewportPanel)

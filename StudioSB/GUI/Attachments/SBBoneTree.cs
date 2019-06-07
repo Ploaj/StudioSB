@@ -8,37 +8,41 @@ using OpenTK;
 
 namespace StudioSB.GUI
 {
-    public class SBBoneTree : SBTreeView, IAttachment
+    public class SBBoneTree : GroupBox, IAttachment
     {
         private SBBoneEditor BoneEditor { get; set; }
+
+        private SBTreeView BoneList { get; set; }
 
         public SBBoneTree() : base()
         {
             //CheckBoxes = true;
             //ImageList = new System.Windows.Forms.ImageList();
             //ImageList.ImageSize = new System.Drawing.Size(24, 24);
+            Text = "Bone List";
+            Dock = DockStyle.Fill;
+            ApplicationSettings.SkinControl(this);
 
-            Indent = 16;
+            BoneList = new SBTreeView();
+            BoneList.Indent = 16;
 
-            LabelEdit = true;
+            BoneList.LabelEdit = true;
 
-            AfterSelect += SelectBone;
+            BoneList.AfterSelect += SelectBone;
 
-            AfterLabelEdit += treeView_AfterLabelEdit;
+            BoneList.AfterLabelEdit += treeView_AfterLabelEdit;
             
-            Dock = DockStyle.Top;
+            BoneList.Dock = DockStyle.Top;
 
-            Size = new System.Drawing.Size(400, 400);
+            BoneList.Size = new System.Drawing.Size(400, 300);
 
             BoneEditor = new SBBoneEditor();
             BoneEditor.Dock = DockStyle.Fill;
-
-            container = new Panel();
-            container.AutoScroll = true;
-            container.Dock = DockStyle.Fill;
-            container.Controls.Add(BoneEditor);
-            container.Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
-            container.Controls.Add(this);
+            
+            Dock = DockStyle.Fill;
+            Controls.Add(BoneEditor);
+            Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
+            Controls.Add(BoneList);
         }
 
         public bool OverlayScene()
@@ -64,13 +68,13 @@ namespace StudioSB.GUI
         /// <param name="args"></param>
         private void SelectBone(object sender, EventArgs args)
         {
-            if (SelectedNode == null)
+            if (BoneList.SelectedNode == null)
             {
                 BoneEditor.Visible = false;
                 return;
             }
 
-            BoneEditor.BindBone((SBBone)SelectedNode.Tag);
+            BoneEditor.BindBone((SBBone)BoneList.SelectedNode.Tag);
             BoneEditor.Visible = true;
         }
 
@@ -80,7 +84,7 @@ namespace StudioSB.GUI
         /// <param name="Scene"></param>
         private void LoadFromScene(SBScene Scene)
         {
-            Nodes.Clear();
+            BoneList.Nodes.Clear();
             Dictionary<SBBone, SBTreeNode> boneToNode = new Dictionary<SBBone, SBTreeNode>();
             if(Scene.Skeleton != null)
             foreach(var bone in Scene.Skeleton.Bones)
@@ -88,12 +92,12 @@ namespace StudioSB.GUI
                 var node = new SBTreeNode(bone.Name) { Tag = bone };
                 boneToNode.Add(bone, node);
                 if (bone.Parent == null)
-                    Nodes.Add(node);
+                        BoneList.Nodes.Add(node);
                 else if (boneToNode.ContainsKey(bone.Parent))
                     boneToNode[bone.Parent].Nodes.Add(node);
             }
-            if(Nodes.Count > 0)
-                Nodes[0].ExpandAll();
+            if(BoneList.Nodes.Count > 0)
+                BoneList.Nodes[0].ExpandAll();
         }
 
         public void Update(SBViewport viewport)
@@ -117,11 +121,9 @@ namespace StudioSB.GUI
             return false;
         }
 
-        private Panel container;
-
         public void OnAttach(SBViewportPanel viewportPanel)
         {
-            viewportPanel.TabPanel.AddTab("Bone", container);
+            viewportPanel.TabPanel.AddTab("Bones", this);
         }
 
         public void OnRemove(SBViewportPanel viewportPanel)
@@ -131,7 +133,7 @@ namespace StudioSB.GUI
 
         public void Pick(Ray ray)
         {
-            foreach(var v in Nodes)
+            foreach(var v in BoneList.Nodes)
             {
                 if(v is SBTreeNode node)
                 {
@@ -147,7 +149,7 @@ namespace StudioSB.GUI
             {
                 if (ray.CheckSphereHit(Vector3.TransformPosition(Vector3.Zero, bone.WorldTransform), 0.5f, out close))
                 {
-                    SelectedNode = treeNode;
+                    BoneList.SelectedNode = treeNode;
                     return;
                 }
             }

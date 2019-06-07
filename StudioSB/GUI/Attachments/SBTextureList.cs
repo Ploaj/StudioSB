@@ -49,7 +49,7 @@ namespace StudioSB.GUI.Attachments
 
         public SBTextureList()
         {
-            Text = "Textures";
+            Text = "Texture List";
             Dock = DockStyle.Fill;
             ApplicationSettings.SkinControl(this);
 
