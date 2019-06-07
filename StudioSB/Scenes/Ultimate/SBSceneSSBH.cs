@@ -33,6 +33,7 @@ namespace StudioSB.Scenes.Ultimate
 
         // Rendering
         public Dictionary<SBUltimateMesh, UltimateRenderMesh> sbMeshToRenderMesh = new Dictionary<SBUltimateMesh, UltimateRenderMesh>();
+        private Dictionary<string, SBSurface> nameToSurface = new Dictionary<string, SBSurface>();
         private BufferObject boneUniformBuffer;
         private Matrix4[] boneBinds = new Matrix4[200];
 
@@ -45,6 +46,28 @@ namespace StudioSB.Scenes.Ultimate
             HasBones = true;
             boneUniformBuffer = new BufferObject(BufferTarget.UniformBuffer);
             AttachmentTypes.Add(typeof(SBUltimateSettingsAttachment));
+        }
+
+        public SBSurface GetSurfaceFromName(string name)
+        {
+            if (!nameToSurface.ContainsKey(name))
+            {
+                if (name == "" || name.Contains("#replace"))
+                    return null;
+                var search = Surfaces.Find(e => e.Name.ToLower() == name);
+                if (search == null)
+                {
+                    // no surface with this name exists
+                    return null;
+                }
+                else
+                {
+                    nameToSurface.Clear();
+                    foreach (var surface in Surfaces)
+                        nameToSurface.Add(surface.Name.ToLower(), surface);
+                }
+            }
+            return nameToSurface[name];
         }
 
         /// <summary>
