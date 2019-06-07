@@ -202,6 +202,23 @@ namespace StudioSB.Scenes.Ultimate
         private Dictionary<string, DefaultTextureName> nameToDefaultTexture = new Dictionary<string, DefaultTextureName>();
         private Dictionary<string, string> paramNameToPropertyName = new Dictionary<string, string>();
 
+        public void SetProperty(string name, object value)
+        {
+            if (!paramNameToPropertyName.ContainsKey(name))
+                return;
+
+            if (value is bool b)
+                ((SBMatAttrib<bool>)MatAttribs[paramNameToPropertyName[name]]).Value = b;
+            if (value is Vector4 vec)
+                ((SBMatAttrib<Vector4>)MatAttribs[paramNameToPropertyName[name]]).Value = vec;
+            if (value is int i)
+                ((SBMatAttrib<int>)MatAttribs[paramNameToPropertyName[name]]).Value = i;
+            if (value is float f)
+                ((SBMatAttrib<float>)MatAttribs[paramNameToPropertyName[name]]).Value = f;
+            if (value is string s)
+                ((SBMatAttrib<string>)MatAttribs[paramNameToPropertyName[name]]).Value = s;
+        }
+
         public UltimateMaterial()
         {
             foreach(var prop in Properties)

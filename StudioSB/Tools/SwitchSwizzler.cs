@@ -61,21 +61,24 @@ namespace StudioSB.Tools
                     if (msize > ImageData.Length - (ArrayOffset + MipOffsets[mipLevel]))
                         msize = (int)(ImageData.Length - (ArrayOffset + MipOffsets[mipLevel]));
                     byte[] data_ = new byte[msize];
-                    Array.Copy(ImageData, ArrayOffset + MipOffsets[mipLevel], data_, 0, msize);
+                    if (ArrayLevel == arrayLevel && MipLevel == mipLevel)
+                        Array.Copy(ImageData, ArrayOffset + MipOffsets[mipLevel], data_, 0, msize);
                     try
                     {
                         Pitch = RoundUp(width__ * bpp, 64);
                         SurfaceSize += Pitch * RoundUp(height__, Math.Max(1, blockHeight >> blockHeightShift) * 8);
 
-                        //Console.WriteLine($"{width} {height} {blkWidth} {blkHeight} {target} {bpp} {TileMode} {(int)Math.Max(0, BlockHeightLog2 - blockHeightShift)} {data_.Length}");
-                        byte[] result = Deswizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), data_);
-                        //Create a copy and use that to remove uneeded data
-                        byte[] result_ = new byte[size];
-                        Array.Copy(result, 0, result_, 0, size);
-                        result = null;
-
                         if (ArrayLevel == arrayLevel && MipLevel == mipLevel)
+                        {
+                            //Console.WriteLine($"{width} {height} {blkWidth} {blkHeight} {target} {bpp} {TileMode} {(int)Math.Max(0, BlockHeightLog2 - blockHeightShift)} {data_.Length}");
+                            byte[] result = Deswizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), data_);
+                            //Create a copy and use that to remove uneeded data
+                            byte[] result_ = new byte[size];
+                            Array.Copy(result, 0, result_, 0, size);
+                            result = null;
+
                             return result_;
+                        }
                     }
                     catch (Exception e)
                     {

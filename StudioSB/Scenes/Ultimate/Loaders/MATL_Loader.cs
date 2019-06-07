@@ -62,23 +62,13 @@ namespace StudioSB.Scenes.Ultimate
                                 var prop = NameToProperty[attr.ParamID.ToString()];
                                 if (prop.PropertyType == typeof(SBMatAttrib<string>))
                                 {
-                                    ((SBMatAttrib<string>)prop.GetValue(material)).Value = attr.DataObject.ToString();
-                                    //foreach (var surface in Scene.Surfaces)
-                                    //    if (surface.Name == attr.DataObject.ToString())
-                                    //        prop.SetValue(material, surface);
-                                }
+                                    material.SetProperty(attr.ParamID.ToString(), attr.DataObject.ToString());
+                                }else
                                 if(prop.PropertyType == typeof(SBMatAttrib<Vector4>))
                                 {
-                                    ((SBMatAttrib<Vector4>)prop.GetValue(material)).Value = MATLVectorToGLVector((MatlAttribute.MatlVector4)attr.DataObject);
-                                }
-                                if (prop.PropertyType == typeof(SBMatAttrib<float>))
-                                {
-                                    ((SBMatAttrib<float>)prop.GetValue(material)).Value = (float)attr.DataObject;
-                                }
-                                if (prop.PropertyType == typeof(SBMatAttrib<bool>))
-                                {
-                                    ((SBMatAttrib<bool>)prop.GetValue(material)).Value = (bool)attr.DataObject;
-                                }
+                                    material.SetProperty(attr.ParamID.ToString(), MATLVectorToGLVector((MatlAttribute.MatlVector4)attr.DataObject));
+                                }else
+                                    material.SetProperty(attr.ParamID.ToString(), attr.DataObject);
                             }
                             else
                             switch (attr.ParamID)
@@ -90,7 +80,7 @@ namespace StudioSB.Scenes.Ultimate
                                     material.BlendState = (MatlAttribute.MatlBlendState)attr.DataObject;
                                     break;
                                 default:
-                                        SBConsole.WriteLine("Extra Param: " + attr.ParamID.ToString() + " = " + attr.DataObject.ToString());
+                                    //SBConsole.WriteLine("Extra Param: " + attr.ParamID.ToString() + " = " + attr.DataObject.ToString());
                                     material.extraParams.Add(attr.ParamID, attr.DataObject);
                                     break;
                             }

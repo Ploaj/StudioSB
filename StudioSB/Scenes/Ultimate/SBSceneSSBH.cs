@@ -12,6 +12,7 @@ using SFGraphics.GLObjects.BufferObjects;
 using StudioSB.IO.Formats;
 using System.Linq;
 using StudioSB.GUI.Attachments;
+using System.Diagnostics;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -85,6 +86,7 @@ namespace StudioSB.Scenes.Ultimate
                     matlPath = file;
                 }
             }
+            
             // import order Skeleton+Textures->Materials->Mesh
             // mesh needs to be loaded after skeleton
             if (skelPath != "")
@@ -92,11 +94,13 @@ namespace StudioSB.Scenes.Ultimate
                 SBConsole.WriteLine($"Importing skeleton: {Path.GetFileName(skelPath)}");
                 SKEL_Loader.Open(skelPath, this);
             }
+            
             if (matlPath != "")
             {
                 SBConsole.WriteLine($"Importing materials: {Path.GetFileName(matlPath)}");
                 MATL_Loader.Open(matlPath, this);
             }
+            
             if (meshPath != "")
             {
                 SBConsole.WriteLine($"Importing mesh: {Path.GetFileName(meshPath)}");
