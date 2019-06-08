@@ -33,8 +33,32 @@ namespace StudioSB.IO.Formats
                 throw new NotSupportedException($"Only FBX version 7.4 is currently supported: Imported version = {test.Version}");
             }
 
-            FbxAccessor accessor = new FbxAccessor(FileName);
+            // global settings
+            float Scale = 1;
 
+            // read global settings
+            var settings = test.GetNodesByName("GlobalSettings");
+            if(settings.Length != 0)
+            {
+                var prop70 = settings[0].GetNodesByName("Properties70");
+                if(prop70.Length != 0)
+                {
+                    foreach(var property in prop70[0].Nodes)
+                    {
+                        if (property == null)
+                            continue;
+                        if(property.Properties.Count > 0 && property.Name == "P")
+                        {
+                            //TODO: this is inaccurate...
+                            //if (property.Properties[0].Equals("UnitScaleFactor"))
+                            //    Scale = (float)(double)property.Properties[4];
+                        }
+                    }
+                }
+            }
+
+            FbxAccessor accessor = new FbxAccessor(FileName);
+            
             //Bones
             var limbs = accessor.GetLimbNodes();
             SBConsole.WriteLine($"Limb Node Count: {limbs.Length}");
@@ -42,6 +66,10 @@ namespace StudioSB.IO.Formats
             foreach(var limb in limbs)
             {
                 skeleton.AddRoot(ConvertLimbToSBBone(limb));
+            }
+            foreach(var root in skeleton.Roots)
+            {
+                root.Scale *= Scale;
             }
 
             // Fast access to bone indices
@@ -103,9 +131,9 @@ namespace StudioSB.IO.Formats
                         mesh.Indices.Add((uint)i);
                         mesh.Indices.Add((uint)i + 1);
                         mesh.Indices.Add((uint)i + 2);
-                        mesh.Vertices.Add(CreateVertex(transform, geom, i, BoneIndices, BoneWeights));
-                        mesh.Vertices.Add(CreateVertex(transform, geom, i + 1, BoneIndices, BoneWeights));
-                        mesh.Vertices.Add(CreateVertex(transform, geom, i + 2, BoneIndices, BoneWeights));
+                        mesh.Vertices.Add(CreateVertex(transform, geom, i, BoneIndices, BoneWeights, Scale));
+                        mesh.Vertices.Add(CreateVertex(transform, geom, i + 1, BoneIndices, BoneWeights, Scale));
+                        mesh.Vertices.Add(CreateVertex(transform, geom, i + 2, BoneIndices, BoneWeights, Scale));
                     }
 
                     mesh.HasPositions = true;
@@ -137,19 +165,19 @@ namespace StudioSB.IO.Formats
         /// <param name="geometry"></param>
         /// <param name="Index"></param>
         /// <returns></returns>
-        private static IOVertex CreateVertex(Matrix4 transform, FbxGeometry geometry, int Index, Vector4[] boneIndices, Vector4[] boneWeights)
+        private static IOVertex CreateVertex(Matrix4 transform, FbxGeometry geometry, int Index, Vector4[] boneIndices, Vector4[] boneWeights, float scale)
         {
             int VertexIndex = geometry.Indices[Index];
             if((Index + 1) % 3 == 0)
                 VertexIndex = (geometry.Indices[Index] + 1) * -1;
 
-            IOVertex vertex = new IOVertex(){
+            IOVertex vertex = new IOVertex() {
                 Position = Vector3.TransformPosition(
                     new Vector3(
                         (float)geometry.Vertices[VertexIndex * 3],
-                        (float)geometry.Vertices[VertexIndex * 3 + 1], 
+                        (float)geometry.Vertices[VertexIndex * 3 + 1],
                         (float)geometry.Vertices[VertexIndex * 3 + 2]), 
-                    transform),
+                    transform) * scale,
                 BoneIndices = boneIndices[VertexIndex],
                 BoneWeights = boneWeights[VertexIndex]
             };

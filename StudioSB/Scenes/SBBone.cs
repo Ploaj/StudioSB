@@ -230,10 +230,12 @@ namespace StudioSB.Scenes
                     if (_parent != null)
                     {
                         Vector3 parentScale = AnimatedTransform.ExtractScale();
-                        transform *= Matrix4.CreateScale(
-                            1f / parentScale.X,
-                            1f / parentScale.Y,
-                            1f / parentScale.Z);
+                        parentScale.X *= 1 / parentScale.X;
+                        parentScale.Y *= 1 / parentScale.Y;
+                        parentScale.Z *= 1 / parentScale.Z;
+                        transform = transform.ClearScale();
+                        transform *= Matrix4.CreateScale(parentScale);
+                        transform *= Matrix4.CreateScale(AnimatedCompensateScale);
                         transform *= _parent.AnimatedWorldTransform;
                     }
                     return transform;

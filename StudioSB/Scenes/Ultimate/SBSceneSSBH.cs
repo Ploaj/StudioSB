@@ -481,8 +481,11 @@ namespace StudioSB.Scenes.Ultimate
                 if (!m.Visible) 
                     continue;
 
+
                 if (((UltimateMaterial)m.Material).HasBlending)
+                {
                     transparentZSorted.Add(m);
+                }
                 else
                     opaqueZSorted.Add(m);
             }
@@ -490,7 +493,15 @@ namespace StudioSB.Scenes.Ultimate
             // TODO: Account for bounding sphere center and transform in depth sorting.
             // do we need to sort opaque?
             //opaqueZSorted = opaqueZSorted.OrderBy(m => m.BoundingSphere.Radius).ToList();
-            transparentZSorted = transparentZSorted.OrderBy(m => m.BoundingSphere.Radius).ToList();
+            transparentZSorted = transparentZSorted.OrderBy(c =>
+            {
+                Matrix4 transform = Matrix4.Identity;
+                if (Skeleton != null && c.ParentBone != "" && Skeleton.ContainsBone(c.ParentBone))
+                    transform = Skeleton[c.ParentBone].AnimatedWorldTransform;
+                var v = Vector3.TransformPosition(c.BoundingSphere.Position, transform);
+                v = Vector3.TransformPosition(c.BoundingSphere.Position, camera.MvpMatrix);
+                return v.Z + c.BoundingSphere.Radius;
+            }).ToList();
 
             opaqueZSorted.AddRange(transparentZSorted);
 

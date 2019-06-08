@@ -106,7 +106,7 @@ namespace StudioSB.IO.Formats
                             SX.AddKey(i, transform.SX);
                             SY.AddKey(i, transform.SY);
                             SZ.AddKey(i, transform.SZ);
-                            CompensateScale.AddKey(i, 0);// t.CompensateScale);
+                            CompensateScale.AddKey(i, t.CompensateScale);
                         }
                     }
                 }

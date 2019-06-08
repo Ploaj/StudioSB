@@ -36,6 +36,14 @@ namespace StudioSB.Scenes
             }
         }
 
+        public SBBone[] Roots
+        {
+            get
+            {
+                return RootBones.ToArray();
+            }
+        }
+
         public SBBone[] Bones
         {
             get
