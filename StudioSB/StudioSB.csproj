@@ -37,6 +37,9 @@
       <HintPath>lib\Fbx.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="HSDLib">
+      <HintPath>..\..\..\Mods\HSDLib\HSDLib\bin\Release\HSDLib.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
@@ -224,6 +227,12 @@
     <Compile Include="Scenes\LVD\LVDRangeCurve.cs" />
     <Compile Include="Scenes\LVD\LVDShape.cs" />
     <Compile Include="Scenes\LVD\LVDSpawn.cs" />
+    <Compile Include="Scenes\Melee\GXtoGL.cs" />
+    <Compile Include="Scenes\Melee\SBHsdBone.cs" />
+    <Compile Include="Scenes\Melee\HSDScene.cs" />
+    <Compile Include="Scenes\Melee\SBHsdMaterial.cs" />
+    <Compile Include="Scenes\Melee\SBHsdMesh.cs" />
+    <Compile Include="Scenes\Melee\SBHsdVertex.cs" />
     <Compile Include="Scenes\SBBone.cs" />
     <Compile Include="Scenes\SBScene.cs" />
     <Compile Include="Scenes\ISBSkeleton.cs" />
@@ -456,6 +465,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\CubeMap.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\HSD.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\HSD.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\HSDDebug.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\SolidColor.frag">

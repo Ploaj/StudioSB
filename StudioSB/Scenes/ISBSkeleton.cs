@@ -43,6 +43,12 @@ namespace StudioSB.Scenes
         Matrix4[] GetBindTransforms();
 
         /// <summary>
+        /// Gets the world transform of all bones
+        /// </summary>
+        /// <returns></returns>
+        Matrix4[] GetWorldTransforms();
+
+        /// <summary>
         /// Renders the skeleton using Legacy OpenGL on the current thread
         /// Warning: slow
         /// </summary>

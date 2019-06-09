@@ -3,6 +3,8 @@ using OpenTK.Graphics.OpenGL;
 using SFGraphics.GLObjects.Textures;
 using SFGraphics.GLObjects.Textures.TextureFormats;
 using System.ComponentModel;
+using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace StudioSB.Scenes
 {
@@ -71,6 +73,33 @@ namespace StudioSB.Scenes
             renderTexture = null;
         }
 
+        public static SBSurface FromBitmap(Bitmap bmp)
+        {
+            SBSurface surface = new SBSurface();
+
+            surface.Name = "";
+            surface.Width = bmp.Width;
+            surface.Height = bmp.Height;
+            surface.InternalFormat = InternalFormat.Rgba;
+            surface.PixelFormat = PixelFormat.Bgra;
+            surface.PixelType = PixelType.UnsignedByte;
+
+            var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var length = bitmapData.Stride * bitmapData.Height;
+
+            byte[] bytes = new byte[length];
+            
+            Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
+            bmp.UnlockBits(bitmapData);
+
+            var mip = new MipArray();
+            mip.Mipmaps.Add(bytes);
+
+            surface.Arrays.Add(mip);
+            
+            return surface;
+        }
+
         /// <summary>
         /// Gets the SFTexture of this surface
         /// </summary>
@@ -129,7 +158,7 @@ namespace StudioSB.Scenes
                     else
                     {
                         // TODO: Uncompressed mipmaps
-                        var format = new TextureFormatUncompressed((PixelInternalFormat)PixelFormat, PixelFormat, PixelType.UnsignedByte);
+                        var format = new TextureFormatUncompressed(PixelInternalFormat.Rgba, PixelFormat, PixelType);
                         sfTex.LoadImageData(Width, Height, Arrays[0].Mipmaps, format);
                     }
                     renderTexture = sfTex;

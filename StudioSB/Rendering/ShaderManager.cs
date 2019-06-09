@@ -43,7 +43,7 @@ namespace StudioSB.Rendering
             Shader boneShader = CreateBoneShader();
             shaderByName.Add("Bone", boneShader);
 
-            Shader textShader = CreateTextShader();
+            Shader textShader = CreateBasicShader("Text");
             shaderByName.Add("Text", textShader);
 
             Shader sphShader = CreateSphereShader();
@@ -55,8 +55,14 @@ namespace StudioSB.Rendering
             Shader primShader = CreatePrismShader();
             shaderByName.Add("Prism", primShader);
 
-            Shader cubeShader = CreateCubeShader();
+            Shader cubeShader = CreateBasicShader("CubeMap");
             shaderByName.Add("CubeMap", cubeShader);
+
+            Shader hsdShader = CreateBasicShader("HSD");
+            shaderByName.Add("HSD", hsdShader);
+
+            Shader hsdDShader = CreateBasicDebugShader("HSD");
+            shaderByName.Add("HSDDebug", hsdDShader);
 
             foreach (var pair in shaderByName)
             {
@@ -66,6 +72,20 @@ namespace StudioSB.Rendering
                     System.Diagnostics.Debug.WriteLine(pair.Value.GetErrorLog());
                 }
             }
+        }
+
+        private static Shader CreateBasicShader(string name)
+        {
+            Shader shader = new Shader();
+            shader.LoadShaders(File.ReadAllText($"Shaders/{name}.vert"), File.ReadAllText($"Shaders/{name}.frag"));
+            return shader;
+        }
+
+        private static Shader CreateBasicDebugShader(string name)
+        {
+            Shader shader = new Shader();
+            shader.LoadShaders(File.ReadAllText($"Shaders/{name}.vert"), File.ReadAllText($"Shaders/{name}Debug.frag"));
+            return shader;
         }
 
         private static Shader CreateSphereShader()
@@ -80,20 +100,6 @@ namespace StudioSB.Rendering
             Shader shader = new Shader();
             shader.LoadShaders(File.ReadAllText("Shaders/Capsule.vert"), File.ReadAllText("Shaders/SolidColor.frag"));
             return shader;
-        }
-
-        private static Shader CreateTextShader()
-        {
-            Shader textShader = new Shader();
-            textShader.LoadShaders(File.ReadAllText("Shaders/Text.vert"), File.ReadAllText("Shaders/Text.frag"));
-            return textShader;
-        }
-
-        private static Shader CreateCubeShader()
-        {
-            Shader cubeShader = new Shader();
-            cubeShader.LoadShaders(File.ReadAllText("Shaders/CubeMap.vert"), File.ReadAllText("Shaders/CubeMap.frag"));
-            return cubeShader;
         }
 
         private static Shader CreateBoneShader()
