@@ -7,6 +7,8 @@ in vec4 color;
 in vec2 tex0;
 in vec3 specularPass;
 
+noperspective in vec3 edgeDistance;
+
 uniform int hasDiffuse;
 uniform int diffuseCoordType;
 uniform vec2 diffuseScale;
@@ -43,7 +45,12 @@ uniform int renderNormalMap;
 
 uniform vec3 cameraPos;
 
+uniform int renderWireframe;
+
 out vec4 fragColor;
+
+// Defined in Wireframe.frag.
+float WireframeIntensity(vec3 distanceToEdges);
 
 vec3 CalculateBumpMapNormal(vec3 normal, vec3 tangent, vec3 bitangent,
     int hasBump, sampler2D bumpMap, int width, int height, vec2 texCoords)
@@ -82,7 +89,7 @@ vec2 GetCoordType(int coordType, vec2 tex0)
 // color map pass for the diffuse texture
 vec3 ColorMapDiffusePass(vec3 N, vec3 V)
 {
-    vec4 diffuseMap = vec4(0);
+    vec4 diffuseMap = vec4(1);
 
     vec2 diffuseCoords = GetCoordType(diffuseCoordType, tex0);
 
@@ -97,7 +104,7 @@ vec3 DiffusePass(vec3 N, vec3 V)
 {
     float lambert = clamp(dot(N, V), 0, 1);
 	
-    vec3 diffuseTerm = ambientColor.rgb + diffuseColor.rgb * lambert;
+    vec3 diffuseTerm = diffuseColor.rgb * lambert;
 
 	diffuseTerm *= enableDiffuseLighting;
 
@@ -132,11 +139,19 @@ void main()
     }*/
 
 	// Render passes
+	fragColor.rgb += ambientColor.rgb * ColorMapDiffusePass(N, V) * 0.5;
 	fragColor.rgb += DiffusePass(N, V) * ColorMapDiffusePass(N, V) * renderDiffuse;
 	fragColor.rgb += specularPass * renderSpecular;//SpecularPass(N, V) * renderSpecular;
 	fragColor.rgb += ColorMapExtPass(N, V);
 
 	//fragColor.rgb *= color.rgb;
+	
+    if (renderWireframe == 1)
+    {
+        vec3 edgeColor = vec3(1);
+        float intensity = WireframeIntensity(edgeDistance);
+        fragColor.rgb = mix(fragColor.rgb, edgeColor, intensity);
+    }
 
 	// Set alpha
     if (renderAlpha == 1)

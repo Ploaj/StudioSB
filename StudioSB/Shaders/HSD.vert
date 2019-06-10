@@ -7,15 +7,23 @@ in vec4 Clr0;
 in vec4 Bone;
 in vec4 Weight;
 
+/*out vec3 geomPosition;
+out vec3 geomNormal;
+out vec2 geomTex0;
+out vec4 geomColor;
+out vec3 geomBitangent;
+out vec3 geomTangent;*/
+
 out vec3 vertPosition;
 out vec3 normal;
 out vec2 tex0;
 out vec4 color;
 out vec3 bitangent;
 out vec3 tangent;
+out vec3 specularPass;
 
 // specular----------------------------------
-out vec3 specularPass;
+out vec3 geomSpecularPass;
 
 uniform int hasSpecular;
 uniform int specularCoordType;
@@ -42,7 +50,7 @@ uniform mat4 mvp;
 
 vec2 GetSphereCoords(vec3 N)
 {
-    vec3 viewNormal = mat3(sphereMatrix) * normal.xyz;
+    vec3 viewNormal = mat3(sphereMatrix) * N;
     return viewNormal.xy * 0.5 + 0.5;
 }
 
@@ -50,7 +58,7 @@ vec2 GetCoordType(int coordType, vec2 tex0)
 {
 	//COORD_REFLECTION
 	if(coordType == 1)
-		return GetSphereCoords(normal);
+		return GetSphereCoords(NRM);
 	//COORD_UV
 	return tex0;
 }

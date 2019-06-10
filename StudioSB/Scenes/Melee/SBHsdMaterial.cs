@@ -56,12 +56,13 @@ namespace StudioSB.Scenes.Melee
                 shader.SetVector4("specularColor", matcol.SPC_R / 255f, matcol.SPC_G / 255f, matcol.SPC_B / 255f, matcol.SPC_A / 255f);
             }
 
-            if(_mobj.Textures != null)
+            bool hasDiffuse = false;
+            bool hasSpecular = false;
+            bool hasExt = false;
+            bool hasBumpMap = false;
+
+            if (_mobj.Textures != null)
             {
-                bool hasDiffuse = false;
-                bool hasSpecular = false;
-                bool hasExt = false;
-                bool hasBumpMap = false;
                 foreach (var texture in _mobj.Textures.List)
                 {
                     var rTexture = ((HSDScene)scene).TOBJtoRenderTexture(texture);
@@ -106,12 +107,12 @@ namespace StudioSB.Scenes.Melee
                         shader.SetTexture("bumpMapTex", rTexture, TextureUnit++);
                     }
                 }
-                
-                shader.SetBoolToInt("hasDiffuse", hasDiffuse);
-                shader.SetBoolToInt("hasSpecular", hasSpecular);
-                shader.SetBoolToInt("hasBumpMap", hasBumpMap);
-                shader.SetBoolToInt("hasExt", hasExt);
             }
+
+            shader.SetBoolToInt("hasDiffuse", hasDiffuse);
+            shader.SetBoolToInt("hasSpecular", hasSpecular);
+            shader.SetBoolToInt("hasBumpMap", hasBumpMap);
+            shader.SetBoolToInt("hasExt", hasExt);
         }
 
         public void ExportMaterial(string FileName)

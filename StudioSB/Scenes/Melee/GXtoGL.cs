@@ -1,11 +1,23 @@
 ﻿using HSDLib.GX;
 using HSDLib.Helpers;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
 namespace StudioSB.Scenes.Melee
 {
     class GXtoGL
     {
+
+        public static Vector3 GLVector3(GXVector3 v)
+        {
+            return new Vector3(v.X, v.Y, v.Z);
+        }
+
+        public static Vector2 GLVector2(GXVector2 v)
+        {
+            return new Vector2(v.X, v.Y);
+        }
+
         public static PrimitiveType GLPrimitiveType(GXPrimitiveType gxprim)
         {
             switch (gxprim)

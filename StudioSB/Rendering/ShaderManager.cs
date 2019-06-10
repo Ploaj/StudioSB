@@ -58,7 +58,7 @@ namespace StudioSB.Rendering
             Shader cubeShader = CreateBasicShader("CubeMap");
             shaderByName.Add("CubeMap", cubeShader);
 
-            Shader hsdShader = CreateBasicShader("HSD");
+            Shader hsdShader = CreateHSDShader();
             shaderByName.Add("HSD", hsdShader);
 
             Shader hsdDShader = CreateBasicDebugShader("HSD");
@@ -85,6 +85,18 @@ namespace StudioSB.Rendering
         {
             Shader shader = new Shader();
             shader.LoadShaders(File.ReadAllText($"Shaders/{name}.vert"), File.ReadAllText($"Shaders/{name}Debug.frag"));
+            return shader;
+        }
+
+        private static Shader CreateHSDShader()
+        {
+            Shader shader = new Shader();
+            shader.LoadShaders(new List<Tuple<string, ShaderType, string>>()
+            {
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/HSD.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/Wireframe.frag"), ShaderType.FragmentShader, ""),
+                new Tuple<string, ShaderType, string>(File.ReadAllText("Shaders/HSD.vert"), ShaderType.VertexShader, ""),
+            });
             return shader;
         }
 

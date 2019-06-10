@@ -11,6 +11,9 @@ using OpenTK.Graphics.OpenGL;
 using SFGraphics.GLObjects.BufferObjects;
 using SFGraphics.GLObjects.Textures;
 using StudioSB.IO.Models;
+using StudioSB.GUI.Attachments;
+using StudioSB.GUI;
+using StudioSB.Tools;
 
 namespace StudioSB.Scenes.Melee
 {
@@ -43,7 +46,8 @@ namespace StudioSB.Scenes.Melee
 
         public HSDScene()
         {
-            //AttachmentTypes.Remove(typeof(SBMeshList));
+            AttachmentTypes.Remove(typeof(SBMeshList));
+            AttachmentTypes.Add(typeof(SBDobjAttachment));
             boneBindUniformBuffer = new BufferObject(BufferTarget.UniformBuffer);
             boneTransformUniformBuffer = new BufferObject(BufferTarget.UniformBuffer);
         }
@@ -232,8 +236,110 @@ namespace StudioSB.Scenes.Melee
 
         public override IOModel GetIOModel()
         {
-            System.Windows.Forms.MessageBox.Show("Export DAT model is not supported at this time");
-            return base.GetIOModel();
+            //System.Windows.Forms.MessageBox.Show("Export DAT model is not supported at this time");
+
+            var iomodel = new IOModel();
+
+            iomodel.Skeleton = (SBSkeleton)Skeleton;
+            
+            List<SBHsdBone> bones = new List<SBHsdBone>();
+
+            foreach (SBHsdBone bone in Skeleton.Bones)
+                bones.Add(bone);
+
+            foreach (SBHsdMesh me in GetMeshObjects())
+            {
+                var dobj = me.DOBJ;
+
+                var parent = Skeleton.Bones[0];
+                foreach (var b in Skeleton.Bones)
+                {
+                    if (b is SBHsdBone bone)
+                    {
+                        if (bone.GetJOBJ().DOBJ != null)
+                            if (bone.GetJOBJ().DOBJ.List.Contains(dobj))
+                            {
+                                parent = b;
+                                break;
+                            }
+                    }
+                }
+                
+                var iomesh = new IOMesh();
+                iomesh.Name = me.Name;
+                iomodel.Meshes.Add(iomesh);
+
+                iomesh.HasPositions = true;
+                iomesh.HasColor = true;
+                iomesh.HasNormals = true;
+                iomesh.HasBoneWeights = true;
+                iomesh.HasUV0 = true;
+
+                if (dobj.POBJ != null)
+                    foreach (var pobj in dobj.POBJ.List)
+                    {
+                        var vertices = VertexAccessor.GetDecodedVertices(pobj);
+                        var dl = VertexAccessor.GetDisplayList(pobj);
+
+                        HSD_JOBJWeight[] bindGroups = null; ;
+                        if (pobj.BindGroups != null)
+                            bindGroups = pobj.BindGroups.Elements;
+
+                        var offset = 0;
+                        foreach (var v in dl.Primitives)
+                        {
+                            List<GXVertex> strip = new List<GXVertex>();
+                            for (int i = 0; i < v.Count; i++)
+                                strip.Add(vertices[offset + i]);
+                            offset += v.Count;
+                            iomesh.Vertices.AddRange(ConvertGXDLtoTriangleList(v.PrimitiveType, SBHsdMesh.GXVertexToHsdVertex(strip, bones, bindGroups), (SBHsdBone)parent));
+                        }
+                    }
+                
+                for (int i = 0; i < iomesh.Vertices.Count; i++)
+                    iomesh.Indices.Add((uint)i);
+            }
+
+            return iomodel;
+        }
+
+        private List<IOVertex> ConvertGXDLtoTriangleList(GXPrimitiveType type, List<SBHsdVertex> vertices, SBHsdBone parent)
+        {
+            var list = new List<IOVertex>();
+
+            foreach(var v in vertices)
+            {
+                var vertex = new IOVertex()
+                {
+                    Position = GXtoGL.GLVector3(v.POS),
+                    Normal = GXtoGL.GLVector3(v.NRM),
+                    UV0 = GXtoGL.GLVector2(v.UV0),
+                    BoneIndices = v.Bone,
+                    BoneWeights = v.Weight,
+                };
+                if(parent != null)
+                {
+                    vertex.Position = Vector3.TransformPosition(vertex.Position, parent.WorldTransform);
+                    vertex.Normal = Vector3.TransformNormal(vertex.Normal, parent.WorldTransform);
+
+                    if (vertex.BoneWeights.X == 0)
+                    {
+                        vertex.BoneWeights.X = 1;
+                        vertex.BoneIndices.X = Skeleton.IndexOfBone(parent);
+                    }
+                }
+                if(v.Weight.X == 1)
+                {
+                    vertex.Position = Vector3.TransformPosition(vertex.Position, Skeleton.Bones[(int)v.Bone.X].WorldTransform);
+                    vertex.Normal = Vector3.TransformNormal(vertex.Normal, Skeleton.Bones[(int)v.Bone.X].WorldTransform);
+                }
+                list.Add(vertex);
+            }
+
+            if (type == GXPrimitiveType.TriangleStrip)
+                TriangleConvert.StripToList(list, out list);
+
+            return list;
         }
 
         #endregion
@@ -284,6 +390,9 @@ namespace StudioSB.Scenes.Melee
 
             foreach (var rm in Mesh)
             {
+                if (!rm.Visible)
+                    continue;
+                shader.SetBoolToInt("renderWireframe", ApplicationSettings.EnableWireframe || rm.Selected);
                 rm.Draw(this, shader);
             }
 

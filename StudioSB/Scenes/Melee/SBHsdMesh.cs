@@ -22,6 +22,7 @@ namespace StudioSB.Scenes.Melee
 
     public class SBHsdMesh : ISBMesh
     {
+        public HSD_DOBJ DOBJ{ get => _dobj; }
         private HSD_DOBJ _dobj { get; set; }
 
         public override int PolyCount => base.PolyCount;
@@ -80,6 +81,7 @@ namespace StudioSB.Scenes.Melee
                     }
 
                 }
+            
         }
 
         public void Draw(HSDScene scene, Shader shader)
@@ -97,7 +99,7 @@ namespace StudioSB.Scenes.Melee
             }
         }
         
-        private List<SBHsdVertex> GXVertexToHsdVertex(List<GXVertex> vertices, List<SBHsdBone> bones, HSD_JOBJWeight[] jobjweights)
+        public static List<SBHsdVertex> GXVertexToHsdVertex(List<GXVertex> vertices, List<SBHsdBone> bones, HSD_JOBJWeight[] jobjweights)
         {
             List<SBHsdVertex> newvertices = new List<SBHsdVertex>();
 
