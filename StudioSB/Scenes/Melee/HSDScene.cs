@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HSDLib;
 using HSDLib.Helpers;
 using HSDLib.Common;
@@ -12,6 +10,7 @@ using StudioSB.Rendering;
 using OpenTK.Graphics.OpenGL;
 using SFGraphics.GLObjects.BufferObjects;
 using SFGraphics.GLObjects.Textures;
+using StudioSB.IO.Models;
 
 namespace StudioSB.Scenes.Melee
 {
@@ -44,6 +43,7 @@ namespace StudioSB.Scenes.Melee
 
         public HSDScene()
         {
+            //AttachmentTypes.Remove(typeof(SBMeshList));
             boneBindUniformBuffer = new BufferObject(BufferTarget.UniformBuffer);
             boneTransformUniformBuffer = new BufferObject(BufferTarget.UniformBuffer);
         }
@@ -185,9 +185,20 @@ namespace StudioSB.Scenes.Melee
             HSDFile.Save(FileName);
         }
 
+        public override void FromIOModel(IOModel iomodel)
+        {
+            System.Windows.Forms.MessageBox.Show("Importing Model to DAT not supported");
+        }
+
+        public override IOModel GetIOModel()
+        {
+            System.Windows.Forms.MessageBox.Show("Export DAT model is not supported at this time");
+            return base.GetIOModel();
+        }
+
         #endregion
 
-         #region Rendering
+        #region Rendering
 
         public override void RenderLegacy()
         {
@@ -204,7 +215,16 @@ namespace StudioSB.Scenes.Melee
                 return;
 
             shader.UseProgram();
-            
+
+            Matrix4 sphereMatrix = camera.ModelViewMatrix;
+            sphereMatrix.Invert();
+            sphereMatrix.Transpose();
+            shader.SetMatrix4x4("sphereMatrix", ref sphereMatrix);
+
+            shader.SetBoolToInt("renderDiffuse", ApplicationSettings.EnableDiffuse);
+            shader.SetBoolToInt("renderSpecular", ApplicationSettings.EnableSpecular);
+            shader.SetBoolToInt("renderAlpha", true);
+            shader.SetBoolToInt("renderNormalMap", ApplicationSettings.RenderNormalMaps);
             shader.SetInt("renderMode", (int)ApplicationSettings.ShadingMode);
 
             shader.SetVector3("cameraPos", camera.Position);

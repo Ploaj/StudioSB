@@ -33,7 +33,7 @@ namespace StudioSB.Scenes.Melee
             switch (wm)
             {
                 case GXWrapMode.CLAMP:
-                    return TextureWrapMode.Clamp;
+                    return TextureWrapMode.ClampToEdge;
                 case GXWrapMode.MIRROR:
                     return TextureWrapMode.MirroredRepeat;
                 case GXWrapMode.REPEAT:

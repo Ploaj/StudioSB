@@ -89,10 +89,10 @@ namespace StudioSB.Scenes.Melee
 
             material.Bind(scene, shader);
 
+            shader.SetMatrix4x4("singleBind", scene.Skeleton[ParentBone].WorldTransform);
+
             foreach (var rm in renderMesh)
             {
-                shader.SetMatrix4x4("singleBind", scene.Skeleton[ParentBone].WorldTransform);
-
                 rm.Draw(shader);
             }
         }
@@ -113,10 +113,10 @@ namespace StudioSB.Scenes.Melee
                     var m0xid = v.PMXID;
                     var jobjWeight = jobjweights[m0xid / 3];
 
-                    for (int i = 0; i < jobjWeight.JOBJs.Count; i++)
+                    for (int i = 0; i < Math.Min(4, jobjWeight.JOBJs.Count); i++)
                         bone[i] = bones.FindIndex(e=>e.GetJOBJ() == jobjWeight.JOBJs[i]);
 
-                    for (int i = 0; i < jobjWeight.Weights.Count; i++)
+                    for (int i = 0; i < Math.Min(4, jobjWeight.Weights.Count); i++)
                         weights[i] = jobjWeight.Weights[i];
                 }
 

@@ -40,7 +40,6 @@ namespace StudioSB.GUI
                 if (_scene != null)
                 {
                     float Extent = 0;
-                    var io = value.GetIOModel();
                     foreach (var mesh in Scene.GetMeshObjects())
                         Extent = Math.Max(Extent, mesh.BoundingSphere.Y);
                     if (Extent > 0)
