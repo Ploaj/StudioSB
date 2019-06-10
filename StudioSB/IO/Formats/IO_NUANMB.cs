@@ -245,7 +245,13 @@ namespace StudioSB.IO.Formats
                 encoder.AddTrack(mat.MaterialName, mat.AttributeName, ANIM_TYPE.Material, list);
             }
 
-            encoder.Save(FileName);
+            try
+            {
+                encoder.Save(FileName);
+            } catch(Exception)
+            {
+                System.Windows.Forms.MessageBox.Show("Error creating ANIM file: try using a larger compression level");
+            }
         }
 
         private static AnimTrackTransform MatrixToTransform(Matrix4 matrix)
