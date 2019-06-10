@@ -53,6 +53,44 @@ namespace StudioSB.Scenes.Melee
 
         }*/
 
+        private void RemakeVertexData()
+        {
+            var dobjs = RootJOBJ.GetAllOfType<HSD_DOBJ>();
+            VertexCompressor c = new VertexCompressor();
+            foreach(var dobj in dobjs)
+            {
+                Console.WriteLine(dobj.MOBJ.RenderFlags.ToString());
+                dobj.MOBJ.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFSE_MAT;
+                dobj.MOBJ.Textures = null;
+                if (dobj.MOBJ.Textures != null)
+                foreach (var tobj in dobj.MOBJ.Textures.List)
+                {
+                    tobj.Flags = 0;
+                    tobj.ImageData = null;
+                    tobj.Tlut = null;
+                }
+                foreach (var pobj in dobj.POBJ.List)
+                {
+                    int off = 0;
+                    var vertices = VertexAccessor.GetDecodedVertices(pobj);
+                    var displayList = VertexAccessor.GetDisplayList(pobj);
+                    GXDisplayList newdl = new GXDisplayList();
+                    foreach (var dl in VertexAccessor.GetDisplayList(pobj).Primitives)
+                    {
+                        var vs = new List<GXVertex>();
+                        for(int i = 0; i < dl.Count; i++)
+                        {
+                            vs.Add(vertices[off+i]);
+                        }
+                        off += dl.Count;
+                        newdl.Primitives.Add(c.Compress(dl.PrimitiveType, vs.ToArray(), pobj.VertexAttributes));
+                    }
+                    pobj.DisplayListBuffer = newdl.ToBuffer(pobj.VertexAttributes);
+                }
+            }
+            c.SaveChanges();
+        }
+
         #region Properties
             
         public Texture TOBJtoRenderTexture(HSD_TOBJ tobj)
@@ -181,6 +219,8 @@ namespace StudioSB.Scenes.Melee
             // update new single binds
 
             // update textures
+
+            //RemakeVertexData();
 
             HSDFile.Save(FileName);
         }

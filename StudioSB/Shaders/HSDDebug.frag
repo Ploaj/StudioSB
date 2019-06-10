@@ -2,7 +2,12 @@
 
 in vec3 vertPosition;
 in vec3 normal;
+in vec3 bitangent;
+in vec3 tangent;
+in vec4 color;
 in vec2 tex0;
+in vec3 specularPass;
+
 
 uniform sampler2D uvPattern;
 

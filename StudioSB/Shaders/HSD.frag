@@ -7,19 +7,15 @@ in vec4 color;
 in vec2 tex0;
 in vec3 specularPass;
 
-uniform int hasSphere0;
-uniform int hasDiffuse0;
-uniform sampler2D diffuseTex0;
-uniform vec2 diffuseScale0;
+uniform int hasDiffuse;
+uniform int diffuseCoordType;
+uniform vec2 diffuseScale;
+uniform sampler2D diffuseTex;
 
-uniform int hasSphere1;
-uniform int hasDiffuse1;
-uniform sampler2D diffuseTex1;
-uniform vec2 diffuseScale1;
-
-uniform int hasSpecular;
-uniform sampler2D specularTex;
-uniform vec2 specularScale;
+uniform int hasExt;
+uniform int extCoordType;
+uniform vec2 extScale;
+uniform sampler2D extTex;
 
 uniform int hasBumpMap;
 uniform int bumpMapWidth;
@@ -29,10 +25,7 @@ uniform vec2 bumpMapTexScale;
 
 uniform vec4 diffuseColor;
 uniform vec4 ambientColor;
-uniform vec4 specularColor;
 
-uniform int flags;
-uniform int enableSpecular;
 uniform int enableDiffuseLighting;
 
 uniform float glossiness;
@@ -77,50 +70,52 @@ vec2 GetSphereCoords(vec3 N)
     return viewNormal.xy * 0.5 + 0.5;
 }
 
-vec3 DiffusePass(vec3 N, vec3 V)
+vec2 GetCoordType(int coordType, vec2 tex0)
 {
-    // Diffuse
-    //float blend = 0.1; // TODO: Use texture's blend.
-    float lambert = clamp(dot(N, V), 0, 1);
-
-    vec4 diffuseMap = vec4(1);
-
-    vec2 diffuseCoords0 = tex0;
-    if (hasSphere0 == 1)
-        diffuseCoords0 = GetSphereCoords(N);
-
-    vec2 diffuseCoords1 = tex0;
-    if (hasSphere1 == 1)
-        diffuseCoords1 = GetSphereCoords(N);
-
-    if (hasDiffuse0 == 1)
-        diffuseMap = texture(diffuseTex0, diffuseCoords0 * diffuseScale0).rgba;
-
-    if (hasDiffuse1 == 1)
-        diffuseMap = mix(diffuseMap, texture(diffuseTex1, diffuseCoords1 * diffuseScale1), 0.1);
-
-    vec3 diffuseTerm = diffuseMap.rgb;
-    if (enableDiffuseLighting == 1)
-        diffuseTerm *= ambientColor.rgb + diffuseColor.rgb * lambert;//mix(ambientColor.rgb, diffuseColor.rgb, lambert);
-
-    return diffuseTerm;
+	//COORD_REFLECTION
+	if(coordType == 1)
+		return GetSphereCoords(normal);
+	//COORD_UV
+	return tex0;
 }
 
-vec3 SpecularPass(vec3 N, vec3 V)
+// color map pass for the diffuse texture
+vec3 ColorMapDiffusePass(vec3 N, vec3 V)
 {
-    // Specular
-    float phong = clamp(dot(N, V), 0, 1);
+    vec4 diffuseMap = vec4(0);
 
-    phong = pow(phong, glossiness);
+    vec2 diffuseCoords = GetCoordType(diffuseCoordType, tex0);
 
-    vec3 specularTerm = vec3(phong) * specularColor.rgb;
+    if (hasDiffuse == 1)
+        diffuseMap = texture(diffuseTex, diffuseCoords * diffuseScale);
 
-    //if (hasSpecular == 1)
-    //    specularTerm *= texture(specularTex, tex0 * specularScale).rgb;
+    return diffuseMap.rgb;
+}
 
-    specularTerm *= enableSpecular;
+// basic lambert diffuse
+vec3 DiffusePass(vec3 N, vec3 V)
+{
+    float lambert = clamp(dot(N, V), 0, 1);
+	
+    vec3 diffuseTerm = ambientColor.rgb + diffuseColor.rgb * lambert;
 
-    return specularTerm;
+	diffuseTerm *= enableDiffuseLighting;
+
+	return diffuseTerm;
+}
+
+// This is usally a reflection map
+//
+vec3 ColorMapExtPass(vec3 N, vec3 V)
+{
+    vec4 Map = vec4(0);
+
+    vec2 Coords = GetCoordType(extCoordType, tex0);
+
+    if (hasExt== 1)
+        Map = texture(extTex, Coords * extScale);
+
+    return Map.rgb;
 }
 
 void main()
@@ -137,12 +132,13 @@ void main()
     }*/
 
 	// Render passes
-	fragColor.rgb += DiffusePass(N, V) * renderDiffuse;
+	fragColor.rgb += DiffusePass(N, V) * ColorMapDiffusePass(N, V) * renderDiffuse;
 	fragColor.rgb += specularPass * renderSpecular;//SpecularPass(N, V) * renderSpecular;
+	fragColor.rgb += ColorMapExtPass(N, V);
 
 	//fragColor.rgb *= color.rgb;
 
 	// Set alpha
     if (renderAlpha == 1)
-        fragColor.a = texture(diffuseTex0, tex0 * diffuseScale0).a * transparency;
+        fragColor.a = texture(diffuseTex, tex0 * diffuseScale).a * transparency;
 }

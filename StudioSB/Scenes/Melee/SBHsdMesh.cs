@@ -96,9 +96,7 @@ namespace StudioSB.Scenes.Melee
                 rm.Draw(shader);
             }
         }
-
         
-
         private List<SBHsdVertex> GXVertexToHsdVertex(List<GXVertex> vertices, List<SBHsdBone> bones, HSD_JOBJWeight[] jobjweights)
         {
             List<SBHsdVertex> newvertices = new List<SBHsdVertex>();
