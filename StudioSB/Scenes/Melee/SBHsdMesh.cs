@@ -84,6 +84,15 @@ namespace StudioSB.Scenes.Melee
             
         }
 
+        /// <summary>
+        /// Clears the texture in the mobj
+        /// </summary>
+        public void ClearTextures()
+        {
+            DOBJ.MOBJ.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE;
+            DOBJ.MOBJ.Textures = null;
+        }
+
         public void Draw(HSDScene scene, Shader shader)
         {
             if (!Visible)

@@ -37,8 +37,9 @@
       <HintPath>lib\Fbx.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="HSDLib">
-      <HintPath>..\..\..\Mods\HSDLib\HSDLib\bin\Release\HSDLib.dll</HintPath>
+    <Reference Include="HSDLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Mods\HSDLib\HSDLib\bin\Debug\HSDLib.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
@@ -102,9 +103,7 @@
     </Compile>
     <Compile Include="GUI\Attachments\SBAnimAttachment.cs" />
     <Compile Include="GUI\Attachments\IAttachment.cs" />
-    <Compile Include="GUI\Attachments\SBDobjAttachment.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="GUI\Attachments\SBDobjAttachment.cs" />
     <Compile Include="GUI\Attachments\SBTextureList.cs">
       <SubType>Component</SubType>
     </Compile>

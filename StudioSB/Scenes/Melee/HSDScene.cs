@@ -122,8 +122,13 @@ namespace StudioSB.Scenes.Melee
         public override void LoadFromFile(string FileName)
         {
             HSDFile = new HSDFile(FileName);
-            RefreshTextures();
             RefreshSkeleton();
+            RefreshRendering();
+        }
+
+        public void RefreshRendering()
+        {
+            RefreshTextures();
             RefreshMesh();
         }
 
