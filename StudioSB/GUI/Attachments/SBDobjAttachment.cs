@@ -32,6 +32,9 @@ namespace StudioSB.GUI.Attachments
         [DisplayName("UV Type"), Description("")]
         public TOBJUVType UVType { get; set; }
 
+        [DisplayName("Use Blending"), Description("")]
+        public bool UseBlending { get; set; }
+
         [DisplayName("Image Format"), Description("Palette format, if applicable")]
         public GXTexFmt ImageFormat { get; set; } = GXTexFmt.RGB565;
 
@@ -215,6 +218,9 @@ namespace StudioSB.GUI.Attachments
                             var bmp = new Bitmap(filePath);
                             tobj.SetFromBitmap(bmp, settings.ImageFormat, settings.PaletteFormat);
                             bmp.Dispose();
+
+                            if (settings.UseBlending && mobj.PixelProcessing == null)
+                                mobj.PixelProcessing = new HSD_PixelProcessing();
                             
                             //TODO: set flags for texture types
                             if(settings.TextureType == TOBJTextureType.Diffuse)
