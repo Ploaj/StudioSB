@@ -14,6 +14,7 @@ using StudioSB.IO.Models;
 using StudioSB.GUI.Attachments;
 using StudioSB.GUI;
 using StudioSB.Tools;
+using HSDLib.GX;
 
 namespace StudioSB.Scenes.Melee
 {
@@ -47,6 +48,7 @@ namespace StudioSB.Scenes.Melee
         public HSDScene()
         {
             AttachmentTypes.Remove(typeof(SBMeshList));
+            AttachmentTypes.Remove(typeof(SBTextureList));
             AttachmentTypes.Add(typeof(SBDobjAttachment));
             boneBindUniformBuffer = new BufferObject(BufferTarget.UniformBuffer);
             boneTransformUniformBuffer = new BufferObject(BufferTarget.UniformBuffer);
@@ -175,6 +177,60 @@ namespace StudioSB.Scenes.Melee
             }
         }
 
+        public bool HasMaterialAnimations
+        {
+            get
+            {
+                return HSDFile.Roots.Find(e => e.Node is HSDLib.MaterialAnimation.HSD_MatAnimJoint) != null;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ClearMaterialAnimations()
+        {
+            foreach(var roots in HSDFile.Roots)
+            {
+                if(roots.Node is HSDLib.MaterialAnimation.HSD_MatAnimJoint matjoint)
+                {
+                    foreach (var v in matjoint.DepthFirstList)
+                    {
+                        if(v.MaterialAnimation != null)
+                        foreach(var matanim in v.MaterialAnimation.List)
+                        {
+                                if (matanim.TextureAnimation != null)
+                                {
+                                    Console.WriteLine(matanim.TextureAnimation.ImageCount + " " +
+                                        matanim.TextureAnimation.TlutCount + " " +
+                                        (matanim.TextureAnimation.ImageArray==null) + " " +
+                                        matanim.TextureAnimation.GXTexMapID);
+
+                                    matanim.TextureAnimation.AnimationObject.Flags = HSDLib.Animation.AOBJ_Flags.NO_ANIM;
+                                    matanim.TextureAnimation.AnimationObject.FObjDesc = null;
+                                    matanim.TextureAnimation.AnimationObject.EndFrame = 0;
+                                    matanim.TextureAnimation.GXTexMapID = (int)HSDLib.GX.GXTexMapID.GX_TEXMAP0;
+                                    matanim.TextureAnimation.ImageCount = 0;
+                                    matanim.TextureAnimation.TlutCount = 0;
+                                    if (matanim.TextureAnimation.ImageArray != null)
+                                    {
+                                        matanim.TextureAnimation.ImageArray.Elements = null;
+                                        matanim.TextureAnimation.ImageArray.SetSize = 0;
+                                    }
+                                    if(matanim.TextureAnimation.TlutArray != null)
+                                    {
+                                        matanim.TextureAnimation.TlutArray.Elements = null;
+                                        matanim.TextureAnimation.TlutArray.SetSize = 0;
+                                    }
+                                }
+                                matanim.AnimationObject = null;
+                                //matanim.TextureAnimation = null;
+                        }
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// Refreshes the skeleton to update state of the HSDFile
         /// </summary>
@@ -236,13 +292,90 @@ namespace StudioSB.Scenes.Melee
 
         public override void FromIOModel(IOModel iomodel)
         {
-            System.Windows.Forms.MessageBox.Show("Importing Model to DAT not supported");
+            //System.Windows.Forms.MessageBox.Show("Importing Model to DAT not supported");
+
+            // use the existing skeleton always
+            //iomodel.ConvertToSkeleton((SBSkeleton)Skeleton);
+
+            // single bound vertices are stored in inverse transform positions
+            iomodel.InvertSingleBinds();
+
+            // dobjs to import to
+            var dobjs = GetMeshObjects();
+
+            // make attribute group
+            HSD_AttributeGroup attributeGroup = new HSD_AttributeGroup();
+            //TODO: redo how these are generated
+            {
+                GXVertexBuffer buff = new GXVertexBuffer();
+                buff.Name = GXAttribName.GX_VA_PNMTXIDX;
+                buff.AttributeType = GXAttribType.GX_DIRECT;
+                attributeGroup.Attributes.Add(buff);
+            }
+            {
+                GXVertexBuffer buff = new GXVertexBuffer();
+                buff.Name = GXAttribName.GX_VA_POS;
+                buff.AttributeType = GXAttribType.GX_INDEX16;
+                buff.CompCount = GXCompCnt.PosXYZ;
+                buff.CompType = GXCompType.Int16;
+                buff.Scale = 10;
+                buff.Stride = 6;
+                attributeGroup.Attributes.Add(buff);
+            }
+            {
+                GXVertexBuffer buff = new GXVertexBuffer();
+                buff.Name = GXAttribName.GX_VA_NRM;
+                buff.AttributeType = GXAttribType.GX_INDEX16;
+                buff.CompCount = GXCompCnt.NrmXYZ;
+                buff.CompType = GXCompType.Int8;
+                buff.Scale = 6;
+                buff.Stride = 3;
+                attributeGroup.Attributes.Add(buff);
+            }
+            {
+                GXVertexBuffer buff = new GXVertexBuffer();
+                buff.Name = GXAttribName.GX_VA_TEX0;
+                buff.AttributeType = GXAttribType.GX_INDEX16;
+                buff.CompCount = GXCompCnt.TexST;
+                buff.CompType = GXCompType.Int16;
+                buff.Scale = 13;
+                buff.Stride = 4;
+                attributeGroup.Attributes.Add(buff);
+            }
+
+            foreach (SBHsdMesh m in GetMeshObjects())
+            {
+                m.DOBJ.POBJ = null;
+            }
+
+            // get a compressor ready
+            // the compressor will handle making the compressed attribute buffers
+            VertexCompressor compressor = new VertexCompressor();
+
+            // import the iomeshes into their respective dobjs
+            foreach (var iomesh in iomodel.Meshes)
+            {
+                int dobjId = -1;
+                int.TryParse(iomesh.Name.Replace("DOBJ_", ""), out dobjId);
+
+                SBConsole.WriteLine(iomesh.Name + " imported:" + (dobjId!=-1));
+
+                if (dobjId != -1)
+                {
+                    var dobj = (SBHsdMesh)dobjs[dobjId];
+                    dobj.ImportPBOJs(iomesh, (SBSkeleton)Skeleton, compressor, attributeGroup);
+                }
+            }
+
+            // finalizes and remakes the buffer
+            compressor.SaveChanges();
+
+            // refresh everything
+            RefreshRendering();
         }
 
         public override IOModel GetIOModel()
         {
-            //System.Windows.Forms.MessageBox.Show("Export DAT model is not supported at this time");
-
             var iomodel = new IOModel();
 
             iomodel.Skeleton = (SBSkeleton)Skeleton;
@@ -303,6 +436,8 @@ namespace StudioSB.Scenes.Melee
                 
                 for (int i = 0; i < iomesh.Vertices.Count; i++)
                     iomesh.Indices.Add((uint)i);
+
+                iomesh.Optimize();
             }
 
             return iomodel;

@@ -95,7 +95,7 @@ namespace StudioSB.IO.Formats
             }
             var Header = new DDS_Header()
             {
-                dwFlags = (DDSD.CAPS | DDSD.HEIGHT | DDSD.WIDTH | DDSD.PIXELFORMAT | DDSD.MIPMAPCOUNT | DDSD.LINEARSIZE),
+                dwFlags = (DDSD.CAPS | DDSD.HEIGHT | DDSD.WIDTH | DDSD.PIXELFORMAT | DDSD.LINEARSIZE),
                 dwHeight = surface.Height,
                 dwWidth = surface.Width,
                 dwPitchOrLinearSize = GetPitchOrLinearSize(surface.InternalFormat, surface.Width),
@@ -109,6 +109,9 @@ namespace StudioSB.IO.Formats
                 dwCaps = 0,
                 dwCaps2 = 0
             };
+
+            if (surface.Arrays.Count > 0 && surface.Arrays[0].Mipmaps.Count > 1)
+                Header.dwFlags |= DDSD.MIPMAPCOUNT;
 
             if (surface.IsCubeMap)
             {

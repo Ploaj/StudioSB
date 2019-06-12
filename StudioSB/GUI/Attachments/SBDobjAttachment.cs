@@ -8,6 +8,8 @@ using StudioSB.Tools;
 using HSDLib.GX;
 using HSDLib.Common;
 using System.ComponentModel;
+using StudioSB.Scenes;
+using StudioSB.IO.Formats;
 
 namespace StudioSB.GUI.Attachments
 {
@@ -96,6 +98,7 @@ namespace StudioSB.GUI.Attachments
             {
                 removeTexture.Visible = propertyGrid.SelectedObject is HSD_TOBJ;
                 exportTexture.Visible = propertyGrid.SelectedObject is HSD_TOBJ;
+                importTexture.Visible = propertyGrid.SelectedObject != null;
             };
 
 
@@ -105,9 +108,20 @@ namespace StudioSB.GUI.Attachments
             {
                 if(scene != null)
                 {
-                    foreach (SBHsdMesh m in scene.GetMeshObjects())
-                        m.ClearTextures();
-                    RefreshList();
+                    if (scene.HasMaterialAnimations)
+                    {
+                        MessageBox.Show("Eror: DATs with material animations must keep their textures intact");
+                    }
+                    else
+                    {
+                        if(MessageBox.Show("Are you sure? This cannot be undone", "Clear Textures", MessageBoxButtons.OKCancel) != DialogResult.OK)
+                            return;
+                        scene.ClearMaterialAnimations();
+                        //return;
+                        foreach (SBHsdMesh m in scene.GetMeshObjects())
+                            m.ClearTextures();
+                        RefreshList();
+                    }
                 }
             };
 
@@ -117,10 +131,10 @@ namespace StudioSB.GUI.Attachments
             optionPanel.Dock = DockStyle.Top;
 
             AutoScroll = true;
-
-
+            
             exportTexture = new SBButton("Export Texture");
             exportTexture.Dock = DockStyle.Top;
+            exportTexture.Visible = false;
             optionPanel.Controls.Add(exportTexture);
             exportTexture.Click += (sender, args) =>
             {
@@ -129,15 +143,30 @@ namespace StudioSB.GUI.Attachments
                 {
                     if(propertyGrid.SelectedObject is HSD_TOBJ tobj)
                     {
-                        var bmp = tobj.ToBitmap();
-                        bmp.Save(filePath);
-                        bmp.Dispose();
+                        //TODO: dds export / import
+                        /*if(tobj.ImageData != null && tobj.ImageData.Format == GXTexFmt.CMP)
+                        {
+                            SBSurface s = new SBSurface();
+                            s.Width = tobj.ImageData.Width;
+                            s.Height = tobj.ImageData.Height;
+                            s.InternalFormat = OpenTK.Graphics.OpenGL.InternalFormat.CompressedRgbaS3tcDxt1Ext;
+                            s.Arrays.Add(new MipArray() { Mipmaps = new List<byte[]>() { HSDLib.Helpers.TPL.ToCMP(tobj.ImageData.Data, tobj.ImageData.Width, tobj.ImageData.Height) } });
+
+                            IO_DDS.Export(System.IO.Path.GetDirectoryName(filePath)+"\\" + System.IO.Path.GetFileNameWithoutExtension(filePath) + ".dds", s);
+                        }
+                        else*/
+                        {
+                            var bmp = tobj.ToBitmap();
+                            bmp.Save(filePath);
+                            bmp.Dispose();
+                        }
                     }
                 }
             };
 
             removeTexture = new SBButton("Remove Texture");
             removeTexture.Dock = DockStyle.Top;
+            removeTexture.Visible = false;
             optionPanel.Controls.Add(removeTexture);
             removeTexture.Click += (sender, args) =>
             {
@@ -162,34 +191,42 @@ namespace StudioSB.GUI.Attachments
                             prevTexture = tex;
                         }
 
-                    RefreshList();
-
+                    FixMOBJTexIDs(mobj);
+                    var root = dobjList.SelectedNode.Parent.Parent;
+                    root.Nodes.Clear();
+                    root.Nodes.Add(CreateMOBJNode(mobj));
+                    scene.RefreshRendering();
                 }
             };
 
             importTexture = new SBButton("Import Texture");
             importTexture.Dock = DockStyle.Top;
+            importTexture.Visible = false;
             optionPanel.Controls.Add(importTexture);
             importTexture.Click += (sender, args) =>
             {
                 // select texture
                 HSD_MOBJ mobj = null;
+                SBTreeNode root = null;
                 if(dobjList.SelectedNode.Tag is SBHsdMesh mesh)
                 {
                     if(mesh.DOBJ.MOBJ != null)
                     {
                         mobj = mesh.DOBJ.MOBJ;
+                        root = (SBTreeNode)dobjList.SelectedNode;
                     }
                 }
                 if (dobjList.SelectedNode.Tag is HSD_MOBJ m)
                 {
                     mobj = m;
+                    root = (SBTreeNode)dobjList.SelectedNode.Parent;
                 }
                 if (dobjList.SelectedNode.Tag is HSD_TOBJ)
                 {
                     if (dobjList.SelectedNode.Parent.Tag is HSD_MOBJ mo)
                     {
                         mobj = mo;
+                        root = (SBTreeNode)dobjList.SelectedNode.Parent.Parent;
                     }
                 }
                 if (mobj == null)
@@ -205,7 +242,6 @@ namespace StudioSB.GUI.Attachments
                         {
                             // create tobj and attach to selected mobj
                             HSD_TOBJ tobj = new HSD_TOBJ();
-                            tobj.GXTexGenSrc = 4;
                             tobj.MagFilter = GXTexFilter.GX_LINEAR;
                             tobj.HScale = 1;
                             tobj.WScale = 1;
@@ -251,21 +287,19 @@ namespace StudioSB.GUI.Attachments
                             if (mobj.Textures == null)
                             {
                                 mobj.Textures = tobj;
-                                tobj.TexMapID = GXTexMapID.GX_TEXMAP0;
                                 tobj.Flags |= TOBJ_FLAGS.COLORMAP_REPLACE;
                             }
                             else
                             {
                                 tobj.Flags |= TOBJ_FLAGS.COLORMAP_BLEND;
-                                var current = mobj.Textures;
-                                while (current.Next != null)
-                                    current = current.Next;
-                                current.Next = tobj;
-                                tobj.TexMapID = (GXTexMapID)mobj.Textures.List.Length;
                             }
                             propertyGrid.SelectedObject = tobj;
 
-                            RefreshList();
+                            FixMOBJTexIDs(mobj);
+
+                            root.Nodes.Clear();
+                            root.Nodes.Add(CreateMOBJNode(mobj));
+                            scene.RefreshRendering();
                         }
                     }
                 }
@@ -346,34 +380,52 @@ namespace StudioSB.GUI.Attachments
 
                 if (m.DOBJ.MOBJ != null)
                 {
-                    SBTreeNode child = new SBTreeNode("MOBJ");
-                    child.Tag = m.DOBJ.MOBJ;
-                    item.Nodes.Add(child);
-                    if (m.DOBJ.MOBJ.MaterialColor != null)
-                    {
-                        SBTreeNode mc = new SBTreeNode("Material Color");
-                        mc.Tag = m.DOBJ.MOBJ.MaterialColor;
-                        child.Nodes.Add(mc);
-                    }
-                    if (m.DOBJ.MOBJ.PixelProcessing != null)
-                    {
-                        SBTreeNode mc = new SBTreeNode("Pixel Processing");
-                        mc.Tag = m.DOBJ.MOBJ.PixelProcessing;
-                        child.Nodes.Add(mc);
-                    }
-                    if (m.DOBJ.MOBJ.Textures != null)
-                    {
-                        foreach (var tex in m.DOBJ.MOBJ.Textures.List)
-                        {
-                            SBTreeNode mc = new SBTreeNode(tex.Flags.ToString());
-                            mc.Tag = tex;
-                            child.Nodes.Add(mc);
-                        }
-                    }
+                    item.Nodes.Add(CreateMOBJNode(m.DOBJ.MOBJ));
                 }
 
                 dobjList.Nodes.Add(item);
             };
         }
+
+        private SBTreeNode CreateMOBJNode(HSD_MOBJ mobj)
+        {
+            SBTreeNode child = new SBTreeNode("MOBJ");
+            child.Tag = mobj;
+            if (mobj.MaterialColor != null)
+            {
+                SBTreeNode mc = new SBTreeNode("Material Color");
+                mc.Tag = mobj.MaterialColor;
+                child.Nodes.Add(mc);
+            }
+            if (mobj.PixelProcessing != null)
+            {
+                SBTreeNode mc = new SBTreeNode("Pixel Processing");
+                mc.Tag = mobj.PixelProcessing;
+                child.Nodes.Add(mc);
+            }
+            if (mobj.Textures != null)
+            {
+                foreach (var tex in mobj.Textures.List)
+                {
+                    SBTreeNode mc = new SBTreeNode(tex.Flags.ToString());
+                    mc.Tag = tex;
+                    child.Nodes.Add(mc);
+                }
+            }
+            return child;
+        }
+
+        private void FixMOBJTexIDs(HSD_MOBJ mobj)
+        {
+            int index = 0;
+            if(mobj.Textures != null)
+                foreach(var t in mobj.Textures.List)
+                {
+                    t.GXTexGenSrc = (uint)(4 + index);
+                    t.TexMapID = GXTexMapID.GX_TEXMAP0 + index;
+                    index++;
+                }
+        }
+
     }
 }

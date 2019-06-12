@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using StudioSB.Scenes;
+using OpenTK;
 
 namespace StudioSB.IO.Models
 {
@@ -14,6 +15,30 @@ namespace StudioSB.IO.Models
         public bool HasMeshes { get { return Meshes != null && Meshes.Count != 0; } }
         //public bool HasMaterials { get { return Materials != null && Materials.Count > 0; } }
 
+        /// <summary>
+        /// Transform single bound vertices by the inverse of their bound bone
+        /// </summary>
+        public void InvertSingleBinds()
+        {
+            if (Skeleton == null)
+                return;
+            foreach (var mesh in Meshes)
+            {
+                for(int v = 0; v < mesh.Vertices.Count; v++)
+                {
+                    var vertex = mesh.Vertices[v];
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (vertex.BoneWeights[i] == 1)
+                        {
+                            vertex.Position = Vector3.TransformPosition(vertex.Position, Skeleton.Bones[(int)vertex.BoneIndices[i]].InvWorldTransform);
+                            vertex.Normal = Vector3.TransformNormal(vertex.Normal, Skeleton.Bones[(int)vertex.BoneIndices[i]].InvWorldTransform);
+                        }
+                    }
+                    mesh.Vertices[v] = vertex;
+                }
+            }
+        }
             /// <summary>
             /// converts the rigging to a new skeleton
             /// </summary>
