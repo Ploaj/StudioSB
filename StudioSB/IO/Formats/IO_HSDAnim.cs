@@ -113,11 +113,17 @@ namespace StudioSB.IO.Formats
             tree.FrameCount = animation.FrameCount;
             tree.Type = 1;
             root.Node = tree;
-            
+
+            int boneIndex = -1;
             foreach(var skelnode in skeleton.Bones)
             {
                 HSD_AnimNode animNode = new HSD_AnimNode();
                 tree.Nodes.Add(animNode);
+
+                boneIndex++;
+                // skip trans n and rotn tracks
+                if (boneIndex == 0 || boneIndex == 1)
+                    continue;
 
                 var node = animation.TransformNodes.Find(e => e.Name == skelnode.Name);
                 if (node == null)
