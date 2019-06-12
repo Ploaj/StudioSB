@@ -44,6 +44,8 @@ uniform BoneTransforms
     mat4 transforms[200];
 } bones2;
 
+uniform mat4 binds[200];
+
 uniform mat4 singleBind;
 uniform mat4 mvp;
 
@@ -98,6 +100,24 @@ void main()
 		position = (bones2.transforms[int(Bone.x)] * vec4(position, 1)).xyz;
 		normal = (inverse(transpose(bones2.transforms[int(Bone.x)])) * vec4(normal, 1)).xyz;
 	}
+	else
+    {
+        vec4 transformedPosition = vec4(position, 1);
+		position = vec3(0);
+        vec4 transformedNormal = vec4(0);
+
+        for (int i = 0; i < 4; i++)
+        {
+			//if(Weight[i] > 0) // this may not be necessary
+			{
+				position += (binds[int(Bone[i])] * transformedPosition * Weight[i]).xyz;
+				transformedNormal.xyz += (inverse(transpose(binds[int(Bone[i])])) * vec4(normal, 1) * Weight[i]).xyz;
+			}
+        }
+
+		normal = transformedNormal.xyz;
+    }
+
 	vertPosition = position;
 	tex0 = UV0;
 	color = Clr0;

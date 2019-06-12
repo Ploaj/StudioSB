@@ -71,7 +71,10 @@ namespace StudioSB.IO.Formats
                                 var key = keys[k];
 
                                 if (key.InterpolationType == HSDLib.Animation.InterpolationType.HermiteCurve)
+                                {
+                                    prevCurve = key.Tan;
                                     continue;
+                                }
 
                                 if(key.InterpolationType == HSDLib.Animation.InterpolationType.HermiteValue)
                                 {
@@ -88,6 +91,7 @@ namespace StudioSB.IO.Formats
                                         track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan);
                                 }
 
+                                if(key.InterpolationType == HSDLib.Animation.InterpolationType.Hermite)
                                 prevCurve = key.Tan;
                             }
                         }

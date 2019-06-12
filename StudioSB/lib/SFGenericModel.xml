@@ -429,9 +429,39 @@
         </member>
         <member name="M:SFGenericModel.RenderState.GLRenderSettings.SetRenderSettings(SFGenericModel.RenderState.RenderSettings)">
             <summary>
-            Updates the current OpenGL rendering state based on render settings
+            Updates the current OpenGL rendering state based on <paramref name="settings"/>.
             </summary>
-            <param name="renderSettings">The settings used to perform the update</param>
+            <param name="settings">The settings used to perform the update</param>
+        </member>
+        <member name="M:SFGenericModel.RenderState.GLRenderSettings.SetPolygonModeSettings(SFGenericModel.RenderState.PolygonModeSettings)">
+            <summary>
+            Updates the current OpenGL rendering state based on <paramref name="settings"/>.
+            </summary>
+            <param name="settings">The settings used to perform the update</param>
+        </member>
+        <member name="M:SFGenericModel.RenderState.GLRenderSettings.SetFaceCulling(SFGenericModel.RenderState.FaceCullingSettings)">
+            <summary>
+            Updates the current OpenGL rendering state based on <paramref name="settings"/>.
+            </summary>
+            <param name="settings">The settings used to perform the update</param>
+        </member>
+        <member name="M:SFGenericModel.RenderState.GLRenderSettings.SetDepthTesting(SFGenericModel.RenderState.DepthTestSettings)">
+            <summary>
+            Updates the current OpenGL rendering state based on <paramref name="settings"/>.
+            </summary>
+            <param name="settings">The settings used to perform the update</param>
+        </member>
+        <member name="M:SFGenericModel.RenderState.GLRenderSettings.SetAlphaBlending(SFGenericModel.RenderState.AlphaBlendSettings)">
+            <summary>
+            Updates the current OpenGL rendering state based on <paramref name="settings"/>.
+            </summary>
+            <param name="settings">The settings used to perform the update</param>
+        </member>
+        <member name="M:SFGenericModel.RenderState.GLRenderSettings.SetAlphaTesting(SFGenericModel.RenderState.AlphaTestSettings)">
+            <summary>
+            Updates the current OpenGL rendering state based on <paramref name="settings"/>.
+            </summary>
+            <param name="settings">The settings used to perform the update</param>
         </member>
         <member name="T:SFGenericModel.ShaderGenerators.GlslShaderUtils.CaseStatement">
             <summary>
@@ -1070,12 +1100,6 @@
             When overriding this method, the order of attributes in the list should match the order of the member variables.
             </summary>
             <returns>Vertex attribute information</returns>
-        </member>
-        <member name="M:SFGenericModel.GenericMesh`1.ConfigureVertexAttributes(SFGraphics.GLObjects.Shaders.Shader)">
-            <summary>
-            
-            </summary>
-            <param name="shader"></param>
         </member>
     </members>
 </doc>

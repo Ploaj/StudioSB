@@ -535,12 +535,16 @@ namespace StudioSB.Scenes.Melee
                 for (int i = 0; i < bones.Length; i++)
                 {
                     boneTransforms[i] = bones[i].AnimatedWorldTransform;
+                    boneBinds[i] = bones[i].AnimatedBindMatrix;
                 }
             }
 
             int blockIndex2 = GL.GetUniformBlockIndex(shader.Id, "BoneTransforms");
             boneTransformUniformBuffer.BindBase(BufferRangeTarget.UniformBuffer, blockIndex2);
             boneTransformUniformBuffer.SetData(boneTransforms, BufferUsageHint.DynamicDraw);
+
+            //TODO update sf grapics so it can be used to bind this
+            shader.SetMatrix4x4("binds", boneBinds);
 
             foreach (var rm in Mesh)
             {
