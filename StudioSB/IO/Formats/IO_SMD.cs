@@ -512,6 +512,7 @@ namespace StudioSB.IO.Formats
             smd.Open(FileName);
 
             SBAnimation animation = new SBAnimation();
+            animation.Name = Path.GetFileNameWithoutExtension(FileName);
             Dictionary<int, SBTransformAnimation> idToAnim = new Dictionary<int, SBTransformAnimation>();
 
             foreach (var node in smd.nodes)

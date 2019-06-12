@@ -19,7 +19,7 @@ namespace StudioSB.Scenes.Animation
 
         private SortedList<float, SBAnimKey<T>> _keys = new SortedList<float, SBAnimKey<T>>();
 
-        public void AddKey(float frame, T value, InterpolationType type = InterpolationType.Linear)
+        public void AddKey(float frame, T value, InterpolationType type = InterpolationType.Linear, float TanIn = 0, float TanOut = float.MaxValue)
         {
             if (_keys.ContainsKey(frame))
                 throw new System.Exception("Two keys cannot share a frame");
@@ -27,6 +27,8 @@ namespace StudioSB.Scenes.Animation
             SBAnimKey<T> key = new SBAnimKey<T>();
             key.Frame = frame;
             key.Value = value;
+            key.InTan = TanIn;
+            key.OutTan = TanOut == float.MaxValue ? TanIn : TanOut;
             key.InterpolationType = type;
             _keys.Add(frame, key);
         }
@@ -88,7 +90,12 @@ namespace StudioSB.Scenes.Animation
 
             if (_keys.Values[left].Value is float)
             {
-                if(_keys.Values[left].InterpolationType == InterpolationType.Linear)
+                if (_keys.Values[left].InterpolationType == InterpolationType.Step
+                    || _keys.Values[left].InterpolationType == InterpolationType.Constant)
+                {
+                    return (T)(object)_keys.Values[left].Value;
+                }
+                if (_keys.Values[left].InterpolationType == InterpolationType.Linear)
                 {
                     float leftValue = (float)(object)_keys.Values[left].Value;
                     float rightValue = (float)(object)_keys.Values[right].Value;
@@ -96,6 +103,22 @@ namespace StudioSB.Scenes.Animation
                     float rightFrame = _keys.Keys[right];
 
                     float value = Interpolation.Lerp(leftValue, rightValue, leftFrame, rightFrame, Frame);
+
+                    if (float.IsNaN(value))
+                        value = 0;
+
+                    return (T)(object)value;
+                }
+                if (_keys.Values[left].InterpolationType == InterpolationType.Hermite)
+                {
+                    float leftValue = (float)(object)_keys.Values[left].Value;
+                    float rightValue = (float)(object)_keys.Values[right].Value;
+                    float leftTan = _keys.Values[left].OutTan;
+                    float rightTan = _keys.Values[right].InTan;
+                    float leftFrame = _keys.Keys[left];
+                    float rightFrame = _keys.Keys[right];
+
+                    float value = Interpolation.Hermite(Frame, leftFrame, rightFrame, leftTan, rightTan, leftValue, rightValue);
 
                     if (float.IsNaN(value))
                         value = 0;

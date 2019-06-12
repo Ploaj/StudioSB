@@ -474,7 +474,7 @@ namespace StudioSB
             {
                 foreach (var extension in extensionToExporter.Keys)
                 {
-                    if (FileName.EndsWith(extension))
+                    if (FileName.ToLower().EndsWith(extension))
                     {
                         DialogResult Result = DialogResult.OK;
                         if(extensionToExporter[extension].Settings != null)

@@ -156,6 +156,9 @@ namespace StudioSB.Scenes.Melee
         {
             Mesh.Clear();
 
+            if (RootJOBJ == null)
+                return;
+
             var dobjs = RootJOBJ.GetAllOfType<HSD_DOBJ>();
             var jobjs = RootJOBJ.GetAllOfType<HSD_JOBJ>();
             foreach (var dobj in dobjs)
@@ -528,7 +531,11 @@ namespace StudioSB.Scenes.Melee
             if (Skeleton != null)
             {
                 //boneBinds = Skeleton.GetBindTransforms();
-                boneTransforms = Skeleton.GetWorldTransforms();
+                var bones = Skeleton.Bones;
+                for (int i = 0; i < bones.Length; i++)
+                {
+                    boneTransforms[i] = bones[i].AnimatedWorldTransform;
+                }
             }
 
             int blockIndex2 = GL.GetUniformBlockIndex(shader.Id, "BoneTransforms");

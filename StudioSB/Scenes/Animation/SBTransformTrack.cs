@@ -36,9 +36,10 @@ namespace StudioSB.Scenes.Animation
             return Keys.GetValue(frame);
         }
 
-        public void AddKey(float frame, float value, InterpolationType interpolationType = InterpolationType.Linear)
+        public void AddKey(float frame, float value, InterpolationType interpolationType = InterpolationType.Linear, float InTan = 0, float OutTan = float.MaxValue)
         {
-            Keys.AddKey(frame, value, interpolationType);
+            Keys.AddKey(frame, value, interpolationType, InTan, OutTan);
         }
+        
     }
 }
