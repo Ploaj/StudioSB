@@ -137,6 +137,8 @@ namespace StudioSB.Scenes.Melee
 
         private void RefreshTextures()
         {
+            if (RootJOBJ == null)
+                return;
             Surfaces.Clear();
             tobjToSurface.Clear();
             var tobjs = RootJOBJ.GetAllOfType<HSD_TOBJ>();

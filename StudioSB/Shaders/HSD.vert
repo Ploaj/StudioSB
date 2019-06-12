@@ -101,6 +101,7 @@ void main()
 		normal = (inverse(transpose(bones2.transforms[int(Bone.x)])) * vec4(normal, 1)).xyz;
 	}
 	else
+	if(Weight.x > 0 || Weight.y > 0 || Weight.z > 0 || Weight.w > 0)
     {
         vec4 transformedPosition = vec4(position, 1);
 		position = vec3(0);
