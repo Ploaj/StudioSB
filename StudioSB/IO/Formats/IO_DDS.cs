@@ -27,7 +27,11 @@ namespace StudioSB.IO.Formats
                 else
                     surface.Depth = 1;
 
-                if(header.ddspf.dwFourCC == 0x30315844)
+                if (header.ddspf.dwFourCC == 0x31545844)
+                {
+                    surface.InternalFormat = InternalFormat.CompressedRgbaS3tcDxt1Ext;
+                }else
+                if (header.ddspf.dwFourCC == 0x30315844)
                 {
                     surface.InternalFormat = DXGItoInternal(header.DXT10Header.dxgiFormat);
                     if(surface.InternalFormat == 0)
@@ -95,7 +99,7 @@ namespace StudioSB.IO.Formats
             }
             var Header = new DDS_Header()
             {
-                dwFlags = (DDSD.CAPS | DDSD.HEIGHT | DDSD.WIDTH | DDSD.PIXELFORMAT | DDSD.MIPMAPCOUNT | DDSD.LINEARSIZE),
+                dwFlags = (DDSD.CAPS | DDSD.HEIGHT | DDSD.WIDTH | DDSD.PIXELFORMAT | DDSD.LINEARSIZE),
                 dwHeight = surface.Height,
                 dwWidth = surface.Width,
                 dwPitchOrLinearSize = GetPitchOrLinearSize(surface.InternalFormat, surface.Width),
@@ -109,6 +113,9 @@ namespace StudioSB.IO.Formats
                 dwCaps = 0,
                 dwCaps2 = 0
             };
+
+            if (surface.Arrays.Count > 0 && surface.Arrays[0].Mipmaps.Count > 1)
+                Header.dwFlags |= DDSD.MIPMAPCOUNT;
 
             if (surface.IsCubeMap)
             {

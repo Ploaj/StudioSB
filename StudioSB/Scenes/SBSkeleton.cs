@@ -175,6 +175,16 @@ namespace StudioSB.Scenes
             }
             return transforms.ToArray();
         }
+
+        public Matrix4[] GetWorldTransforms()
+        {
+            List<Matrix4> transforms = new List<Matrix4>();
+            foreach (var bone in Bones)
+            {
+                transforms.Add(bone.WorldTransform);
+            }
+            return transforms.ToArray();
+        }
         #endregion
     }
 

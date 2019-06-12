@@ -37,6 +37,10 @@
       <HintPath>lib\Fbx.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="HSDLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Mods\HSDLib\HSDLib\bin\Debug\HSDLib.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
@@ -99,6 +103,7 @@
     </Compile>
     <Compile Include="GUI\Attachments\SBAnimAttachment.cs" />
     <Compile Include="GUI\Attachments\IAttachment.cs" />
+    <Compile Include="GUI\Attachments\SBDobjAttachment.cs" />
     <Compile Include="GUI\Attachments\SBTextureList.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -171,6 +176,7 @@
     <Compile Include="IO\Formats\IO_DAE.cs" />
     <Compile Include="IO\Formats\IO_DDS.cs" />
     <Compile Include="IO\Formats\IO_FBX.cs" />
+    <Compile Include="IO\Formats\IO_HSDAnim.cs" />
     <Compile Include="IO\Formats\IO_MayaAnim.cs" />
     <Compile Include="IO\Formats\IO_NUANMB.cs" />
     <Compile Include="IO\Formats\IO_NUTEXB.cs" />
@@ -224,6 +230,12 @@
     <Compile Include="Scenes\LVD\LVDRangeCurve.cs" />
     <Compile Include="Scenes\LVD\LVDShape.cs" />
     <Compile Include="Scenes\LVD\LVDSpawn.cs" />
+    <Compile Include="Scenes\Melee\GXtoGL.cs" />
+    <Compile Include="Scenes\Melee\SBHsdBone.cs" />
+    <Compile Include="Scenes\Melee\HSDScene.cs" />
+    <Compile Include="Scenes\Melee\SBHsdMaterial.cs" />
+    <Compile Include="Scenes\Melee\SBHsdMesh.cs" />
+    <Compile Include="Scenes\Melee\SBHsdVertex.cs" />
     <Compile Include="Scenes\SBBone.cs" />
     <Compile Include="Scenes\SBScene.cs" />
     <Compile Include="Scenes\ISBSkeleton.cs" />
@@ -281,6 +293,7 @@
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\SwitchSwizzler.cs" />
     <Compile Include="Tools\TextureFormatInfo.cs" />
+    <Compile Include="Tools\TriangleConvert.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -458,6 +471,18 @@
     <None Include="Shaders\CubeMap.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Shaders\HSD.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\HSD.geom">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\HSD.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\HSDDebug.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Shaders\SolidColor.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -548,6 +573,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="lib\Fbx.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="lib\HSDLib.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="lib\OpenTK.dll">

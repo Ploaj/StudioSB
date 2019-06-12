@@ -104,6 +104,7 @@ namespace StudioSB.IO.Formats
             public float input, output;
             public string intan, outtan;
             public float t1 = 0, w1 = 1;
+            public float t2 = 0, w2 = 1;
 
             public AnimKey()
             {
@@ -232,8 +233,19 @@ namespace StudioSB.IO.Formats
 
                                             if(keyArgs.Length >= 7)
                                             {
-                                                key.intan = keyArgs[1];
-                                                key.outtan = keyArgs[2];
+                                                key.intan = keyArgs[2];
+                                                key.outtan = keyArgs[3];
+                                            }
+
+                                            if(key.intan == "fixed")
+                                            {
+                                                key.t1 = float.Parse(keyArgs[7]);
+                                                key.w1 = float.Parse(keyArgs[8]);
+                                            }
+                                            if (key.outtan == "fixed")
+                                            {
+                                                key.t2 = float.Parse(keyArgs[9]);
+                                                key.w2 = float.Parse(keyArgs[10]);
                                             }
 
                                             currentData.keys.Add(key);
@@ -286,7 +298,9 @@ namespace StudioSB.IO.Formats
                         foreach (AnimKey key in animData.keys)
                         {
                             // TODO: fixed splines
-                            file.WriteLine($" {key.input} {key.output:N6} {key.intan} {key.outtan} 1 1 0;");
+                            string tanin = key.intan == "fixed" ? " " + key.t1 + " " + key.w1 : "";
+                            string tanout = key.outtan == "fixed" ? " " + key.t2 + " " + key.w2 : "";
+                            file.WriteLine($" {key.input} {key.output:N6} {key.intan} {key.outtan} 1 1 0{tanin}{tanout};");
                         }
                         file.WriteLine(" }");
 
@@ -410,8 +424,15 @@ namespace StudioSB.IO.Formats
                 AnimKey animKey = new AnimKey()
                 {
                     input = key.Frame + 1,
-                    output = key.Value
+                    output = key.Value,
                 };
+                if (key.InterpolationType == InterpolationType.Hermite)
+                {
+                    animKey.intan = "fixed";
+                    animKey.outtan = "fixed";
+                    animKey.t1 = key.InTan;
+                    animKey.t2 = key.OutTan;
+                }
                 d.keys.Add(animKey);
             }
 
@@ -472,6 +493,7 @@ namespace StudioSB.IO.Formats
             anim.Open(FileName);
 
             var animation = new SBAnimation();
+            animation.Name = Path.GetFileNameWithoutExtension(FileName);
             animation.FrameCount = anim.header.endTime - 1;
             
             foreach(var node in anim.Bones)
@@ -490,7 +512,24 @@ namespace StudioSB.IO.Formats
 
                     foreach(var key in att.keys)
                     {
-                        track.AddKey(key.input - header.startTime, GetOutputValue(anim, att, key.output), InterpolationType.Linear);
+                        InterpolationType itype = InterpolationType.Linear;
+                        float intan = 0;
+                        float outtan = 0;
+                        if (key.intan == "fixed")
+                        {
+                            itype = InterpolationType.Hermite;
+                            intan = key.t1;
+                        }
+                        if (key.outtan == "fixed")
+                        {
+                            itype = InterpolationType.Hermite;
+                            outtan = key.t2;
+                        }
+                        track.AddKey(key.input - header.startTime, 
+                            GetOutputValue(anim, att, key.output), 
+                            itype, 
+                            intan
+                            , outtan);
                     }
                 }
             }
