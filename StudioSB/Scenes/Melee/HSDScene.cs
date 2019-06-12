@@ -125,6 +125,7 @@ namespace StudioSB.Scenes.Melee
         {
             HSDFile = new HSDFile(FileName);
             RefreshSkeleton();
+            CreateMesh();
             RefreshRendering();
         }
 
@@ -151,7 +152,7 @@ namespace StudioSB.Scenes.Melee
             }
         }
 
-        private void RefreshMesh()
+        private void CreateMesh()
         {
             Mesh.Clear();
 
@@ -172,9 +173,15 @@ namespace StudioSB.Scenes.Melee
                         }
                     }
                 }
-
-                Mesh.Add(new SBHsdMesh(this, dobj, parent));
+                var mesh = new SBHsdMesh(dobj, parent);
+                Mesh.Add(mesh);
             }
+        }
+
+        public void RefreshMesh()
+        {
+            foreach (SBHsdMesh mesh in GetMeshObjects())
+                mesh.Refresh(this);
         }
 
         public bool HasMaterialAnimations

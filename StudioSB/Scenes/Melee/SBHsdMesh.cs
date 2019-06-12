@@ -40,7 +40,7 @@ namespace StudioSB.Scenes.Melee
             return Name;
         }
 
-        public SBHsdMesh(HSDScene scene, HSD_DOBJ dobj, SBBone parent)
+        public SBHsdMesh(HSD_DOBJ dobj, SBBone parent)
         {
             Name = "DOBJ";
 
@@ -48,10 +48,13 @@ namespace StudioSB.Scenes.Melee
 
             material = new SBHsdMaterial(dobj);
 
-            Visible = true;
-
             ParentBone = parent.Name;
-            
+
+            Visible = true;
+        }
+
+        public void Refresh(HSDScene scene)
+        {
             RefreshRendering(scene.Skeleton);
         }
 

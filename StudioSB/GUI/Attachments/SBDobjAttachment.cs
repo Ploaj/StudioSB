@@ -232,7 +232,7 @@ namespace StudioSB.GUI.Attachments
                 if (mobj == null)
                     return;
                 string filePath;
-                if(FileTools.TryOpenFile(out filePath, "PNG (*.png)|*.png"))
+                if(FileTools.TryOpenFile(out filePath, "Supported Formats (*.png*.dds)|*.png;*.dds"))
                 {
                     var settings = new TOBJImportSettings();
                     // select textue import options
@@ -251,9 +251,27 @@ namespace StudioSB.GUI.Attachments
                             tobj.Transform.SX = 1;
                             tobj.Transform.SY = 1;
                             tobj.Transform.SZ = 1;
-                            var bmp = new Bitmap(filePath);
-                            tobj.SetFromBitmap(bmp, settings.ImageFormat, settings.PaletteFormat);
-                            bmp.Dispose();
+
+                            if(System.IO.Path.GetExtension(filePath.ToLower())  == ".dds")
+                            {
+                                var dxtsurface = IO_DDS.Import(filePath);
+
+                                if (dxtsurface.InternalFormat != OpenTK.Graphics.OpenGL.InternalFormat.CompressedRgbaS3tcDxt1Ext)
+                                    throw new NotSupportedException("DDS format " + dxtsurface.InternalFormat.ToString() + " not supported");
+
+                                HSD_Image i = new HSD_Image();
+                                i.Width = (ushort)dxtsurface.Width;
+                                i.Height = (ushort)dxtsurface.Height;
+                                i.Data = HSDLib.Helpers.TPL.ToCMP(dxtsurface.Arrays[0].Mipmaps[0], i.Width, i.Height);
+                                i.Format = GXTexFmt.CMP;
+                                tobj.ImageData = i;
+                            }
+                            else
+                            {
+                                var bmp = new Bitmap(filePath);
+                                tobj.SetFromBitmap(bmp, settings.ImageFormat, settings.PaletteFormat);
+                                bmp.Dispose();
+                            }
 
                             if (settings.UseBlending && mobj.PixelProcessing == null)
                                 mobj.PixelProcessing = new HSD_PixelProcessing();

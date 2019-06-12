@@ -27,7 +27,11 @@ namespace StudioSB.IO.Formats
                 else
                     surface.Depth = 1;
 
-                if(header.ddspf.dwFourCC == 0x30315844)
+                if (header.ddspf.dwFourCC == 0x31545844)
+                {
+                    surface.InternalFormat = InternalFormat.CompressedRgbaS3tcDxt1Ext;
+                }else
+                if (header.ddspf.dwFourCC == 0x30315844)
                 {
                     surface.InternalFormat = DXGItoInternal(header.DXT10Header.dxgiFormat);
                     if(surface.InternalFormat == 0)
