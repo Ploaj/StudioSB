@@ -1,13 +1,8 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 
 using StudioSB.IO.Models;
-using StudioSB.GUI;
 using System.Windows.Forms;
-using StudioSB.Scenes;
-using System.Collections.Generic;
-using OpenTK;
 
 namespace StudioSB.IO.Formats
 {
