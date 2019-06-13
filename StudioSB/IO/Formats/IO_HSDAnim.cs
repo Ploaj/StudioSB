@@ -27,6 +27,8 @@ namespace StudioSB.IO.Formats
 
             foreach(var root in f.Roots)
             {
+                if (root == null || root.Node == null)
+                    continue;
                 Console.WriteLine(root.Name + " " + root.Node.GetType());
                 anim.Name = root.Name;
                 if (root.Node is HSD_FigaTree tree)
@@ -78,15 +80,15 @@ namespace StudioSB.IO.Formats
 
                                 if(key.InterpolationType == HSDLib.Animation.InterpolationType.HermiteValue)
                                 {
-                                    if (k > 0 && keys[k - 1].InterpolationType == HSDLib.Animation.InterpolationType.HermiteCurve)
-                                        track.AddKey(key.Frame, key.Value, Scenes.Animation.InterpolationType.Hermite, keys[k - 1].Tan, prevCurve);
+                                    if (k < keys.Count - 1 && keys[k + 1].InterpolationType == HSDLib.Animation.InterpolationType.HermiteCurve)
+                                        track.AddKey(key.Frame, key.Value, Scenes.Animation.InterpolationType.Hermite, prevCurve, keys[k + 1].Tan);
                                     else
                                         track.AddKey(key.Frame, key.Value, Scenes.Animation.InterpolationType.Hermite, prevCurve);
                                 }
                                 else
                                 {
-                                    if (k > 0 && keys[k - 1].InterpolationType == HSDLib.Animation.InterpolationType.HermiteCurve)
-                                        track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], keys[k - 1].Tan, key.Tan);
+                                    if (k < keys.Count-1 && keys[k + 1].InterpolationType == HSDLib.Animation.InterpolationType.HermiteCurve)
+                                        track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan, keys[k + 1].Tan);
                                     else
                                         track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan);
                                 }

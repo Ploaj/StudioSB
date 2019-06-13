@@ -415,13 +415,13 @@ namespace StudioSB.IO.Formats
                     string Name = mesh.Name + (UniqueMeshNames[mesh.Name] == 0 ? "" : "_" + UniqueMeshNames[mesh.Name]);
                     UniqueMeshNames[mesh.Name]++;
 
-                    for (int i = 0; i < mesh.Indices.Count; i+=3)
+                    for (int i = 0; i < mesh.Indices.Count / 3; i++)
                     {
                         var triangle = new SMDTriangle();
                         triangle.Material = Name;
-                        triangle.vertex1 = IOVertexToSMDVertex(mesh.Vertices[(int)mesh.Indices[i+0]]);
-                        triangle.vertex2 = IOVertexToSMDVertex(mesh.Vertices[(int)mesh.Indices[i+1]]);
-                        triangle.vertex3 = IOVertexToSMDVertex(mesh.Vertices[(int)mesh.Indices[i+2]]);
+                        triangle.vertex1 = IOVertexToSMDVertex(mesh.Vertices[(int)mesh.Indices[i * 3 + 0]]);
+                        triangle.vertex2 = IOVertexToSMDVertex(mesh.Vertices[(int)mesh.Indices[i * 3 + 1]]);
+                        triangle.vertex3 = IOVertexToSMDVertex(mesh.Vertices[(int)mesh.Indices[i * 3 + 2]]);
                         file.triangles.Add(triangle);
                     }
                 }

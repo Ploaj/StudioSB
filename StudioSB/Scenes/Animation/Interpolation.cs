@@ -5,16 +5,17 @@ namespace StudioSB.Scenes.Animation
 {
     public class Interpolation
     {
-        public static float Hermite(float frame, float frame1, float frame2, float outslope, float inslope, float val1, float val2)
+        public static float Hermite(float Frame, float FrameLeft, float FrameRight, float LS, float RS, float LHS, float RHS)
         {
-            if (frame == frame1) return val1;
-            if (frame == frame2) return val2;
+            float Result;
 
-            float distance = frame - frame1;
-            float invDuration = 1f / (frame2 - frame1);
-            float t = distance * invDuration;
-            float t1 = t - 1f;
-            return (val1 + ((((val1 - val2) * ((2f * t) - 3f)) * t) * t)) + ((distance * t1) * ((t1 * outslope) + (t * inslope)));
+            float FrameDiff = Frame - FrameLeft;
+            float Weight = FrameDiff / (FrameRight - FrameLeft);
+
+            Result = LHS + (LHS - RHS) * (2 * Weight - 3) * Weight * Weight;
+            Result += (FrameDiff * (Weight - 1)) * (LS * (Weight - 1) + RS * Weight);
+
+            return Result;
         }
 
         public static float Lerp(float av, float bv, float v0, float v1, float t)

@@ -163,7 +163,7 @@ namespace StudioSB.Scenes.Melee
 
             material.Bind(scene, shader);
 
-            shader.SetMatrix4x4("singleBind", scene.Skeleton[ParentBone].WorldTransform);
+            shader.SetMatrix4x4("singleBind", scene.Skeleton[ParentBone].AnimatedWorldTransform);
 
             foreach (var rm in renderMesh)
             {
