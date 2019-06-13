@@ -61,10 +61,12 @@ namespace StudioSB.Scenes.Melee
         private void RefreshRendering(ISBSkeleton skeleton)
         {
             BoundingSphere = new Rendering.Bounding.BoundingSphere(0, 0, 0, 0);
-            List<SBHsdBone> bones = new List<SBHsdBone>();
+            renderMesh.Clear();
 
+            List<SBHsdBone> bones = new List<SBHsdBone>();
             foreach (SBHsdBone bone in skeleton.Bones)
                 bones.Add(bone);
+
             if (_dobj.POBJ != null)
                 foreach (var pobj in _dobj.POBJ.List)
                 {

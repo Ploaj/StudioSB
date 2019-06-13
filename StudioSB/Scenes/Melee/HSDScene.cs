@@ -15,6 +15,7 @@ using StudioSB.GUI.Attachments;
 using StudioSB.GUI;
 using StudioSB.Tools;
 using HSDLib.GX;
+using HSDLib.KAR;
 
 namespace StudioSB.Scenes.Melee
 {
@@ -40,6 +41,8 @@ namespace StudioSB.Scenes.Melee
                 {
                     if (roots.Node is HSD_JOBJ jobj)
                         return jobj;
+                    if (roots.Node is KAR_VcStarVehicle star)
+                        return star.ModelData.JOBJRoot;
                 }
                 return null;
             }
@@ -165,7 +168,9 @@ namespace StudioSB.Scenes.Melee
             var jobjs = RootJOBJ.GetAllOfType<HSD_JOBJ>();
             foreach (var dobj in dobjs)
             {
-                var parent = Skeleton.Bones[0];
+                SBBone parent = null;
+                if(Skeleton.Bones.Length > 0)
+                    parent = Skeleton.Bones[0];
                 foreach (var b in Skeleton.Bones)
                 {
                     if(b is SBHsdBone bone)
@@ -249,14 +254,8 @@ namespace StudioSB.Scenes.Melee
         private void RefreshSkeleton()
         {
             Skeleton = new SBSkeleton();
-            foreach(var root in HSDFile.Roots)
-            {
-                if(root.Node is HSD_JOBJ jobj)
-                {
-                    RecursivlyAddChildren(jobj, null);
-                    break;
-                }
-            }
+
+            RecursivlyAddChildren(RootJOBJ, null);
         }
 
         /// <summary>

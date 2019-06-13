@@ -139,13 +139,6 @@ namespace StudioSB.IO.Formats
                     SBAnimKey<float> prevKey = null;
                     foreach (var key in track.Keys.Keys)
                     {
-                        if (key.InTan != key.OutTan)
-                            keys.Add(new FOBJKey()
-                            {
-                                Frame = key.Frame,
-                                Tan = key.InTan,
-                                InterpolationType = HSDLib.Animation.InterpolationType.HermiteCurve
-                            });
                         if (key.InterpolationType == Scenes.Animation.InterpolationType.Hermite &&
                             prevKey != null &&
                             prevKey.InterpolationType == key.InterpolationType &&
@@ -163,6 +156,13 @@ namespace StudioSB.IO.Formats
                                 Value = key.Value,
                                 Tan = key.OutTan,
                                 InterpolationType = ToGXInterpolation(key.InterpolationType)
+                            });
+                        if (key.InTan != key.OutTan)
+                            keys.Add(new FOBJKey()
+                            {
+                                Frame = key.Frame,
+                                Tan = key.OutTan,
+                                InterpolationType = HSDLib.Animation.InterpolationType.HermiteCurve
                             });
                         prevKey = key;
                     }
