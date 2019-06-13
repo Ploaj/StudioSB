@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using StudioSB.IO.Models;
+using System;
 using System.IO;
 
 namespace StudioSB.IO.Formats
@@ -22,9 +23,7 @@ namespace StudioSB.IO.Formats
                 {
                     StringBuilder o = new StringBuilder();
 
-                    //Using \n instead of AppendLine because it adds a white space no text editor can see.
-                    //No idea why. Opening it in a hex editor shows 0D
-                    //.ply doesn't support white spaces unless it's a comment
+                    //Note: ply doesn't support white spaces unless it's a comment
 
                     o.Append("ply\n");
                     o.Append("format ascii 1.0\n");
@@ -48,10 +47,10 @@ namespace StudioSB.IO.Formats
                     }
                     if (mesh.HasColor)
                     {
-                        o.Append("property uchar red\n" +
-                                 "property uchar green\n" +
-                                 "property uchar blue\n" +
-                                 "property uchar alpha\n");
+                        o.Append("property float red\n" +
+                                 "property float green\n" +
+                                 "property float blue\n" +
+                                 "property float alpha\n");
                     }
 
                     //Divide vertex count by 3 to get triangle count
