@@ -194,6 +194,7 @@ namespace StudioSB.GUI
             {
                 TextRenderer.DrawOrtho(Camera, "Polys: " + (polyCount/3).ToString(), new Vector2(0, 30));
                 TextRenderer.DrawOrtho(Camera, "Verts: " + vertexCount.ToString(), new Vector2(0, 46));
+                TextRenderer.DrawOrtho(Camera, "Frame: " + Frame, new Vector2(0, 62));
             }
 
             GL.PopAttrib();
