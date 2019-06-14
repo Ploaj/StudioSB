@@ -419,12 +419,28 @@ namespace StudioSB.IO.Formats
             AnimData d = new AnimData();
             d.controlType = ctype;
             d.type = ttype;
+            if(IsAngular(ctype))
+                d.output = OutputType.angular;
+
+            float value = 0;
+            if (keys.Keys.Count > 0)
+                value = keys.Keys[0].Value;
+
+            bool IsConstant = true;
+            foreach (var key in keys.Keys)
+            {
+                if(key.Value != value)
+                {
+                    IsConstant = false;
+                    break;
+                }
+            }
             foreach (var key in keys.Keys)
             {
                 AnimKey animKey = new AnimKey()
                 {
                     input = key.Frame + 1,
-                    output = key.Value,
+                    output = IsAngular(ctype) ? (MayaSettings.UseRadians ? key.Value : (float)(key.Value * (180/Math.PI))) : key.Value,
                 };
                 if (key.InterpolationType == InterpolationType.Hermite)
                 {
@@ -434,10 +450,19 @@ namespace StudioSB.IO.Formats
                     animKey.t2 = key.OutTan;
                 }
                 d.keys.Add(animKey);
+                if (IsConstant)
+                    break;
             }
 
             if (d.keys.Count > 0)
                 animBone.atts.Add(d);
+        }
+
+        private static bool IsAngular(ControlType type)
+        {
+            if (type == ControlType.rotate)
+                return true;
+            return false;
         }
 
         private static float GetValue(Matrix4 transform, ControlType ctype, TrackType ttype)

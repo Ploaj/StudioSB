@@ -96,7 +96,7 @@ namespace StudioSB.IO.Formats
 
                         if (ExportUV3 == true)
                         {
-                            if (mesh.HasUV1)
+                            if (mesh.HasUV3)
                                 csv.Append($"{v.UV3.X},{v.UV3.Y}\n");
                             else
                                 csv.Append("0.000000,0.000000\n");
