@@ -147,7 +147,7 @@ namespace StudioSB.GUI
             Vector3 close;
             if (treeNode.Tag is SBBone bone)
             {
-                if (ray.CheckSphereHit(Vector3.TransformPosition(Vector3.Zero, bone.WorldTransform), 0.5f, out close))
+                if (ray.CheckSphereHit(Vector3.TransformPosition(Vector3.Zero, bone.AnimatedWorldTransform), 0.5f, out close))
                 {
                     BoneList.SelectedNode = treeNode;
                     return;

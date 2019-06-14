@@ -156,36 +156,39 @@ namespace StudioSB.IO.Formats
                             Value = v,
                             InterpolationType = HSDLib.Animation.InterpolationType.Constant
                         });
-                    }else
-                    foreach (var key in track.Keys.Keys)
-                    {
-                        if (key.InTan != key.OutTan)
-                            keys.Add(new FOBJKey()
-                            {
-                                Frame = key.Frame,
-                                Tan = key.OutTan,
-                                InterpolationType = HSDLib.Animation.InterpolationType.HermiteCurve
-                            });
-                        if (key.InterpolationType == Scenes.Animation.InterpolationType.Hermite &&
-                            prevKey != null &&
-                            prevKey.InterpolationType == key.InterpolationType &&
-                            prevKey.InTan == key.InTan && prevKey.OutTan == key.OutTan)
-                            keys.Add(new FOBJKey()
-                            {
-                                Frame = key.Frame,
-                                Value = key.Value,
-                                InterpolationType = HSDLib.Animation.InterpolationType.HermiteValue
-                            });
-                        else
-                            keys.Add(new FOBJKey()
-                            {
-                                Frame = key.Frame,
-                                Value = key.Value,
-                                Tan = key.OutTan,
-                                InterpolationType = ToGXInterpolation(key.InterpolationType)
-                            });
-                        prevKey = key;
                     }
+                    else
+                    for(int i = 0; i < track.Keys.Keys.Count; i++)
+                        {
+                            var key = track.Keys.Keys[i];
+                            if (i > 0 && track.Keys.Keys[i-1].InTan != track.Keys.Keys[i - 1].OutTan)
+                                keys.Add(new FOBJKey()
+                                {
+                                    Frame = key.Frame,
+                                    Tan = track.Keys.Keys[i - 1].OutTan,
+                                    InterpolationType = HSDLib.Animation.InterpolationType.HermiteCurve
+                                });
+
+                            if (key.InterpolationType == Scenes.Animation.InterpolationType.Hermite &&
+                                prevKey != null &&
+                                prevKey.InterpolationType == key.InterpolationType &&
+                                prevKey.InTan == key.InTan && prevKey.OutTan == key.OutTan)
+                                keys.Add(new FOBJKey()
+                                {
+                                    Frame = key.Frame,
+                                    Value = key.Value,
+                                    InterpolationType = HSDLib.Animation.InterpolationType.HermiteValue
+                                });
+                            else
+                                keys.Add(new FOBJKey()
+                                {
+                                    Frame = key.Frame,
+                                    Value = key.Value,
+                                    Tan = key.InTan,
+                                    InterpolationType = ToGXInterpolation(key.InterpolationType)
+                                });
+                            prevKey = key;
+                        }
                     animTrack.Track = FOBJFrameEncoder.EncodeFrames(keys, ToGXTrackType(track.Type));
                     animNode.Tracks.Add(animTrack);
                 }
