@@ -22,7 +22,10 @@ namespace StudioSB.Scenes.Animation
         public void AddKey(float frame, T value, InterpolationType type = InterpolationType.Linear, float TanIn = 0, float TanOut = float.MaxValue)
         {
             if (_keys.ContainsKey(frame))
-                throw new System.Exception("Two keys cannot share a frame");
+            {
+                SBConsole.WriteLine("Warning: Two keys cannot share a frame");
+                return;
+            }
 
             SBAnimKey<T> key = new SBAnimKey<T>();
             key.Frame = frame;

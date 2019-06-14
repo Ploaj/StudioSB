@@ -29,12 +29,10 @@ namespace StudioSB.IO.Formats
             {
                 if (root == null || root.Node == null)
                     continue;
-                Console.WriteLine(root.Name + " " + root.Node.GetType());
                 anim.Name = root.Name;
                 if (root.Node is HSD_FigaTree tree)
                 {
                     anim.FrameCount = tree.FrameCount;
-                    Console.WriteLine(tree.Type + " " + tree.FrameCount + " " + (tree.MatAnimJoint == null));
                     int nodeIndex = 0;
                     foreach(var node in tree.Nodes)
                     {
@@ -109,6 +107,9 @@ namespace StudioSB.IO.Formats
             HSDFile file = new HSDFile();
             HSDRoot root = new HSDRoot();
             root.Name = animation.Name;
+            //TODO: export option for name
+            if (animation.Name == "")
+                root.Name = System.IO.Path.GetFileNameWithoutExtension(FileName);
             file.Roots.Add(root);
 
             HSD_FigaTree tree = new HSD_FigaTree();
@@ -124,8 +125,8 @@ namespace StudioSB.IO.Formats
 
                 boneIndex++;
                 // skip trans n and rotn tracks
-                if (boneIndex == 0 || boneIndex == 1)
-                    continue;
+                //if (boneIndex == 0 || boneIndex == 1)
+                //    continue;
 
                 var node = animation.TransformNodes.Find(e => e.Name == skelnode.Name);
                 if (node == null)
@@ -133,12 +134,38 @@ namespace StudioSB.IO.Formats
 
                 foreach (var track in node.Tracks)
                 {
-                    //SBConsole.WriteLine("writing track " + node.Name + " " + track.Type);
                     HSD_Track animTrack = new HSD_Track();
                     List<FOBJKey> keys = new List<FOBJKey>();
                     SBAnimKey<float> prevKey = null;
+
+                    var constant = true;
+                    var v = track.Keys.Keys.Count > 0 ? track.Keys.Keys[0].Value : 0;
                     foreach (var key in track.Keys.Keys)
                     {
+                        if (key.Value != v)
+                        {
+                            constant = false;
+                            break;
+                        }
+                    }
+                    if (constant)
+                    {
+                        keys.Add(new FOBJKey()
+                        {
+                            Frame = 0,
+                            Value = v,
+                            InterpolationType = HSDLib.Animation.InterpolationType.Constant
+                        });
+                    }else
+                    foreach (var key in track.Keys.Keys)
+                    {
+                        if (key.InTan != key.OutTan)
+                            keys.Add(new FOBJKey()
+                            {
+                                Frame = key.Frame,
+                                Tan = key.OutTan,
+                                InterpolationType = HSDLib.Animation.InterpolationType.HermiteCurve
+                            });
                         if (key.InterpolationType == Scenes.Animation.InterpolationType.Hermite &&
                             prevKey != null &&
                             prevKey.InterpolationType == key.InterpolationType &&
@@ -156,13 +183,6 @@ namespace StudioSB.IO.Formats
                                 Value = key.Value,
                                 Tan = key.OutTan,
                                 InterpolationType = ToGXInterpolation(key.InterpolationType)
-                            });
-                        if (key.InTan != key.OutTan)
-                            keys.Add(new FOBJKey()
-                            {
-                                Frame = key.Frame,
-                                Tan = key.OutTan,
-                                InterpolationType = HSDLib.Animation.InterpolationType.HermiteCurve
                             });
                         prevKey = key;
                     }

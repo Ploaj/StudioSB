@@ -318,7 +318,7 @@ namespace StudioSB.IO.Formats
             List<SBBone> bone = new List<SBBone>();
             Queue<SBBone> q = new Queue<SBBone>();
 
-            foreach (SBBone b in Skeleton.Bones)
+            foreach (SBBone b in Skeleton.Roots)
             {
                 QueueBones(b, q, Skeleton);
             }
@@ -373,8 +373,8 @@ namespace StudioSB.IO.Formats
                 if (node == null) continue;
 
                 //TODO: bake scale for compensate scale...
-
-                foreach(var track in node.Tracks)
+                
+                foreach (var track in node.Tracks)
                 {
                     switch (track.Type)
                     {
