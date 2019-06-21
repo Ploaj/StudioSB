@@ -189,6 +189,7 @@
     <Compile Include="IO\IExportableAnimation.cs" />
     <Compile Include="IO\IExportableModelType.cs" />
     <Compile Include="IO\IImportableModelType.cs" />
+    <Compile Include="IO\Models\IOMaterial.cs" />
     <Compile Include="IO\Models\IOMesh.cs" />
     <Compile Include="IO\Models\IOModel.cs" />
     <Compile Include="Rendering\Bounding\AABoundingBox.cs" />

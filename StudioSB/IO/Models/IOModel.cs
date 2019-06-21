@@ -9,11 +9,13 @@ namespace StudioSB.IO.Models
         public string Name;
         public SBSkeleton Skeleton;
         public List<IOMesh> Meshes = new List<IOMesh>();
-        //public List<IOMaterial> Materials = new List<IOMaterial>();
+        public List<IOMaterial> Materials = new List<IOMaterial>();
+        public List<SBSurface> Textures = new List<SBSurface>();
 
         public bool HasSkeleton { get { return Skeleton != null; } }
         public bool HasMeshes { get { return Meshes != null && Meshes.Count != 0; } }
-        //public bool HasMaterials { get { return Materials != null && Materials.Count > 0; } }
+        public bool HasMaterials { get { return Materials != null && Materials.Count > 0; } }
+        public bool HasTextures { get { return Textures != null && Textures.Count > 0; } }
 
         /// <summary>
         /// Transform single bound vertices by the inverse of their bound bone

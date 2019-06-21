@@ -5,42 +5,55 @@ namespace StudioSB.IO.Formats
 {
     public class IO_DAE : IExportableModelType
     {
+        public class DAEExportSettings
+        {
+            public bool ExportTextures { get; set; } = false;
+        }
+
         public string Name => "Collada DAE";
 
         public string Extension => ".dae";
 
+        public static DAEExportSettings ExportSettings = new DAEExportSettings();
+
         public void ExportIOModel(string FileName, IOModel model)
         {
+            using (StudioSB.GUI.SBCustomDialog d = new GUI.SBCustomDialog(ExportSettings))
+            {
+                if (d.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    return;
+            }
+
             using (DAEWriter writer = new DAEWriter(FileName, false))
             {
                 writer.WriteAsset();
 
                 // Material IO needs big rework
-                /*if (m.HasMaterials && ExportMaterials)
+                if (model.HasMaterials && ExportSettings.ExportTextures)
                 {
                     List<string> TextureNames = new List<string>();
-                    foreach (var mat in m.Materials)
+                    foreach (var tex in model.Textures)
                     {
-                        if (mat.DiffuseTexture != null && !TextureNames.Contains(mat.DiffuseTexture.Name))
-                            TextureNames.Add(mat.DiffuseTexture.Name);
+                        TextureNames.Add(tex.Name);
+                        IO_DDS.Export(System.IO.Path.GetDirectoryName(FileName) + "\\" + tex.Name + ".dds", tex);
                     }
-                    writer.WriteLibraryImages(TextureNames.ToArray());
+                    writer.WriteLibraryImages(TextureNames.ToArray(), ".dds");
 
                     writer.StartMaterialSection();
-                    foreach (var mat in m.Materials)
+                    foreach (var mat in model.Materials)
                     {
                         writer.WriteMaterial(mat.Name);
                     }
                     writer.EndMaterialSection();
 
                     writer.StartEffectSection();
-                    foreach (var mat in m.Materials)
+                    foreach (var mat in model.Materials)
                     {
-                        writer.WriteEffect(mat.Name, mat.DiffuseTexture == null ? "" : mat.DiffuseTexture.Name);
+                        writer.WriteEffect(mat.Name, mat.DiffuseTexture);
                     }
                     writer.EndEffectSection();
                 }
-                else*/
+                else
                 {
                     writer.WriteLibraryImages();
                 }
@@ -68,7 +81,7 @@ namespace StudioSB.IO.Formats
 
                     if (mesh.MaterialIndex != -1)
                     {
-                        //writer.CurrentMaterial = model.Materials[mesh.MaterialIndex].Name;
+                        writer.CurrentMaterial = model.Materials[mesh.MaterialIndex].Name;
                     }
 
                     // collect sources

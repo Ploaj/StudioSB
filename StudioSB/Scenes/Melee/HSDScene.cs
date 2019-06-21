@@ -565,7 +565,7 @@ namespace StudioSB.Scenes.Melee
             base.RenderShader(camera);
 
             // render zones
-            if(HSDFile != null && HSDFile.Roots[1].Node is KAR_GrModel model)
+            if(HSDFile != null && HSDFile.Roots.Count > 1 && HSDFile.Roots[1].Node is KAR_GrModel model)
             {
                 foreach( var el in model.MainModel.ModelUnk1.GroupsUnk1_1.Elements)
                 {

@@ -40,7 +40,7 @@ namespace StudioSB.GUI
 
             meshObjectList = new SBListView();
             meshObjectList.CheckBoxes = true;
-            //meshObjectList.View = View.Details;
+            meshObjectList.View = View.Details;
             meshObjectList.Scrollable = true;
             meshObjectList.HeaderStyle = ColumnHeaderStyle.None;
 

@@ -68,7 +68,7 @@ namespace StudioSB.IO.Formats
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public string GetUniqueID(string id)
+        private string GetUniqueID(string id)
         {
             if (UsedIDs.ContainsKey(id))
             {
@@ -102,7 +102,7 @@ namespace StudioSB.IO.Formats
         }
 
 
-        public void WriteLibraryImages(string[] TextureNames = null)
+        public void WriteLibraryImages(string[] TextureNames = null, string extension = ".png")
         {
             writer.WriteStartElement("library_images");
             if (TextureNames != null)
@@ -112,7 +112,7 @@ namespace StudioSB.IO.Formats
                     writer.WriteStartElement("image");
                     writer.WriteAttributeString("id", tn);
                     writer.WriteStartElement("init_from");
-                    writer.WriteString(tn + ".png");
+                    writer.WriteString(tn + extension);
                     writer.WriteEndElement();
                     writer.WriteEndElement();
                 }

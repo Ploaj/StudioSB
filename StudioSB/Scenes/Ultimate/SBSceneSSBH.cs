@@ -13,9 +13,25 @@ using StudioSB.IO.Formats;
 using System.Linq;
 using StudioSB.GUI.Attachments;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace StudioSB.Scenes.Ultimate
 {
+    public class SSBHExportSettings
+    {
+        [DisplayName("Export Mesh and Model (.numshb, .numdlb)")]
+        public bool ExportModel { get; set; } = true;
+
+        [DisplayName("Export Skeleton (.nusktb)")]
+        public bool ExportSkeleton { get; set; } = true;
+
+        //[DisplayName("Export Materials (.numatb)")]
+        //public bool ExportMaterials { get; set; } = false;
+
+        [DisplayName("Export Textures (.nutexb)")]
+        public bool ExportTextures { get; set; } = false;
+    }
+
     public enum UltimateMaterialTransitionMode
     {
         Ditto,
@@ -23,11 +39,13 @@ namespace StudioSB.Scenes.Ultimate
         Gold,
         Metal
     }
+
     [SceneFileInformation("NU Model File Binary", ".numdlb", "The model specification for Smash Ultimate models", sceneCode: "SSBU")]
     public class SBSceneSSBH : SBScene
     {
-        public static SBUltimateImportSettings ImportSettings = new SBUltimateImportSettings();
-        public static SBUltimateNewImportSettings NewImportSettings = new SBUltimateNewImportSettings();
+        public static SSBHExportSettings ExportSettings { get; } = new SSBHExportSettings();
+        public static SBUltimateImportSettings ImportSettings { get; } = new SBUltimateImportSettings();
+        public static SBUltimateNewImportSettings NewImportSettings { get; } = new SBUltimateNewImportSettings();
         
         public ISBModel<SBUltimateMesh> Model { get; set; }
 
@@ -174,27 +192,50 @@ namespace StudioSB.Scenes.Ultimate
         {
             if (Model == null) return;
 
+            using (GUI.SBCustomDialog d = new GUI.SBCustomDialog(ExportSettings))
+            {
+                if (d.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    return;
+            }
+
             string name = Path.GetDirectoryName(FileName) + "/" + Path.GetFileNameWithoutExtension(FileName);
             string simpleName = Path.GetFileNameWithoutExtension(FileName);
 
-            SBConsole.WriteLine("Creating MODL...");
-            var modl = MODL_Loader.CreateMODLFile((SBUltimateModel)Model);
-            modl.ModelFileName = simpleName;
-            modl.SkeletonFileName = $"{simpleName}.nusktb";
-            modl.MeshString = $"{simpleName}.numshb";
-            modl.UnknownFileName = null;
-            modl.MaterialFileNames = new MODL_MaterialName[] { new MODL_MaterialName() { MaterialFileName = $"{simpleName}.numatb" } };
-            SBConsole.WriteLine("Done");
-            SSBH.TrySaveSSBHFile(FileName, modl);
+            if (ExportSettings.ExportModel)
+            {
+                SBConsole.WriteLine("Creating MODL...");
+                var modl = MODL_Loader.CreateMODLFile((SBUltimateModel)Model);
+                modl.ModelFileName = simpleName;
+                modl.SkeletonFileName = $"{simpleName}.nusktb";
+                modl.MeshString = $"{simpleName}.numshb";
+                modl.UnknownFileName = null;
+                modl.MaterialFileNames = new MODL_MaterialName[] { new MODL_MaterialName() { MaterialFileName = $"{simpleName}.numatb" } };
+                SBConsole.WriteLine("Done");
+                SSBH.TrySaveSSBHFile(FileName, modl);
 
-            SBConsole.WriteLine($"Creating MESH... {name}.numshb");
-            var mesh = MESH_Loader.CreateMESH((SBUltimateModel)Model, (SBSkeleton)Skeleton);
-            SBConsole.WriteLine("Done");
-            SSBH.TrySaveSSBHFile(name + ".numshb", mesh);
+                SBConsole.WriteLine($"Creating MESH... {name}.numshb");
+                var mesh = MESH_Loader.CreateMESH((SBUltimateModel)Model, (SBSkeleton)Skeleton);
+                SBConsole.WriteLine("Done");
+                SSBH.TrySaveSSBHFile(name + ".numshb", mesh);
+            }
 
-            SBConsole.WriteLine($"Creating SKEL.. {name}.nusktb");
-            SKEL_Loader.Save(name + ".nusktb", this);
-            SBConsole.WriteLine("Done");
+            if (ExportSettings.ExportSkeleton)
+            {
+                SBConsole.WriteLine($"Creating SKEL.. {name}.nusktb");
+                SKEL_Loader.Save(name + ".nusktb", this);
+                SBConsole.WriteLine("Done");
+            }
+
+            if (ExportSettings.ExportTextures)
+            {
+                SBConsole.WriteLine($"Creating Textures");
+                foreach (var tex in Surfaces)
+                {
+                    SBConsole.WriteLine($"Exporting.. {tex.Name}.nutexb");
+                    IO_NUTEXB.Export(Path.GetDirectoryName(FileName) + "/" + tex.Name + ".nutexb", tex);
+                }
+                SBConsole.WriteLine("Done");
+            }
 
             //SBConsole.WriteLine("Creating MATL...");
 
@@ -211,11 +252,26 @@ namespace StudioSB.Scenes.Ultimate
             IOModel iomodel = new IOModel();
             iomodel.Skeleton = (SBSkeleton)Skeleton;
 
+            foreach(var tex in Surfaces)
+            {
+                iomodel.Textures.Add(tex);
+            }
+
+            foreach(UltimateMaterial mat in Materials)
+            {
+                var m = new IOMaterial();
+                m.Name = mat.Name;
+                m.DiffuseTexture = mat.colMap.Value;
+                iomodel.Materials.Add(m);
+            }
+
             foreach (var mesh in Model.Meshes)
             {
                 var iomesh = new IOMesh();
                 iomesh.Name = mesh.Name;
                 iomodel.Meshes.Add(iomesh);
+
+                iomesh.MaterialIndex = Materials.IndexOf(mesh.Material);
 
                 iomesh.HasPositions = mesh.ExportAttributes.Contains(UltimateVertexAttribute.Position0);
                 iomesh.HasNormals = mesh.ExportAttributes.Contains(UltimateVertexAttribute.Normal0);
@@ -489,9 +545,8 @@ namespace StudioSB.Scenes.Ultimate
                 // no need to sort invisible meshes
                 if (!m.Visible) 
                     continue;
-
-
-                if (((UltimateMaterial)m.Material).HasBlending)
+                
+                if (m.Material != null && ((UltimateMaterial)m.Material).HasBlending)
                 {
                     transparentZSorted.Add(m);
                 }
