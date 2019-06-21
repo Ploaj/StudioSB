@@ -147,23 +147,27 @@ namespace StudioSB.Tools
                     //Get the first mip offset and current one and the total image size
                     int msize = (int)((MipOffsets[0] + surface.Arrays[arrayLevel].Mipmaps[mipLevel].Length - MipOffsets[mipLevel]) / surface.ArrayCount);
                     
-                    try
+                    //try
                     {
                         Pitch = RoundUp(width__ * bpp, 64);
                         SurfaceSize += Pitch * RoundUp(height__, Math.Max(1, blockHeight >> blockHeightShift) * 8);
 
-                        //Console.WriteLine($"{width} {height} {blkWidth} {blkHeight} {target} {bpp} {TileMode} {(int)Math.Max(0, BlockHeightLog2 - blockHeightShift)} {data_.Length}");
-                        byte[] result = Swizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), surface.Arrays[arrayLevel].Mipmaps[mipLevel]);
+                        //Console.WriteLine($"{width} {height} {blkWidth} {blkHeight} {target} {bpp} {TileMode} {(int)Math.Max(0, BlockHeightLog2 - blockHeightShift)}");
+                        var mipData = surface.Arrays[arrayLevel].Mipmaps[mipLevel];
+                        /*byte[] padded = new byte[mipData.Length * 2];
+                        Array.Copy(mipData, 0, padded, 0, mipData.Length);
+                        mipData = padded;*/
+                        byte[] result = Swizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), mipData);
                         //Console.WriteLine(result.Length + " " + surface.Mipmaps[mipLevel].Length);
                         ImageData.AddRange(result);
                     }
-                    catch (Exception e)
+                    /*catch (Exception e)
                     {
                         System.Windows.Forms.MessageBox.Show($"Failed to swizzle texture {surface.Name}!");
                         Console.WriteLine(e);
 
                         return new byte[0];
-                    }
+                    }*/
                 }
 
                 // alignment
@@ -312,7 +316,10 @@ namespace StudioSB.Tools
                         if (toSwizzle == 0)
                             Array.Copy(data, pos, result, pos_, bpp);
                         else
-                            Array.Copy(data, pos_, result, pos, bpp);
+                        {
+                            if(pos_ < data.Length)
+                                Array.Copy(data, pos_, result, pos, bpp);
+                        }
                     }
                 }
             }

@@ -71,10 +71,14 @@ namespace StudioSB.IO.Formats
 
                     for (int i = 0; i < (header.dwFlags.HasFlag(DDSD.MIPMAPCOUNT) ? header.dwMipMapCount : 1); i++)
                     {
-                        var mipSize = w * h * (int)TextureFormatInfo.GetBPP(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockHeight(surface.InternalFormat) / (int)TextureFormatInfo.GetBlockWidth(surface.InternalFormat);
-                        if (mipSize < TextureFormatInfo.GetBPP(surface.InternalFormat))
-                            mipSize = (int)TextureFormatInfo.GetBPP(surface.InternalFormat);
-                        mip.Mipmaps.Add(reader.ReadBytes(mipSize));
+                        var mipSize = Math.Max(1, ((w + 3) / 4)) * Math.Max(1, ((h + 3) / 4) ) * (int)TextureFormatInfo.GetBPP(surface.InternalFormat);
+
+                        if (mipSize % TextureFormatInfo.GetBPP(surface.InternalFormat) != 0)
+                            mipSize += (int)(TextureFormatInfo.GetBPP(surface.InternalFormat) - (mipSize % TextureFormatInfo.GetBPP(surface.InternalFormat)));
+
+                        var data = reader.ReadBytes(mipSize);
+
+                        mip.Mipmaps.Add(data);
                         w /= 2;
                         h /= 2;
                     }
