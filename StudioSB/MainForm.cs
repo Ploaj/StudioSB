@@ -371,6 +371,7 @@ namespace StudioSB
             }
             foreach (var type in AttachmentTypes)
             {
+                if (type.Extension() == null) continue;
                 foreach(var extension in type.Extension())
                 {
                     Filter += $"*{extension};";
