@@ -115,6 +115,14 @@ namespace StudioSB.Scenes
         {
             return null;
         }
+        
+        /// <summary>
+        /// Removes the mesh objects from the scene
+        /// </summary>
+        /// <returns></returns>
+        public virtual void RemoveMeshObjects(ISBMesh[] MeshToRemove)
+        {
+        }
 
         /// <summary>
         /// Gets the materials inside of the scene

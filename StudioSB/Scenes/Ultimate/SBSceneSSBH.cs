@@ -371,6 +371,15 @@ namespace StudioSB.Scenes.Ultimate
             return Model.Meshes.ToArray();
         }
 
+        public override void RemoveMeshObjects(ISBMesh[] MeshToRemove)
+        {
+            foreach(SBUltimateMesh mesh in MeshToRemove){
+                if(mesh != null)
+                    Model.Meshes.Remove(mesh);
+            }
+            RefreshRendering();
+        }
+
         public override ISBMaterial[] GetMaterials()
         {
             return Materials.ToArray();

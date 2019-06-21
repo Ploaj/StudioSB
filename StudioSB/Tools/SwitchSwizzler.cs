@@ -167,6 +167,7 @@ namespace StudioSB.Tools
                 }
 
                 // alignment
+                if(arrayLevel != surface.Arrays.Count - 1)
                 ImageData.AddRange(new byte[0x1000 - (ImageData.Count % 0x1000)]);
             }
             return ImageData.ToArray();

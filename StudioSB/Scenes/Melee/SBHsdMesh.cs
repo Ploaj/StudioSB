@@ -95,7 +95,7 @@ namespace StudioSB.Scenes.Melee
         /// <summary>
         /// 
         /// </summary>
-        public void ImportPBOJs(IOMesh mesh, SBSkeleton skeleton, VertexCompressor compressor, HSD_AttributeGroup attrGroup)
+        public void ImportPBOJs(IOMesh mesh, SBSkeleton skeleton, VertexCompressor compressor, HSD_AttributeGroup attrGroup, bool singleBind = false)
         {
             DOBJ.POBJ = null;
 
@@ -110,6 +110,11 @@ namespace StudioSB.Scenes.Melee
             
             // compress and generate display lists
             DOBJ.POBJ = compressor.CreatePOBJ(triStrip, attrGroup, weightList);
+            if (singleBind)
+            {
+                DOBJ.POBJ.BindGroups = null;
+                DOBJ.POBJ.Flags = 0;
+            }
         }
 
         private List<GXVertex> IOVertexToGXVertex(List<IOVertex> ioverts, SBSkeleton skeleton, out List<HSD_JOBJWeight> weightList)

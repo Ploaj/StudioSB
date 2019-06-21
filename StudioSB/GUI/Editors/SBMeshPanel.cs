@@ -51,7 +51,7 @@ namespace StudioSB.GUI.Editors
         }
         private string _parentBone;
 
-
+        public SBScene SelectedScene { get; set; } = null;
         private ISBMesh[] SelectedMeshes = null;
 
         public SBMeshPanel()
@@ -75,7 +75,7 @@ namespace StudioSB.GUI.Editors
             meshName = new Label();
             meshName.Dock = DockStyle.Top;
             meshName.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-
+            
             Controls.Add(parentBoneSelector);
             Controls.Add(new Label() { Text = "Parent Bone:", Dock = DockStyle.Top, TextAlign = System.Drawing.ContentAlignment.BottomLeft });
             Controls.Add(materialSelector);
@@ -83,11 +83,19 @@ namespace StudioSB.GUI.Editors
             Controls.Add(meshName);
         }
 
+        public void DeleteSelectedMesh()
+        {
+            if(SelectedScene != null && SelectedMeshes != null)
+                SelectedScene.RemoveMeshObjects(SelectedMeshes);
+        }
+
         public void Clear()
         {
             meshName.Text = "";
             parentBoneSelector.Items.Clear();
             materialSelector.Items.Clear();
+            SelectedScene = null;
+            SelectedMeshes = null;
         }
 
         /// <summary>
@@ -133,6 +141,7 @@ namespace StudioSB.GUI.Editors
 
             //
             SelectedMeshes = selected.ToArray();
+            SelectedScene = scene;
         }
     }
 }

@@ -4,6 +4,7 @@ using StudioSB.Scenes;
 using System;
 using System.Windows.Forms;
 using StudioSB.Rendering.Bounding;
+using System.Drawing;
 
 namespace StudioSB.GUI
 {
@@ -29,6 +30,8 @@ namespace StudioSB.GUI
         
         private SBListView meshObjectList { get; set; }
 
+        private SBButton DeleteButton;
+
         public SBMeshList() : base()
         {
             Text = "Object List";
@@ -37,7 +40,7 @@ namespace StudioSB.GUI
 
             meshObjectList = new SBListView();
             meshObjectList.CheckBoxes = true;
-            meshObjectList.View = View.Details;
+            //meshObjectList.View = View.Details;
             meshObjectList.Scrollable = true;
             meshObjectList.HeaderStyle = ColumnHeaderStyle.None;
 
@@ -62,7 +65,19 @@ namespace StudioSB.GUI
             MeshPanel = new SBMeshPanel();
             MeshPanel.Dock = DockStyle.Fill;
             
+            DeleteButton = new SBButton("Delete Selected Mesh");
+            DeleteButton.Click += (sender, args) =>
+            {
+                if(MessageBox.Show("Delete Selected Mesh", "This cannot be undone", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                {
+                    MeshPanel.DeleteSelectedMesh();
+                    LoadFromScene(MeshPanel.SelectedScene);
+                }
+            };
+            DeleteButton.Dock = DockStyle.Top;
+
             Controls.Add(MeshPanel);
+            Controls.Add(DeleteButton);
             Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
             Controls.Add(meshObjectList);
         }

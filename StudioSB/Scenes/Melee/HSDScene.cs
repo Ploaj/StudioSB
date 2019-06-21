@@ -43,6 +43,8 @@ namespace StudioSB.Scenes.Melee
                         return jobj;
                     if (roots.Node is KAR_VcStarVehicle star)
                         return star.ModelData.JOBJRoot;
+                    if (roots.Node is KAR_GrModel model)
+                        return model.MainModel.JOBJRoot;
                 }
                 return null;
             }
@@ -329,7 +331,7 @@ namespace StudioSB.Scenes.Melee
                 buff.AttributeType = GXAttribType.GX_INDEX16;
                 buff.CompCount = GXCompCnt.PosXYZ;
                 buff.CompType = GXCompType.Int16;
-                buff.Scale = 10;
+                buff.Scale = 3;
                 buff.Stride = 6;
                 attributeGroup.Attributes.Add(buff);
             }
@@ -533,6 +535,11 @@ namespace StudioSB.Scenes.Melee
             {
                 //boneBinds = Skeleton.GetBindTransforms();
                 var bones = Skeleton.Bones;
+                if(bones.Length > boneTransforms.Length)
+                {
+                    boneTransforms = new Matrix4[bones.Length];
+                    boneBinds = new Matrix4[bones.Length];
+                }
                 for (int i = 0; i < bones.Length; i++)
                 {
                     boneTransforms[i] = bones[i].AnimatedWorldTransform;
@@ -556,6 +563,19 @@ namespace StudioSB.Scenes.Melee
             }
 
             base.RenderShader(camera);
+
+            // render zones
+            if(HSDFile != null && HSDFile.Roots[1].Node is KAR_GrModel model)
+            {
+                foreach( var el in model.MainModel.ModelUnk1.GroupsUnk1_1.Elements)
+                {
+                    var min = new Vector3(el.UnkFloat1, el.UnkFloat2, el.UnkFloat3);
+                    var max = new Vector3(el.UnkFloat4, el.UnkFloat5, el.UnkFloat6);
+                    var mid = (max + min) / 2;
+                    var size = max - min;
+                    Rendering.Shapes.RectangularPrism.DrawRectangularPrism(camera, mid, size, Matrix4.Identity);
+                }
+            }
         }
 
         #endregion
