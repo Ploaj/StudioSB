@@ -212,6 +212,8 @@ namespace StudioSB.Scenes
         
         public bool EnableAnimatedCompensateScale { get; set; } = false;
 
+        public bool Selected { get; set; } = false;
+
         public Matrix4 AnimatedBindMatrix
         {
             get

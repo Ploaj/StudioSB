@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenTK;
+using System.Drawing;
 
 namespace StudioSB.Tools
 {
@@ -110,6 +111,16 @@ namespace StudioSB.Tools
         public static bool FastDistance(Vector3 p1, Vector3 p2, float distance)
         {
             return Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2) + Math.Pow(p1.Z - p2.Z, 2) < distance * distance;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static Vector4 ColorToVector(Color color)
+        {
+            return new Vector4(color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f);
         }
     }
 }

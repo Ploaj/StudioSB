@@ -14,6 +14,8 @@ namespace StudioSB.GUI
 
         private SBTreeView BoneList { get; set; }
 
+        private SBSkeleton SelectedSkeleton { get; set; }
+
         public SBBoneTree() : base()
         {
             //CheckBoxes = true;
@@ -68,12 +70,18 @@ namespace StudioSB.GUI
         /// <param name="args"></param>
         private void SelectBone(object sender, EventArgs args)
         {
+            if (SelectedSkeleton != null)
+            {
+                SelectedSkeleton.ClearSelection();
+            }
+
             if (BoneList.SelectedNode == null)
             {
                 BoneEditor.Visible = false;
                 return;
             }
 
+            ((SBBone)BoneList.SelectedNode.Tag).Selected = true;
             BoneEditor.BindBone((SBBone)BoneList.SelectedNode.Tag);
             BoneEditor.Visible = true;
         }
@@ -87,14 +95,18 @@ namespace StudioSB.GUI
             BoneList.Nodes.Clear();
             Dictionary<SBBone, SBTreeNode> boneToNode = new Dictionary<SBBone, SBTreeNode>();
             if(Scene.Skeleton != null)
-            foreach(var bone in Scene.Skeleton.Bones)
             {
-                var node = new SBTreeNode(bone.Name) { Tag = bone };
-                boneToNode.Add(bone, node);
-                if (bone.Parent == null)
+                SelectedSkeleton = Scene.Skeleton as SBSkeleton;
+
+                foreach (var bone in Scene.Skeleton.Bones)
+                {
+                    var node = new SBTreeNode(bone.Name) { Tag = bone };
+                    boneToNode.Add(bone, node);
+                    if (bone.Parent == null)
                         BoneList.Nodes.Add(node);
-                else if (boneToNode.ContainsKey(bone.Parent))
-                    boneToNode[bone.Parent].Nodes.Add(node);
+                    else if (boneToNode.ContainsKey(bone.Parent))
+                        boneToNode[bone.Parent].Nodes.Add(node);
+                }
             }
             if(BoneList.Nodes.Count > 0)
                 BoneList.Nodes[0].ExpandAll();
@@ -129,6 +141,7 @@ namespace StudioSB.GUI
         public void OnRemove(SBViewportPanel viewportPanel)
         {
             BoneEditor.Visible = false;
+            SelectedSkeleton = null;
         }
 
         public void Pick(Ray ray)

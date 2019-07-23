@@ -126,12 +126,19 @@ namespace StudioSB.Scenes
 
             boneShader.SetMatrix4x4("mvpMatrix", camera.MvpMatrix);
 
-            boneShader.SetVector4("color", new Vector4(ApplicationSettings.BoneColor.R / 255f, ApplicationSettings.BoneColor.G / 255f, ApplicationSettings.BoneColor.B / 255f, ApplicationSettings.BoneColor.A / 255f));
-            
+            var color = Tools.CrossMath.ColorToVector(ApplicationSettings.BoneColor);
+
+            var selcolor = Tools.CrossMath.ColorToVector(ApplicationSettings.SelectedBoneColor);
+
             boneShader.SetMatrix4x4("rotation", ref prismRotation);
 
             foreach (var b in Bones)
             {
+                if (b.Selected)
+                    boneShader.SetVector4("color", selcolor);
+                else
+                    boneShader.SetVector4("color", color);
+
                 Matrix4 transform = b.AnimatedWorldTransform;
                 boneShader.SetMatrix4x4("bone", ref transform);
                 boneShader.SetInt("hasParent", b.Parent != null ? 1 : 0);
@@ -151,6 +158,14 @@ namespace StudioSB.Scenes
             foreach (var b in Bones)
             {
                 TextRenderer.Draw(camera, b.Name, b.AnimatedWorldTransform);
+            }
+        }
+
+        public void ClearSelection()
+        {
+            foreach(var b in Bones)
+            {
+                b.Selected = false;
             }
         }
 

@@ -69,7 +69,7 @@ namespace StudioSB.Scenes.Animation
                         temp.Scale = bone.Scale;
                         bone.AnimatedTransform = temp.Transform;
                     }
-                    if (a.GetTrackValueAt(Frame, SBTrackType.CompensateScale) > 0)
+                    if (ApplicationSettings.EnableCompensateScale && a.GetTrackValueAt(Frame, SBTrackType.CompensateScale) != 0)
                     {
                         bone.EnableAnimatedCompensateScale = true;
                         bone.AnimatedCompensateScale = a.GetTrackValueAt(Frame, SBTrackType.CompensateScale);

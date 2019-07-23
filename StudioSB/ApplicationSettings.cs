@@ -131,8 +131,14 @@ namespace StudioSB
         [SettingsGroup(SettingsGroupType.Skeleton, "Renders the bone names on top of the bones", "Render Bone Names")]
         public static bool RenderBoneNames { get; set; } = false;
 
+        [SettingsGroup(SettingsGroupType.Skeleton, "", "Enable Compensate Scale")]
+        public static bool EnableCompensateScale { get; set; } = false;
+
         [SettingsGroup(SettingsGroupType.Skeleton, "The color the bones are rendered with", "Bone Color")]
         public static Color BoneColor { get; set; } = Color.Ivory;
+
+        [SettingsGroup(SettingsGroupType.Skeleton, "", "Selected Bone Color")]
+        public static Color SelectedBoneColor { get; set; } = Color.Goldenrod;
 
         // ported from render settings
 
