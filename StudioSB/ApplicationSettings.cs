@@ -61,6 +61,9 @@ namespace StudioSB
 
     public class ApplicationSettings
     {
+        [SettingsGroup(SettingsGroupType.Misc, "When closing the scene show save warning", "Show Scene Close Warning")]
+        public static bool ShowSaveChangesPopup { get; set; } = true;
+        
         // Skinning for application
 
         [SettingsGroup(SettingsGroupType.Application)]

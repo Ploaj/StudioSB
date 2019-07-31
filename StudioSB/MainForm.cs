@@ -128,7 +128,7 @@ namespace StudioSB
 
                 var view = new SBToolStripMenuItem("View");
                 {
-                    var rsettings = new SBToolStripMenuItem("Render Settings");
+                    var rsettings = new SBToolStripMenuItem("Application Settings");
                     rsettings.Click += OpenRenderSettings;
                     view.DropDownItems.Add(rsettings);
 
@@ -249,17 +249,13 @@ namespace StudioSB
         /// <returns>true if workspace is successfully cleared and false otherwise</returns>
         private bool ClearWorkspace()
         {
-            if(viewportPanel.LoadedScene != null)
+            if(viewportPanel.LoadedScene != null && ApplicationSettings.ShowSaveChangesPopup)
             {
-                DialogResult result = MessageBox.Show("Save current scene?", "Warning",
-                    MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
-                if (result == DialogResult.Yes)
+                DialogResult result = MessageBox.Show("Discard current scene?", "Warning",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (result == DialogResult.OK)
                 {
-                    //code for Yes
-                }
-                else if (result == DialogResult.No)
-                {
-                    //code for No
+
                 }
                 else if (result == DialogResult.Cancel)
                 {
