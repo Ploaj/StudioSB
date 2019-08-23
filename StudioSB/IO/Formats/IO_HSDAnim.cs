@@ -13,11 +13,18 @@ namespace StudioSB.IO.Formats
 {
     public class IO_HSDAnim : IImportableAnimation, IExportableAnimation
     {
+        public class HSDAnimSettings
+        {
+            public string RootName { get; set; }
+        }
+
         public string Name => "Dat Anim File";
 
-        public string Extension => "aj.dat";
+        public string Extension => ".dat";
 
-        public object Settings => null;
+        public static HSDAnimSettings HSDSettings = new HSDAnimSettings();
+
+        public object Settings => HSDSettings;
 
         public SBAnimation ImportSBAnimation(string FileName, SBSkeleton skeleton)
         {
@@ -106,10 +113,15 @@ namespace StudioSB.IO.Formats
         {
             HSDFile file = new HSDFile();
             HSDRoot root = new HSDRoot();
-            root.Name = animation.Name;
-            //TODO: export option for name
-            if (animation.Name == "")
-                root.Name = System.IO.Path.GetFileNameWithoutExtension(FileName);
+
+            if (HSDSettings.RootName == "")
+                HSDSettings.RootName = animation.Name;
+
+            if (HSDSettings.RootName == "")
+                HSDSettings.RootName = System.IO.Path.GetFileNameWithoutExtension(FileName);
+            
+            root.Name = HSDSettings.RootName;
+
             file.Roots.Add(root);
 
             HSD_FigaTree tree = new HSD_FigaTree();
@@ -248,6 +260,5 @@ namespace StudioSB.IO.Formats
                     return 0;
             }
         }
-
     }
 }
