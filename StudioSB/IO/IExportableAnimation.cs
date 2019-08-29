@@ -3,7 +3,7 @@ using StudioSB.Scenes.Animation;
 
 namespace StudioSB.IO
 {
-    interface IExportableAnimation
+    public interface IExportableAnimation
     {
         string Name { get; }
         string Extension { get; }

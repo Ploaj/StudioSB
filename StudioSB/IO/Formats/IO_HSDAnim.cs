@@ -122,6 +122,9 @@ namespace StudioSB.IO.Formats
             
             root.Name = HSDSettings.RootName;
 
+            if (!root.Name.EndsWith("_figatree"))
+                System.Windows.Forms.MessageBox.Show($"Warning, the root name does not end with \"_figatree\"\n{root.Name}");
+
             file.Roots.Add(root);
 
             HSD_FigaTree tree = new HSD_FigaTree();

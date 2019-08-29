@@ -44,11 +44,11 @@ namespace StudioSB
     where typeof(SBScene).IsAssignableFrom(type)
     select type).ToArray();
 
-        private List<IImportableModelType> ModelImporters = new List<IImportableModelType>();
-        private List<IExportableModelType> ModelExporters = new List<IExportableModelType>();
+        private static List<IImportableModelType> ModelImporters = new List<IImportableModelType>();
+        private static List<IExportableModelType> ModelExporters = new List<IExportableModelType>();
 
-        private List<IImportableAnimation> AnimationImporters = new List<IImportableAnimation>();
-        private List<IExportableAnimation> AnimationExporters = new List<IExportableAnimation>();
+        private static List<IImportableAnimation> AnimationImporters = new List<IImportableAnimation>();
+        private static List<IExportableAnimation> AnimationExporters = new List<IExportableAnimation>();
 
         public static List<IAttachment> AttachmentTypes = new List<IAttachment>();
 
@@ -305,19 +305,42 @@ namespace StudioSB
             }
 
             // Animation
-            foreach (var openableAnimation in AnimationImporters)
+            if (viewportPanel.Viewport.Scene != null)
             {
-                if (FilePath.ToLower().EndsWith(openableAnimation.Extension))
+                var anim = LoadAnimation(FilePath, (SBSkeleton)viewportPanel.Viewport.Scene.Skeleton);
+                if (anim != null)
                 {
-                    if (viewportPanel.Viewport.Scene == null) continue;
-                    var animation = openableAnimation.ImportSBAnimation(FilePath, (SBSkeleton)viewportPanel.Viewport.Scene.Skeleton);
-                    var animattach = new SBAnimAttachment(animation);
+                    var animattach = new SBAnimAttachment(anim);
                     viewportPanel.AddAttachment(animattach);
                     return;
                 }
             }
 
             // Scenes
+            var scene = LoadScene(FilePath);
+            if(scene != null)
+            {
+                CloseWorkspace(null, null);
+                viewportPanel.SetScene(scene);
+                return;
+            }
+        }
+
+        public static SBAnimation LoadAnimation(string FilePath, SBSkeleton skeleton)
+        {
+            foreach (var openableAnimation in AnimationImporters)
+            {
+                if (FilePath.ToLower().EndsWith(openableAnimation.Extension))
+                {
+                    var animation = openableAnimation.ImportSBAnimation(FilePath, skeleton);
+                    return animation;
+                }
+            }
+            return null;
+        }
+
+        public static SBScene LoadScene(string FilePath)
+        {
             Dictionary<string, Type> extensionToType = new Dictionary<string, Type>();
             foreach (var type in SceneTypes)
             {
@@ -331,16 +354,14 @@ namespace StudioSB
 
                             if (ob is SBScene scene)
                             {
-                                CloseWorkspace(null, null);
                                 scene.LoadFromFile(FilePath);
-                                viewportPanel.SetScene(scene);
-                                return;
+                                return scene;
                             }
                         }
                     }
                 }
             }
-
+            return null;
         }
 
         /// <summary>
@@ -437,6 +458,11 @@ namespace StudioSB
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void ExportAnimationToFile(object sender, EventArgs args)
         {
             if (viewportPanel.LoadedScene == null)
@@ -521,13 +547,14 @@ namespace StudioSB
             }
         }
 
-            /// <summary>
-            /// Imports a model to scene
-            /// </summary>
-            /// <param name="sender"></param>
-            /// <param name="args"></param>
+        /// <summary>
+        /// Imports a model to scene
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void ImportToScene(object sender, EventArgs args)
         {
+            string FileName;
             string Filter = "";
 
             //Create filter
@@ -538,72 +565,126 @@ namespace StudioSB
                 Filter += $"*{Extension};";
                 extensionToExporter.Add(Extension, exporter);
             }
-            
-            string FileName;
+
             if (Tools.FileTools.TryOpenFile(out FileName, "Supported Files|" + Filter))
             {
-                foreach (var extension in extensionToExporter.Keys)
+                var scene = LoadScene(FileName, viewportPanel.LoadedScene);
+                viewportPanel.SetScene(scene);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private static IImportableModelType GetModelTypeFromPath(string filePath)
+        {
+            Dictionary<string, IImportableModelType> extensionToExporter = new Dictionary<string, IImportableModelType>();
+            foreach (IImportableModelType exporter in ModelImporters)
+            {
+                if (exporter.Extension == System.IO.Path.GetExtension(filePath).ToLower())
+                    return exporter;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="extensoin"></param>
+        /// <returns></returns>
+        public static IExportableAnimation GetExportableAnimationFromExtension(string extensoin)
+        {
+            foreach (IExportableAnimation exporter in AnimationExporters)
+            {
+                if (exporter.Extension == extensoin)
+                    return exporter;
+            }
+            return null;
+        }
+
+        public static string[] SupportedAnimExportTypes()
+        {
+            string[] s = new string[AnimationExporters.Count];
+            for(int i =0; i < AnimationExporters.Count
+                 ; i++)
+            {
+                s[i] = AnimationExporters[i].Extension;
+            }
+            return s;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static SBScene LoadScene(string filePath, SBScene loadedScene)
+        {
+            IImportableModelType modelType = GetModelTypeFromPath(filePath);
+
+            if (modelType == null)
+                return null;
+
+            DialogResult Result = DialogResult.OK;
+            if (modelType.Settings != null)
+                using (var dialog = new SBCustomDialog(modelType.Settings))
+                    Result = dialog.ShowDialog();
+
+            if (Result == DialogResult.OK)
+            {
+                var ioModel = modelType.ImportIOModel(filePath);
+
+                SBScene scene;
+                if (loadedScene == null)
                 {
-                    if (FileName.ToLower().EndsWith(extension))
+                    SBConsole.WriteLine("No scene loaded, defaulted to Smash Ultimate scene");
+                    scene = new SBSceneSSBH();
+
+                    using (var dialog = new SBCustomDialog(SBSceneSSBH.NewImportSettings))
+                        Result = dialog.ShowDialog();
+
+                    if (Result == DialogResult.OK)
                     {
-                        DialogResult Result = DialogResult.OK;
-                        if (extensionToExporter[extension].Settings != null)
-                            using (var dialog = new SBCustomDialog(extensionToExporter[extension].Settings))
-                                Result = dialog.ShowDialog();
+                        if (SBSceneSSBH.NewImportSettings.NUMATLB != null && SBSceneSSBH.NewImportSettings.NUMATLB != "")
+                            MATL_Loader.Open(SBSceneSSBH.NewImportSettings.NUMATLB, scene);
 
-                        if (Result == DialogResult.OK)
-                        {
-                            var ioModel = extensionToExporter[extension].ImportIOModel(FileName);
-                            
-                            SBScene scene;
-                            if (viewportPanel.LoadedScene == null)
-                            {
-                                SBConsole.WriteLine("No scene loaded, defaulted to Smash Ultimate scene");
-                                scene = new SBSceneSSBH();
-                                
-                                using (var dialog = new SBCustomDialog(SBSceneSSBH.NewImportSettings))
-                                    Result = dialog.ShowDialog();
-
-                                if (Result == DialogResult.OK)
-                                {
-                                    if(SBSceneSSBH.NewImportSettings.NUMATLB != null && SBSceneSSBH.NewImportSettings.NUMATLB != "")
-                                        MATL_Loader.Open(SBSceneSSBH.NewImportSettings.NUMATLB, scene);
-
-                                    if(SBSceneSSBH.NewImportSettings.NUSKTFile != null && SBSceneSSBH.NewImportSettings.NUSKTFile != "")
-                                        ioModel.Skeleton = SKEL_Loader.Open(SBSceneSSBH.NewImportSettings.NUSKTFile, scene);
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Failed to import model");
-                                    return;
-                                }
-                            }
-                            else
-                            {
-                                scene = viewportPanel.LoadedScene;
-
-                                using (var dialog = new SBCustomDialog(SBSceneSSBH.ImportSettings))
-                                    Result = dialog.ShowDialog();
-
-                                if (Result == DialogResult.OK)
-                                {
-                                    if (SBSceneSSBH.ImportSettings.UseExistingSkeleton)
-                                    {
-                                        ioModel.ConvertToSkeleton((SBSkeleton)scene.Skeleton);
-                                    }
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Failed to import model");
-                                    return;
-                                }
-                            }
-
-                            scene.FromIOModel(ioModel);
-                            viewportPanel.SetScene(scene);
-                        }
+                        if (SBSceneSSBH.NewImportSettings.NUSKTFile != null && SBSceneSSBH.NewImportSettings.NUSKTFile != "")
+                            ioModel.Skeleton = SKEL_Loader.Open(SBSceneSSBH.NewImportSettings.NUSKTFile, scene);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to import model");
+                        return null;
                     }
                 }
+                else
+                {
+                    scene = loadedScene;
+
+                    using (var dialog = new SBCustomDialog(SBSceneSSBH.ImportSettings))
+                        Result = dialog.ShowDialog();
+
+                    if (Result == DialogResult.OK)
+                    {
+                        if (SBSceneSSBH.ImportSettings.UseExistingSkeleton)
+                        {
+                            ioModel.ConvertToSkeleton((SBSkeleton)scene.Skeleton);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to import model");
+                        return null;
+                    }
+                }
+
+                scene.FromIOModel(ioModel);
+                return scene;
+            }
+            else
+            {
+                return null;
             }
         }
 
