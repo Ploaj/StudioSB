@@ -291,6 +291,7 @@
     <Compile Include="Rendering\Shapes\Grid3D.cs" />
     <Compile Include="Tools\BinaryReaderExt.cs" />
     <Compile Include="Tools\BinaryWriterExt.cs" />
+    <Compile Include="Tools\ConsoleFunctions.cs" />
     <Compile Include="Tools\CrossMath.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\SwitchSwizzler.cs" />

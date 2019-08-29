@@ -44,12 +44,13 @@ namespace StudioSB.GUI.Attachments
         public GXTlutFmt PaletteFormat { get; set; } = GXTlutFmt.RGB5A3;
     }
 
-    public class SBDobjAttachment : Panel, IAttachment
+    public class SBDobjAttachment : GroupBox, IAttachment
     {
         private SBTreeView dobjList;
         private PropertyGrid propertyGrid;
         private SBButton clearTextures;
         private GroupBox optionPanel;
+        private GroupBox propertyPanel;
 
         //TODO: remove texture button
         private SBButton removeTexture;
@@ -92,7 +93,7 @@ namespace StudioSB.GUI.Attachments
             };
 
             propertyGrid = new PropertyGrid();
-            propertyGrid.Dock = DockStyle.Top;
+            propertyGrid.Dock = DockStyle.Fill;
             propertyGrid.Size = new Size(200, 400);
             propertyGrid.SelectedObjectsChanged += (sender, args) =>
             {
@@ -130,7 +131,7 @@ namespace StudioSB.GUI.Attachments
             ApplicationSettings.SkinControl(optionPanel);
             optionPanel.Dock = DockStyle.Top;
 
-            AutoScroll = true;
+            //AutoScroll = true;
             
             exportTexture = new SBButton("Export Texture");
             exportTexture.Dock = DockStyle.Top;
@@ -324,10 +325,17 @@ namespace StudioSB.GUI.Attachments
 
             };
 
-            Controls.Add(propertyGrid);
-            Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
+            propertyPanel = new GroupBox();
+            propertyPanel.Text = "Properties";
+            propertyPanel.Dock = DockStyle.Top;
+            propertyPanel.Controls.Add(propertyGrid);
+            propertyPanel.Height = 300;
+            ApplicationSettings.SkinControl(propertyPanel);
+
+            Controls.Add(propertyPanel);
+            Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10, BackColor = ApplicationSettings.BGColor2 });
             Controls.Add(optionPanel);
-            Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
+            Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10, BackColor = ApplicationSettings.BGColor2 });
             Controls.Add(dobjList);
             Controls.Add(clearTextures);
         }

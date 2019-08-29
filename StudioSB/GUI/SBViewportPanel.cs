@@ -29,16 +29,21 @@ namespace StudioSB.GUI
                 animationBar.FrameCount = value;
             }
         }
+
         public bool EnableAnimationBar
         {
             set
             {
-                if (value)
-                    Controls.Add(animationBar);
-                else
-                    Controls.Remove(animationBar);
+                animationBar.Visible = value;
+                ClearAnimation.Enabled = value;
+                if(!value)
+                    animationBar.Clear();
+                if (!value && LoadedScene != null && LoadedScene.Skeleton != null)
+                    LoadedScene.Skeleton.Reset();
             }
         }
+
+        private SBPopoutPanel animationPopoutPanel;
         private SBAnimationBar animationBar;
 
         public SBViewport Viewport
@@ -68,10 +73,36 @@ namespace StudioSB.GUI
         private Stopwatch stopWatch;
         public int timing = 0;
 
+
+        private ToolStrip toolStrip;
+        private ToolStripButton ResetPose;
+        private ToolStripButton ClearAnimation;
+
         public SBViewportPanel()
         {
             ApplicationSettings.SkinControl(this);
             BackColor = ApplicationSettings.MiddleColor;
+
+            toolStrip = new ToolStrip();
+            ApplicationSettings.SkinControl(toolStrip);
+
+            ResetPose = new ToolStripButton();
+            ResetPose.Text = "Bind Pose";
+            ResetPose.Click += (sender, args) =>
+            {
+                if (LoadedScene != null && LoadedScene.Skeleton != null)
+                    LoadedScene.Skeleton.Reset();
+            };
+
+            ClearAnimation = new ToolStripButton();
+            ClearAnimation.Text = "Clear Animation";
+            ClearAnimation.Click += (sender, args) =>
+            {
+                EnableAnimationBar = false;
+            };
+
+            toolStrip.Items.Add(ResetPose);
+            toolStrip.Items.Add(ClearAnimation);
 
             //Application.Idle += new EventHandler(TriggerViewportRender);
             stopWatch = new Stopwatch();
@@ -97,6 +128,14 @@ namespace StudioSB.GUI
             animationBar.Dock = DockStyle.Bottom;
 
             animationBar.FrameCount = 0;
+
+            /*animationPopoutPanel = new SBPopoutPanel(PopoutSide.Bottom);
+            animationPopoutPanel.Contents.Add(animationBar);
+            animationPopoutPanel.CloseText = "v";
+            animationPopoutPanel.OpenText = "^";
+            animationPopoutPanel.Expand();
+            animationPopoutPanel.Visible = false;
+            animationPopoutPanel.Dock = DockStyle.Bottom;*/
 
             Viewport.MouseDoubleClick += Pick;
 
@@ -168,6 +207,8 @@ namespace StudioSB.GUI
             TabPanel.ClearTabs();
 
             Viewport.Scene = null;
+
+            EnableAnimationBar = false;
         }
 
         /// <summary>
@@ -176,8 +217,10 @@ namespace StudioSB.GUI
         public void Setup()
         {
             Controls.Clear();
+            Controls.Add(animationBar);
             Controls.Add(Viewport);
             Controls.Add(RightPane);
+            Controls.Add(toolStrip);
         }
 
         /// <summary>

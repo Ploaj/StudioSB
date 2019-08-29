@@ -115,6 +115,12 @@ namespace StudioSB.GUI
             Controls.Add(frameCountLabel);
         }
 
+        public void Clear()
+        {
+            if (IsPlaying)
+                PlayPause(null, null);
+        }
+
         /// <summary>
         /// Updates the frame value
         /// </summary>

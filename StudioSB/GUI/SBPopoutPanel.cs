@@ -75,7 +75,7 @@ namespace StudioSB.GUI
             _popOutButton.BackColor = ApplicationSettings.PoppedInColor;
 
             //_contentPanel.BackColor = ApplicationSettings.MiddleColor;
-            _contentPanel.MinimumSize = new System.Drawing.Size(280, 32);
+            _contentPanel.MinimumSize = new System.Drawing.Size(290, 32);
             _contentPanel.MaximumSize = new System.Drawing.Size(int.MaxValue, int.MaxValue);
             //_contentPanel.AutoSize = true;
             _contentPanel.AutoScroll = true;
@@ -92,6 +92,11 @@ namespace StudioSB.GUI
         private new void Resize()
         {
             _contentPanel.Size = Size;
+        }
+
+        public void Expand()
+        {
+            Expand(null, null);
         }
 
         private void Expand(object sender, EventArgs args)

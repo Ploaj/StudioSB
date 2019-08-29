@@ -192,9 +192,11 @@ namespace StudioSB.GUI
 
             if (ApplicationSettings.RenderSceneInformation)
             {
-                TextRenderer.DrawOrtho(Camera, "Polys: " + (polyCount/3).ToString(), new Vector2(0, 30));
-                TextRenderer.DrawOrtho(Camera, "Verts: " + vertexCount.ToString(), new Vector2(0, 46));
-                TextRenderer.DrawOrtho(Camera, "Frame: " + Frame, new Vector2(0, 62));
+                if(Scene != null)
+                    TextRenderer.DrawOrtho(Camera, "Scene Type: " + Scene.GetType().Name, new Vector2(0, 19));
+                TextRenderer.DrawOrtho(Camera, "Polys: " + (polyCount/3).ToString(), new Vector2(0, 35));
+                TextRenderer.DrawOrtho(Camera, "Verts: " + vertexCount.ToString(), new Vector2(0, 51));
+                TextRenderer.DrawOrtho(Camera, "Frame: " + Frame, new Vector2(0, 67));
             }
 
             GL.PopAttrib();
