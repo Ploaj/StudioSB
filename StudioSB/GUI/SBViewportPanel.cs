@@ -43,6 +43,8 @@ namespace StudioSB.GUI
             }
         }
 
+        private Panel ViewportPanel;
+
         private SBPopoutPanel animationPopoutPanel;
         private SBAnimationBar animationBar;
 
@@ -137,6 +139,11 @@ namespace StudioSB.GUI
             animationPopoutPanel.Visible = false;
             animationPopoutPanel.Dock = DockStyle.Bottom;*/
 
+            ViewportPanel = new Panel();
+            ViewportPanel.Dock = DockStyle.Fill;
+            ViewportPanel.Controls.Add(Viewport);
+            ViewportPanel.Controls.Add(animationBar);
+
             Viewport.MouseDoubleClick += Pick;
 
             Clear();
@@ -217,10 +224,9 @@ namespace StudioSB.GUI
         public void Setup()
         {
             Controls.Clear();
-            Controls.Add(animationBar);
-            Controls.Add(Viewport);
-            Controls.Add(RightPane);
+            Controls.Add(ViewportPanel);
             Controls.Add(toolStrip);
+            Controls.Add(RightPane);
         }
 
         /// <summary>

@@ -113,17 +113,19 @@ namespace StudioSB.IO.Formats
         {
             HSDFile file = new HSDFile();
             HSDRoot root = new HSDRoot();
-
-            if (HSDSettings.RootName == "")
-                HSDSettings.RootName = animation.Name;
-
-            if (HSDSettings.RootName == "")
+            
+            if (HSDSettings.RootName == "" || HSDSettings.RootName == null)
                 HSDSettings.RootName = System.IO.Path.GetFileNameWithoutExtension(FileName);
+
+            if (HSDSettings.RootName == "" || HSDSettings.RootName == null)
+                HSDSettings.RootName = animation.Name;
             
             root.Name = HSDSettings.RootName;
 
-            if (!root.Name.EndsWith("_figatree"))
+            if (root.Name == null || !root.Name.EndsWith("_figatree"))
+            {
                 System.Windows.Forms.MessageBox.Show($"Warning, the root name does not end with \"_figatree\"\n{root.Name}");
+            }
 
             file.Roots.Add(root);
 
@@ -140,8 +142,8 @@ namespace StudioSB.IO.Formats
 
                 boneIndex++;
                 // skip trans n and rotn tracks
-                //if (boneIndex == 0 || boneIndex == 1)
-                //    continue;
+                if (boneIndex == 0)
+                    continue;
 
                 var node = animation.TransformNodes.Find(e => e.Name == skelnode.Name);
                 if (node == null)
