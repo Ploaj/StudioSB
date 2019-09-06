@@ -18,6 +18,9 @@ namespace StudioSB.IO.Formats
 
             [DisplayName("Use Radians"), Description("")]
             public bool UseRadians { get; set; } = true;
+
+            [DisplayName("Optimize Frames"), Description("Removes duplicate key frames")]
+            public bool RemoveRedundantFrames { get; set; } = false;
         }
 
         public string Name => "Maya ANIM";
@@ -351,6 +354,11 @@ namespace StudioSB.IO.Formats
             if (MayaSettings.Maya2015)
             {
                 BonesInOrder = BonesInOrder.OrderBy(f => f.Name, StringComparer.Ordinal).ToList();
+            }
+
+            if (MayaSettings.RemoveRedundantFrames)
+            {
+                animation.Optimize();
             }
 
             foreach (SBBone b in BonesInOrder)

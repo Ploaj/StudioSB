@@ -81,5 +81,19 @@ namespace StudioSB.Scenes.Animation
                 }
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Optimize()
+        {
+            foreach(var v in TransformNodes)
+            {
+                foreach(var track in v.Tracks)
+                {
+                    track.Optimize();
+                }
+            }
+        }
     }
 }

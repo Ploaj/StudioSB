@@ -41,5 +41,9 @@ namespace StudioSB.Scenes.Animation
             Keys.AddKey(frame, value, interpolationType, InTan, OutTan);
         }
         
+        public void Optimize()
+        {
+            Keys.Optimize();
+        }
     }
 }

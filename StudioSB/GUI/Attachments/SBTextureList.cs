@@ -111,9 +111,9 @@ namespace StudioSB.GUI.Attachments
                 if (Tools.FileTools.TryOpenFile(out fileName, "Supported Formats|*" + supported))
                 {
                     var sur = OpenFile(fileName);
-                    if(sur != null)
+                    if (sur != null)
                     {
-                        if(PropertyGrid.SelectedObject is SBSurface surface)
+                        if (PropertyGrid.SelectedObject is SBSurface surface)
                         {
                             surface.Arrays = sur.Arrays;
                             surface.Width = sur.Width;
@@ -133,16 +133,19 @@ namespace StudioSB.GUI.Attachments
             Import = new SBButton("Import");
             Import.Click += (sender, args) =>
             {
-                string fileName;
+                string[] fileNames;
                 string supported = string.Join(";*", Extension());
-                if (Tools.FileTools.TryOpenFile(out fileName, "Supported Formats|*" + supported))
+                if (Tools.FileTools.TryOpenFiles(out fileNames, "Supported Formats|*" + supported))
                 {
-                    var surface = OpenFile(fileName);
-                    if(surface != null)
+                    foreach(var fileName in fileNames)
                     {
-                        if (TextureBank != null)
-                            TextureBank.Add(surface);
-                        TextureList.Items.Add(surface);
+                        var surface = OpenFile(fileName);
+                        if (surface != null)
+                        {
+                            if (TextureBank != null)
+                                TextureBank.Add(surface);
+                            TextureList.Items.Add(surface);
+                        }
                     }
                 }
             };

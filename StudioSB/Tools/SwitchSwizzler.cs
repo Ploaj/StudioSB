@@ -19,13 +19,13 @@ namespace StudioSB.Tools
             uint blkDepth = TextureFormatInfo.GetBlockDepth(surface.InternalFormat);
 
             uint blockHeight = GetBlockHeight(DivRoundUp((uint)surface.Height, blkHeight));
-            uint BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
+            int BlockHeightLog2 = Convert.ToString(blockHeight, 2).Length - 1;
 
             uint Pitch = 0;
             uint DataAlignment = 512;
             uint TileMode = 0;
 
-            int linesPerBlockHeight = (1 << (int)BlockHeightLog2) * 8;
+            int linesPerBlockHeight = (1 << BlockHeightLog2) * 8;
 
             uint ArrayOffset = 0;
             for (int arrayLevel = 0; arrayLevel < surface.ArrayCount; arrayLevel++)
@@ -46,7 +46,8 @@ namespace StudioSB.Tools
                     if (Pow2RoundUp(DivRoundUp(height, blkWidth)) < linesPerBlockHeight)
                         blockHeightShift += 1;
 
-
+                    //SBConsole.WriteLine(height + " " + blkWidth + " " + Pow2RoundUp(DivRoundUp(height, blkWidth)) + " " + blockHeight + " " + blockHeightShift + " " + linesPerBlockHeight + " " + BlockHeightLog2 + " " + (int)Math.Max(0, BlockHeightLog2 - blockHeightShift));
+                    
                     uint width__ = DivRoundUp(width, blkWidth);
                     uint height__ = DivRoundUp(height, blkHeight);
 
@@ -60,6 +61,7 @@ namespace StudioSB.Tools
 
                     if (msize > ImageData.Length - (ArrayOffset + MipOffsets[mipLevel]))
                         msize = (int)(ImageData.Length - (ArrayOffset + MipOffsets[mipLevel]));
+
                     byte[] data_ = new byte[msize];
                     if (ArrayLevel == arrayLevel && MipLevel == mipLevel)
                         Array.Copy(ImageData, ArrayOffset + MipOffsets[mipLevel], data_, 0, msize);
@@ -70,7 +72,7 @@ namespace StudioSB.Tools
 
                         if (ArrayLevel == arrayLevel && MipLevel == mipLevel)
                         {
-                            //Console.WriteLine($"{width} {height} {blkWidth} {blkHeight} {target} {bpp} {TileMode} {(int)Math.Max(0, BlockHeightLog2 - blockHeightShift)} {data_.Length}");
+                            //SBConsole.WriteLine($"{width} {height} {blkWidth} {blkHeight} {target} {bpp} {TileMode} {(int)Math.Max(0, BlockHeightLog2 - blockHeightShift)} {data_.Length}");
                             byte[] result = Deswizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), data_);
                             //Create a copy and use that to remove uneeded data
                             byte[] result_ = new byte[size];

@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StudioSB.Scenes.Animation
 {
@@ -14,6 +15,17 @@ namespace StudioSB.Scenes.Animation
             get
             {
                 return _keys.Values;
+            }
+        }
+
+        public float MaxFrame
+        {
+            get
+            {
+                if (_keys.Count == 0)
+                    return 0;
+
+                return _keys.Keys.Max();
             }
         }
 
@@ -147,6 +159,34 @@ namespace StudioSB.Scenes.Animation
             }
 
             return _keys.Values[left].Value;
+        }
+
+        public void Optimize()
+        {
+            if (_keys.Count == 0)
+                return;
+
+            var temp_keys = new SortedList<float, SBAnimKey<T>>();
+            var values = _keys.Values.ToList();
+
+            temp_keys.Add(values[0].Frame, values[0]);
+            var prevValue = values[0].Value;
+            for(int i = 1; i < values.Count; i++)
+            {
+                if(values[i].InterpolationType != InterpolationType.Linear
+                    || values[i].InterpolationType != InterpolationType.Step)
+                {
+                    return;
+                }
+
+                if(!values[i].Value.Equals(prevValue))
+                {
+                    temp_keys.Add(values[i].Frame, values[i]);
+                }
+                prevValue = values[i].Value;
+            }
+
+            _keys = temp_keys;
         }
     }
 }

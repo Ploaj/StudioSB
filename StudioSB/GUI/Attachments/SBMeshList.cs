@@ -60,7 +60,7 @@ namespace StudioSB.GUI
 
             meshObjectList.Dock = DockStyle.Top;
 
-            meshObjectList.Size = new System.Drawing.Size(400, 300);
+            meshObjectList.Size = new System.Drawing.Size(400, 200);
 
             MeshPanel = new SBMeshPanel();
             MeshPanel.Dock = DockStyle.Fill;

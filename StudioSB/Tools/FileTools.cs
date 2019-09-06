@@ -37,6 +37,23 @@ namespace StudioSB.Tools
             return false;
         }
 
+        public static bool TryOpenFiles(out string[] fileName, string filter = "")
+        {
+            using (var dialog = new OpenFileDialog())
+            {
+                dialog.Multiselect = true;
+                dialog.Filter = filter;
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    fileName = dialog.FileNames;
+                    return true;
+                }
+            }
+            fileName = new string[0];
+            return false;
+        }
+
         public static bool TrySaveFile(out string fileName, string filter = "", string defaultFileName = "")
         {
             using (var dialog = new SaveFileDialog())
