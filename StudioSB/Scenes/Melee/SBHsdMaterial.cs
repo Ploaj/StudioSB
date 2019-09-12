@@ -1,6 +1,6 @@
 ﻿using System;
 using SFGraphics.GLObjects.Shaders;
-using HSDLib.Common;
+using HSDRaw.Common;
 using StudioSB.Rendering;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
@@ -16,7 +16,7 @@ namespace StudioSB.Scenes.Melee
 
         public SBHsdMaterial(HSD_DOBJ dobj)
         {
-            _mobj = dobj.MOBJ;
+            _mobj = dobj.Mobj;
 
             /*if (_mobj.Textures != null)
                 foreach (var tex in _mobj.Textures.List)
@@ -43,6 +43,8 @@ namespace StudioSB.Scenes.Melee
             shader.SetVector4("ambientColor", Vector4.Zero);
             shader.SetVector4("diffuseColor", Vector4.One);
             shader.SetVector4("specularColor", Vector4.One);
+
+            shader.SetInt("TEX0Flag", _mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0) ? 1 : 0);
 
             if (_mobj.MaterialColor != null)
             {

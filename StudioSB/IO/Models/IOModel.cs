@@ -53,7 +53,7 @@ namespace StudioSB.IO.Models
             Dictionary<string, int> boneNameToPosition = new Dictionary<string, int>();
             for(int i = 0; i < Skeleton.Bones.Length; i++)
             {
-                var boneName = newSkeleton.Bones[i].Name;
+                var boneName = Skeleton.Bones[i].Name;
                 if (!boneNameToPosition.ContainsKey(boneName))
                     boneNameToPosition.Add(boneName, i);
             }

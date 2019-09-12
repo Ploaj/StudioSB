@@ -37,9 +37,8 @@
       <HintPath>lib\Fbx.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="HSDLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Mods\HSDLib\HSDLib\bin\Debug\HSDLib.dll</HintPath>
+    <Reference Include="HSDRaw">
+      <HintPath>lib\HSDRaw.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
@@ -578,7 +577,7 @@
     <Content Include="lib\Fbx.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="lib\HSDLib.dll">
+    <Content Include="lib\HSDRaw.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="lib\OpenTK.dll">

@@ -1,4 +1,4 @@
-﻿using HSDLib.Common;
+﻿using HSDRaw.Common;
 
 namespace StudioSB.Scenes.Melee
 {
@@ -25,7 +25,7 @@ namespace StudioSB.Scenes.Melee
             set
             {
                 if(_jobj != null)
-                    _jobj.Transforms.TX = value;
+                    _jobj.TX = value;
                 base.X = value;
             }
         }
@@ -35,7 +35,7 @@ namespace StudioSB.Scenes.Melee
             set
             {
                 if (_jobj != null)
-                    _jobj.Transforms.TY = value;
+                    _jobj.TY = value;
                 base.Y = value;
             }
         }
@@ -45,7 +45,7 @@ namespace StudioSB.Scenes.Melee
             set
             {
                 if (_jobj != null)
-                    _jobj.Transforms.TZ = value;
+                    _jobj.TZ = value;
                 base.Z = value;
             }
         }
@@ -57,7 +57,7 @@ namespace StudioSB.Scenes.Melee
             set
             {
                 if (_jobj != null)
-                    _jobj.Transforms.RX = value;
+                    _jobj.RX = value;
                 base.RX = value;
             }
         }
@@ -67,7 +67,7 @@ namespace StudioSB.Scenes.Melee
             set
             {
                 if (_jobj != null)
-                    _jobj.Transforms.RY = value;
+                    _jobj.RY = value;
                 base.RY = value;
             }
         }
@@ -77,7 +77,7 @@ namespace StudioSB.Scenes.Melee
             set
             {
                 if (_jobj != null)
-                    _jobj.Transforms.RZ = value;
+                    _jobj.RZ = value;
                 base.RZ = value;
             }
         }
@@ -89,7 +89,7 @@ namespace StudioSB.Scenes.Melee
             set
             {
                 if (_jobj != null)
-                    _jobj.Transforms.SX = value;
+                    _jobj.SX = value;
                 base.SX = value;
             }
         }
@@ -99,7 +99,7 @@ namespace StudioSB.Scenes.Melee
             set
             {
                 if (_jobj != null)
-                    _jobj.Transforms.SY = value;
+                    _jobj.SY = value;
                 base.SY = value;
             }
         }
@@ -109,7 +109,7 @@ namespace StudioSB.Scenes.Melee
             set
             {
                 if (_jobj != null)
-                    _jobj.Transforms.SZ = value;
+                    _jobj.SZ = value;
                 base.SZ = value;
             }
         }

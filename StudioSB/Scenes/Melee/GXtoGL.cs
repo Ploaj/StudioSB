@@ -1,5 +1,4 @@
-﻿using HSDLib.GX;
-using HSDLib.Helpers;
+﻿using HSDRaw.GX;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 

@@ -47,6 +47,8 @@ uniform vec3 cameraPos;
 
 uniform int renderWireframe;
 
+uniform int TEX0Flag;
+
 out vec4 fragColor;
 
 // Defined in Wireframe.frag.
@@ -90,6 +92,9 @@ vec2 GetCoordType(int coordType, vec2 tex0)
 vec3 ColorMapDiffusePass(vec3 N, vec3 V)
 {
     vec4 diffuseMap = vec4(1);
+
+	if(TEX0Flag == 1)
+		diffuseMap = vec4(0);
 
     vec2 diffuseCoords = GetCoordType(diffuseCoordType, tex0);
 
@@ -139,9 +144,13 @@ void main()
     }*/
 
 	// Render passes
-	fragColor.rgb += ambientColor.rgb * ColorMapDiffusePass(N, V) * 0.5;
-	fragColor.rgb += DiffusePass(N, V) * ColorMapDiffusePass(N, V) * renderDiffuse;
-	fragColor.rgb += specularPass * renderSpecular;//SpecularPass(N, V) * renderSpecular;
+	if(renderDiffuse == 1)
+		fragColor.rgb += ambientColor.rgb * ColorMapDiffusePass(N, V) * 0.5;
+	if(renderDiffuse == 1)
+		fragColor.rgb += DiffusePass(N, V) * ColorMapDiffusePass(N, V) * renderDiffuse;
+	if(renderSpecular == 1)
+		fragColor.rgb += specularPass * renderSpecular;//SpecularPass(N, V) * renderSpecular;
+
 	fragColor.rgb += ColorMapExtPass(N, V);
 
 	//fragColor.rgb *= color.rgb;

@@ -32,12 +32,22 @@ namespace StudioSB.IO.Formats
                 if (model.HasMaterials && ExportSettings.ExportTextures)
                 {
                     List<string> TextureNames = new List<string>();
+                    var png = false;
                     foreach (var tex in model.Textures)
                     {
+                        var filePath = System.IO.Path.GetDirectoryName(FileName) + "\\" + tex.Name;
+
                         TextureNames.Add(tex.Name);
-                        IO_DDS.Export(System.IO.Path.GetDirectoryName(FileName) + "\\" + tex.Name + ".dds", tex);
+                        if(tex.InternalFormat == OpenTK.Graphics.OpenGL.InternalFormat.Rgba)
+                        {
+                            png = true;
+
+                            Tools.FileTools.WriteBitmapFile(filePath + ".png", tex.Width, tex.Height, tex.Arrays[0].Mipmaps[0]);
+                        }
+                        else
+                            IO_DDS.Export(filePath + ".dds", tex);
                     }
-                    writer.WriteLibraryImages(TextureNames.ToArray(), ".dds");
+                    writer.WriteLibraryImages(TextureNames.ToArray(), png ? ".png" : ".dds");
 
                     writer.StartMaterialSection();
                     foreach (var mat in model.Materials)

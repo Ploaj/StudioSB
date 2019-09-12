@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using StudioSB.Rendering.Bounding;
 using System.Windows.Forms;
 using StudioSB.Scenes.Melee;
 using System.Drawing;
 using StudioSB.Tools;
-using HSDLib.GX;
-using HSDLib.Common;
+using HSDRaw.GX;
+using HSDRaw.Common;
 using System.ComponentModel;
-using StudioSB.Scenes;
 using StudioSB.IO.Formats;
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using StudioSB.Scenes;
 
 namespace StudioSB.GUI.Attachments
 {
@@ -117,7 +118,8 @@ namespace StudioSB.GUI.Attachments
                     {
                         if(MessageBox.Show("Are you sure? This cannot be undone", "Clear Textures", MessageBoxButtons.OKCancel) != DialogResult.OK)
                             return;
-                        scene.ClearMaterialAnimations();
+                        //TODO:
+                        //scene.ClearMaterialAnimations();
                         //return;
                         foreach (SBHsdMesh m in scene.GetMeshObjects())
                             m.ClearTextures();
@@ -140,26 +142,30 @@ namespace StudioSB.GUI.Attachments
             exportTexture.Click += (sender, args) =>
             {
                 string filePath;
-                if(FileTools.TrySaveFile(out filePath, "PNG (*.png)|*.png;"))
+
+                if (propertyGrid.SelectedObject is HSD_TOBJ tobj)
                 {
-                    if(propertyGrid.SelectedObject is HSD_TOBJ tobj)
+                    var filter = "PNG (*.png)|*.png;";
+                
+                    //if (tobj.ImageData != null && tobj.ImageData.Format == GXTexFmt.CMP)
+                    //    filter = "DDS (*.dds)|*.dds;";
+
+                    if (FileTools.TrySaveFile(out filePath, filter))
                     {
                         //TODO: dds export / import
-                        /*if(tobj.ImageData != null && tobj.ImageData.Format == GXTexFmt.CMP)
+                        /*if (tobj.ImageData != null && tobj.ImageData.Format == GXTexFmt.CMP)
                         {
                             SBSurface s = new SBSurface();
                             s.Width = tobj.ImageData.Width;
                             s.Height = tobj.ImageData.Height;
                             s.InternalFormat = OpenTK.Graphics.OpenGL.InternalFormat.CompressedRgbaS3tcDxt1Ext;
-                            s.Arrays.Add(new MipArray() { Mipmaps = new List<byte[]>() { HSDLib.Helpers.TPL.ToCMP(tobj.ImageData.Data, tobj.ImageData.Width, tobj.ImageData.Height) } });
-
-                            IO_DDS.Export(System.IO.Path.GetDirectoryName(filePath)+"\\" + System.IO.Path.GetFileNameWithoutExtension(filePath) + ".dds", s);
+                            s.Arrays.Add(new MipArray() { Mipmaps = new List<byte[]>() { HSDRaw.Tools.TPLConv.ToCMP(tobj.ImageData.ImageData, tobj.ImageData.Width, tobj.ImageData.Height) } });
+                            
+                            IO_DDS.Export(filePath, s);
                         }
                         else*/
                         {
-                            var bmp = tobj.ToBitmap();
-                            bmp.Save(filePath);
-                            bmp.Dispose();
+                            FileTools.WriteBitmapFile(filePath, tobj.ImageData.Width, tobj.ImageData.Height, tobj.GetDecodedImageData());
                         }
                     }
                 }
@@ -180,7 +186,7 @@ namespace StudioSB.GUI.Attachments
                     if(mobj.Textures != null)
                         foreach(var tex in mobj.Textures.List)
                         {
-                            if (tex == tobj)
+                            if (tex._s == tobj._s)
                             {
                                 if (prevTexture == null)
                                     mobj.Textures = tex.Next;
@@ -193,6 +199,7 @@ namespace StudioSB.GUI.Attachments
                         }
 
                     FixMOBJTexIDs(mobj);
+
                     var root = dobjList.SelectedNode.Parent.Parent;
                     root.Nodes.Clear();
                     root.Nodes.Add(CreateMOBJNode(mobj));
@@ -211,9 +218,9 @@ namespace StudioSB.GUI.Attachments
                 SBTreeNode root = null;
                 if(dobjList.SelectedNode.Tag is SBHsdMesh mesh)
                 {
-                    if(mesh.DOBJ.MOBJ != null)
+                    if(mesh.DOBJ.Mobj != null)
                     {
-                        mobj = mesh.DOBJ.MOBJ;
+                        mobj = mesh.DOBJ.Mobj;
                         root = (SBTreeNode)dobjList.SelectedNode;
                     }
                 }
@@ -248,10 +255,9 @@ namespace StudioSB.GUI.Attachments
                             tobj.WScale = 1;
                             tobj.WrapS = GXWrapMode.REPEAT;
                             tobj.WrapT = GXWrapMode.REPEAT;
-                            tobj.Transform = new HSD_Transforms();
-                            tobj.Transform.SX = 1;
-                            tobj.Transform.SY = 1;
-                            tobj.Transform.SZ = 1;
+                            tobj.SX = 1;
+                            tobj.SY = 1;
+                            tobj.SZ = 1;
 
                             if(System.IO.Path.GetExtension(filePath.ToLower())  == ".dds")
                             {
@@ -259,18 +265,23 @@ namespace StudioSB.GUI.Attachments
 
                                 if (dxtsurface.InternalFormat != OpenTK.Graphics.OpenGL.InternalFormat.CompressedRgbaS3tcDxt1Ext)
                                     throw new NotSupportedException("DDS format " + dxtsurface.InternalFormat.ToString() + " not supported");
-
-                                HSD_Image i = new HSD_Image();
-                                i.Width = (ushort)dxtsurface.Width;
-                                i.Height = (ushort)dxtsurface.Height;
-                                i.Data = HSDLib.Helpers.TPL.ToCMP(dxtsurface.Arrays[0].Mipmaps[0], i.Width, i.Height);
-                                i.Format = GXTexFmt.CMP;
-                                tobj.ImageData = i;
+                                
+                                tobj.EncodeImageData(dxtsurface.Arrays[0].Mipmaps[0], dxtsurface.Width, dxtsurface.Height, GXTexFmt.CMP, GXTlutFmt.IA8);
                             }
                             else
                             {
                                 var bmp = new Bitmap(filePath);
-                                tobj.SetFromBitmap(bmp, settings.ImageFormat, settings.PaletteFormat);
+
+                                var bitmapData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                                var length = bitmapData.Stride * bitmapData.Height;
+
+                                byte[] bytes = new byte[length];
+
+                                Marshal.Copy(bitmapData.Scan0, bytes, 0, length);
+                                bmp.UnlockBits(bitmapData);
+
+                                tobj.EncodeImageData(bytes, bmp.Width, bmp.Height, settings.ImageFormat, settings.PaletteFormat);
+
                                 bmp.Dispose();
                             }
 
@@ -339,7 +350,7 @@ namespace StudioSB.GUI.Attachments
             Controls.Add(dobjList);
             Controls.Add(clearTextures);
         }
-
+        
         public bool AllowMultiple()
         {
             return false;
@@ -374,6 +385,7 @@ namespace StudioSB.GUI.Attachments
 
         public void Render(SBViewport viewport, float frame = 0)
         {
+
         }
 
         public void Save(string FilePath)
@@ -398,15 +410,14 @@ namespace StudioSB.GUI.Attachments
             scene.RefreshRendering();
 
             dobjList.Nodes.Clear();
-            int DOBJIndex = 0;
             foreach (SBHsdMesh m in scene.GetMeshObjects())
             {
-                SBTreeNode item = new SBTreeNode("DOBJ_" + DOBJIndex++);
+                SBTreeNode item = new SBTreeNode(m.Name);
                 item.Tag = m;
 
-                if (m.DOBJ.MOBJ != null)
+                if (m.DOBJ.Mobj != null)
                 {
-                    item.Nodes.Add(CreateMOBJNode(m.DOBJ.MOBJ));
+                    item.Nodes.Add(CreateMOBJNode(m.DOBJ.Mobj));
                 }
 
                 dobjList.Nodes.Add(item);
@@ -447,7 +458,7 @@ namespace StudioSB.GUI.Attachments
             if(mobj.Textures != null)
                 foreach(var t in mobj.Textures.List)
                 {
-                    t.GXTexGenSrc = (uint)(4 + index);
+                    t.GXTexGenSrc = 4 + index;
                     t.TexMapID = GXTexMapID.GX_TEXMAP0 + index;
                     index++;
                 }

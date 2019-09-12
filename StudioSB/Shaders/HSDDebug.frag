@@ -8,7 +8,6 @@ in vec4 color;
 in vec2 tex0;
 in vec3 specularPass;
 
-
 uniform sampler2D uvPattern;
 
 uniform vec4 diffuseColor;

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using HSDLib;
-using HSDLib.Helpers;
-using HSDLib.Common;
+using HSDRaw;
+using HSDRaw.Tools;
+using HSDRaw.Common;
 using SFGraphics.Cameras;
 using OpenTK;
 using StudioSB.Rendering;
@@ -14,19 +13,20 @@ using StudioSB.IO.Models;
 using StudioSB.GUI.Attachments;
 using StudioSB.GUI;
 using StudioSB.Tools;
-using HSDLib.GX;
-using HSDLib.KAR;
+using HSDRaw.GX;
+using System.Drawing;
+using System.Linq;
 
 namespace StudioSB.Scenes.Melee
 {
     [SceneFileInformation("HSD", ".dat", "Hal Sys Dat")]
     public class HSDScene : SBScene
     {
-        private HSDFile HSDFile { get; set; }
+        private HSDRawFile HSDFile { get; set; }
 
         private List<SBHsdMesh> Mesh = new List<SBHsdMesh>();
 
-        private Dictionary<HSD_TOBJ, SBSurface> tobjToSurface = new Dictionary<HSD_TOBJ, SBSurface>();
+        private Dictionary<HSDStruct, SBSurface> tobjToSurface = new Dictionary<HSDStruct, SBSurface>();
 
         private BufferObject boneBindUniformBuffer;
         private BufferObject boneTransformUniformBuffer;
@@ -39,12 +39,12 @@ namespace StudioSB.Scenes.Melee
             {
                 foreach(var roots in HSDFile.Roots)
                 {
-                    if (roots.Node is HSD_JOBJ jobj)
+                    if (roots.Data is HSD_JOBJ jobj)
                         return jobj;
-                    if (roots.Node is KAR_VcStarVehicle star)
+                    /*if (roots.Data is KAR_VcStarVehicle star)
                         return star.ModelData.JOBJRoot;
-                    if (roots.Node is KAR_GrModel model)
-                        return model.MainModel.JOBJRoot;
+                    if (roots.Data is KAR_GrModel model)
+                        return model.MainModel.JOBJRoot;*/
                 }
                 return null;
             }
@@ -64,39 +64,67 @@ namespace StudioSB.Scenes.Melee
 
         }*/
 
+        private List<T> GetAllOfType<T>(HSDAccessor root) where T : HSDAccessor
+        {
+            List<T> list = new List<T>();
+
+            SearchType<T>(root, ref list);
+
+            return list;
+        }
+
+        private void SearchType<T>(HSDAccessor root, ref List<T> list) where T : HSDAccessor
+        {
+            if (root == null)
+                return;
+            foreach (var p in root.GetType().GetProperties())
+            {
+                if (p.PropertyType.IsSubclassOf(typeof(HSDAccessor)))
+                {
+                    SearchType((HSDAccessor)p.GetValue(root), ref list);
+                }
+                if (p.PropertyType == typeof(T))
+                {
+                    var v = (T)p.GetValue(root);
+                    if(v != null)
+                        list.Add(v);
+                }
+            }
+        }
+
         private void RemakeVertexData()
         {
-            var dobjs = RootJOBJ.GetAllOfType<HSD_DOBJ>();
-            VertexCompressor c = new VertexCompressor();
+            var dobjs = GetAllOfType<HSD_DOBJ>(RootJOBJ);
+            GX_VertexCompressor c = new GX_VertexCompressor();
             foreach(var dobj in dobjs)
             {
-                Console.WriteLine(dobj.MOBJ.RenderFlags.ToString());
-                dobj.MOBJ.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFSE_MAT;
-                dobj.MOBJ.Textures = null;
-                if (dobj.MOBJ.Textures != null)
-                foreach (var tobj in dobj.MOBJ.Textures.List)
+                Console.WriteLine(dobj.Mobj.RenderFlags.ToString());
+                dobj.Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFSE_MAT;
+                dobj.Mobj.Textures = null;
+                if (dobj.Mobj.Textures != null)
+                foreach (var tobj in dobj.Mobj.Textures.List)
                 {
                     tobj.Flags = 0;
                     tobj.ImageData = null;
-                    tobj.Tlut = null;
+                    tobj.TlutData = null;
                 }
-                foreach (var pobj in dobj.POBJ.List)
+                foreach (var pobj in dobj.Pobj.List)
                 {
                     int off = 0;
-                    var vertices = VertexAccessor.GetDecodedVertices(pobj);
-                    var displayList = VertexAccessor.GetDisplayList(pobj);
-                    GXDisplayList newdl = new GXDisplayList();
-                    foreach (var dl in VertexAccessor.GetDisplayList(pobj).Primitives)
+                    var displayList = pobj.ToDisplayList();
+                    var vertices = GX_VertexAttributeAccessor.GetDecodedVertices(displayList, pobj);
+                    GX_DisplayList newdl = new GX_DisplayList();
+                    foreach (var dl in displayList.Primitives)
                     {
-                        var vs = new List<GXVertex>();
+                        var vs = new List<GX_Vertex>();
                         for(int i = 0; i < dl.Count; i++)
                         {
                             vs.Add(vertices[off+i]);
                         }
                         off += dl.Count;
-                        newdl.Primitives.Add(c.Compress(dl.PrimitiveType, vs.ToArray(), pobj.VertexAttributes));
+                        newdl.Primitives.Add(c.Compress(dl.PrimitiveType, vs.ToArray(), pobj.Attributes));
                     }
-                    pobj.DisplayListBuffer = newdl.ToBuffer(pobj.VertexAttributes);
+                    pobj.FromDisplayList(newdl); 
                 }
             }
             c.SaveChanges();
@@ -106,8 +134,8 @@ namespace StudioSB.Scenes.Melee
             
         public Texture TOBJtoRenderTexture(HSD_TOBJ tobj)
         {
-            if (tobjToSurface.ContainsKey(tobj))
-                return tobjToSurface[tobj].GetRenderTexture();
+            if (tobjToSurface.ContainsKey(tobj._s))
+                return tobjToSurface[tobj._s].GetRenderTexture();
             else
                 return DefaultTextures.Instance.defaultBlack;
         }
@@ -128,7 +156,7 @@ namespace StudioSB.Scenes.Melee
 
         public override void LoadFromFile(string FileName)
         {
-            HSDFile = new HSDFile(FileName);
+            HSDFile = new HSDRawFile(FileName);
             RefreshSkeleton();
             CreateMesh();
             RefreshRendering();
@@ -146,15 +174,19 @@ namespace StudioSB.Scenes.Melee
                 return;
             Surfaces.Clear();
             tobjToSurface.Clear();
-            var tobjs = RootJOBJ.GetAllOfType<HSD_TOBJ>();
+            var tobjs = GetAllOfType<HSD_TOBJ>(RootJOBJ);
             List<HSD_Image> Process = new List<HSD_Image>();
             foreach (var tobj in tobjs)
             {
-                var bm = tobj.ToBitmap();
-                var surface = SBSurface.FromBitmap(bm);
+                var surface = new SBSurface();
                 surface.Name = "TOBJ_" + tobjs.IndexOf(tobj);
-                tobjToSurface.Add(tobj, surface);
-                bm.Dispose();
+                surface.Arrays.Add(new MipArray() { Mipmaps = new List<byte[]>() { tobj.GetDecodedImageData() } });
+                surface.Width = tobj.ImageData.Width;
+                surface.Height = tobj.ImageData.Height;
+                surface.PixelFormat = PixelFormat.Bgra;
+                surface.PixelType = PixelType.UnsignedByte;
+                surface.InternalFormat = InternalFormat.Rgba;
+                tobjToSurface.Add(tobj._s, surface);
                 Surfaces.Add(surface);
             }
         }
@@ -166,10 +198,11 @@ namespace StudioSB.Scenes.Melee
             if (RootJOBJ == null)
                 return;
 
-            var dobjs = RootJOBJ.GetAllOfType<HSD_DOBJ>();
-            var jobjs = RootJOBJ.GetAllOfType<HSD_JOBJ>();
+            var dobjs = GetAllOfType<HSD_DOBJ>(RootJOBJ);
+            var jobjs = GetAllOfType<HSD_JOBJ>(RootJOBJ);
             foreach (var dobj in dobjs)
             {
+                //SBConsole.WriteLine(dobj + " " + dobj.List.Count);
                 SBBone parent = null;
                 if(Skeleton.Bones.Length > 0)
                     parent = Skeleton.Bones[0];
@@ -177,8 +210,8 @@ namespace StudioSB.Scenes.Melee
                 {
                     if(b is SBHsdBone bone)
                     {
-                        if(bone.GetJOBJ().DOBJ != null)
-                        if (bone.GetJOBJ().DOBJ.List.Contains(dobj))
+                        if(bone.GetJOBJ().Dobj != null)
+                        if (bone.GetJOBJ().Dobj.List.Contains(dobj))
                         {
                             parent = b;
                             break;
@@ -186,6 +219,7 @@ namespace StudioSB.Scenes.Melee
                     }
                 }
                 var mesh = new SBHsdMesh(dobj, parent);
+                mesh.Name = $"DOBJ_{Mesh.Count}";
                 Mesh.Add(mesh);
             }
         }
@@ -200,18 +234,18 @@ namespace StudioSB.Scenes.Melee
         {
             get
             {
-                return HSDFile.Roots.Find(e => e.Node is HSDLib.MaterialAnimation.HSD_MatAnimJoint) != null;
+                return HSDFile.Roots.Find(e => e.Data is HSDRaw.Common.Animation.HSD_MatAnimJoint) != null;
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public void ClearMaterialAnimations()
+        private void ClearMaterialAnimations()
         {
             foreach(var roots in HSDFile.Roots)
             {
-                if(roots.Node is HSDLib.MaterialAnimation.HSD_MatAnimJoint matjoint)
+                if(roots.Data is HSDRaw.Common.Animation.HSD_MatAnimJoint matjoint)
                 {
                     foreach (var v in matjoint.DepthFirstList)
                     {
@@ -222,16 +256,17 @@ namespace StudioSB.Scenes.Melee
                                 {
                                     Console.WriteLine(matanim.TextureAnimation.ImageCount + " " +
                                         matanim.TextureAnimation.TlutCount + " " +
-                                        (matanim.TextureAnimation.ImageArray==null) + " " +
+                                        (matanim.TextureAnimation.List==null) + " " +
                                         matanim.TextureAnimation.GXTexMapID);
 
-                                    matanim.TextureAnimation.AnimationObject.Flags = HSDLib.Animation.AOBJ_Flags.NO_ANIM;
+                                    matanim.TextureAnimation.AnimationObject.Flags = HSDRaw.Common.Animation.AOBJ_Flags.NO_ANIM;
                                     matanim.TextureAnimation.AnimationObject.FObjDesc = null;
                                     matanim.TextureAnimation.AnimationObject.EndFrame = 0;
-                                    matanim.TextureAnimation.GXTexMapID = (int)HSDLib.GX.GXTexMapID.GX_TEXMAP0;
-                                    matanim.TextureAnimation.ImageCount = 0;
-                                    matanim.TextureAnimation.TlutCount = 0;
-                                    if (matanim.TextureAnimation.ImageArray != null)
+                                    matanim.TextureAnimation.GXTexMapID = (int)HSDRaw.GX.GXTexMapID.GX_TEXMAP0;
+                                    //matanim.TextureAnimation.ImageCount = 0;
+                                    //matanim.TextureAnimation.TlutCount = 0;
+                                    //TODO:
+                                    /*if (matanim.TextureAnimation. != null)
                                     {
                                         matanim.TextureAnimation.ImageArray.Elements = null;
                                         matanim.TextureAnimation.ImageArray.SetSize = 0;
@@ -240,7 +275,7 @@ namespace StudioSB.Scenes.Melee
                                     {
                                         matanim.TextureAnimation.TlutArray.Elements = null;
                                         matanim.TextureAnimation.TlutArray.SetSize = 0;
-                                    }
+                                    }*/
                                 }
                                 matanim.AnimationObject = null;
                                 //matanim.TextureAnimation = null;
@@ -277,9 +312,9 @@ namespace StudioSB.Scenes.Melee
             bone.Name = "JOBJ_" + Skeleton.Bones.Length;
 
             bone.Transform = OpenTK.Matrix4.Identity;
-            bone.Translation = new OpenTK.Vector3(jobj.Transforms.TX, jobj.Transforms.TY, jobj.Transforms.TZ);
-            bone.RotationEuler = new OpenTK.Vector3(jobj.Transforms.RX, jobj.Transforms.RY, jobj.Transforms.RZ);
-            bone.Scale = new OpenTK.Vector3(jobj.Transforms.SX, jobj.Transforms.SY, jobj.Transforms.SZ);
+            bone.Translation = new OpenTK.Vector3(jobj.TX, jobj.TY, jobj.TZ);
+            bone.RotationEuler = new OpenTK.Vector3(jobj.RX, jobj.RY, jobj.RZ);
+            bone.Scale = new OpenTK.Vector3(jobj.SX, jobj.SY, jobj.SZ);
             bone.SetJOBJ(jobj);
             
             if(parent == null)
@@ -298,72 +333,83 @@ namespace StudioSB.Scenes.Melee
 
             // update textures
 
-            //RemakeVertexData();
+            // Optimize Texture Sharing
+
+            Dictionary<byte[], HSD_Image> imageDataToBuffer = new Dictionary<byte[], HSD_Image>(new ByteArrayComparer());
+
+            foreach(var tobj in tobjToSurface)
+            {
+                var t = new HSD_TOBJ();
+                t._s = tobj.Key;
+
+                if (!imageDataToBuffer.ContainsKey(t.ImageData.ImageData))
+                    imageDataToBuffer.Add(t.ImageData.ImageData, t.ImageData);
+
+                t.ImageData = imageDataToBuffer[t.ImageData.ImageData];
+            }
+
+            // Save to file
 
             HSDFile.Save(FileName);
+        }
+
+        public class ByteArrayComparer : EqualityComparer<byte[]>
+        {
+            public override bool Equals(byte[] first, byte[] second)
+            {
+                if (first == null || second == null)
+                {
+                    // null == null returns true.
+                    // non-null == null returns false.
+                    return first == second;
+                }
+                if (ReferenceEquals(first, second))
+                {
+                    return true;
+                }
+                if (first.Length != second.Length)
+                {
+                    return false;
+                }
+                // Linq extension method is based on IEnumerable, must evaluate every item.
+                return first.SequenceEqual(second);
+            }
+            public override int GetHashCode(byte[] obj)
+            {
+                if (obj == null)
+                {
+                    throw new ArgumentNullException("obj");
+                }
+                // quick and dirty, instantly identifies obviously different
+                // arrays as being different
+                return obj.Length;
+            }
         }
 
         public override void FromIOModel(IOModel iomodel)
         {
             //System.Windows.Forms.MessageBox.Show("Importing Model to DAT not supported");
-
+            
             // use the existing skeleton always
-            //iomodel.ConvertToSkeleton((SBSkeleton)Skeleton);
+            iomodel.ConvertToSkeleton((SBSkeleton)Skeleton);
 
             // single bound vertices are stored in inverse transform positions
             iomodel.InvertSingleBinds();
 
             // dobjs to import to
             var dobjs = GetMeshObjects();
-
-            // make attribute group
-            HSD_AttributeGroup attributeGroup = new HSD_AttributeGroup();
-            //TODO: redo how these are generated
-            {
-                GXVertexBuffer buff = new GXVertexBuffer();
-                buff.Name = GXAttribName.GX_VA_PNMTXIDX;
-                buff.AttributeType = GXAttribType.GX_DIRECT;
-                attributeGroup.Attributes.Add(buff);
-            }
-            {
-                GXVertexBuffer buff = new GXVertexBuffer();
-                buff.Name = GXAttribName.GX_VA_POS;
-                buff.AttributeType = GXAttribType.GX_INDEX16;
-                buff.CompCount = GXCompCnt.PosXYZ;
-                buff.CompType = GXCompType.Int16;
-                buff.Scale = 3;
-                buff.Stride = 6;
-                attributeGroup.Attributes.Add(buff);
-            }
-            {
-                GXVertexBuffer buff = new GXVertexBuffer();
-                buff.Name = GXAttribName.GX_VA_NRM;
-                buff.AttributeType = GXAttribType.GX_INDEX16;
-                buff.CompCount = GXCompCnt.NrmXYZ;
-                buff.CompType = GXCompType.Int8;
-                buff.Scale = 6;
-                buff.Stride = 3;
-                attributeGroup.Attributes.Add(buff);
-            }
-            {
-                GXVertexBuffer buff = new GXVertexBuffer();
-                buff.Name = GXAttribName.GX_VA_TEX0;
-                buff.AttributeType = GXAttribType.GX_INDEX16;
-                buff.CompCount = GXCompCnt.TexST;
-                buff.CompType = GXCompType.Int16;
-                buff.Scale = 13;
-                buff.Stride = 4;
-                attributeGroup.Attributes.Add(buff);
-            }
-
+            
             foreach (SBHsdMesh m in GetMeshObjects())
             {
-                m.DOBJ.POBJ = null;
+                m.DOBJ.Pobj = null;
             }
+
+            var attributeGroup = MakeRiggedAttributes();
+            var singleAttributeGroup = MakeSingleAttributes();
 
             // get a compressor ready
             // the compressor will handle making the compressed attribute buffers
-            VertexCompressor compressor = new VertexCompressor();
+            GX_VertexCompressor compressor = new GX_VertexCompressor();
 
             // import the iomeshes into their respective dobjs
             foreach (var iomesh in iomodel.Meshes)
@@ -376,7 +422,7 @@ namespace StudioSB.Scenes.Melee
                 if (dobjId != -1)
                 {
                     var dobj = (SBHsdMesh)dobjs[dobjId];
-                    dobj.ImportPBOJs(iomesh, (SBSkeleton)Skeleton, compressor, attributeGroup);
+                    dobj.ImportPOBJs(iomesh, (SBSkeleton)Skeleton, compressor, attributeGroup);
                 }
             }
 
@@ -385,6 +431,97 @@ namespace StudioSB.Scenes.Melee
 
             // refresh everything
             RefreshRendering();
+        }
+
+        private GX_Attribute[] MakeRiggedAttributes()
+        {
+            // make attribute group
+            GX_Attribute[] attributeGroup = new GX_Attribute[5];
+            //TODO: redo how these are generated
+            {
+                GX_Attribute buff = new GX_Attribute();
+                buff.AttributeName = GXAttribName.GX_VA_PNMTXIDX;
+                buff.AttributeType = GXAttribType.GX_DIRECT;
+                attributeGroup[0] = buff;
+            }
+            {
+                GX_Attribute buff = new GX_Attribute();
+                buff.AttributeName = GXAttribName.GX_VA_POS;
+                buff.AttributeType = GXAttribType.GX_INDEX16;
+                buff.CompCount = GXCompCnt.PosXYZ;
+                buff.CompType = GXCompType.Int16;
+                buff.Scale = 3;
+                buff.Stride = 6;
+                attributeGroup[1] = buff;
+            }
+            {
+                GX_Attribute buff = new GX_Attribute();
+                buff.AttributeName = GXAttribName.GX_VA_NRM;
+                buff.AttributeType = GXAttribType.GX_INDEX16;
+                buff.CompCount = GXCompCnt.NrmXYZ;
+                buff.CompType = GXCompType.Int8;
+                buff.Scale = 6;
+                buff.Stride = 3;
+                attributeGroup[2] = buff;
+            }
+            {
+                GX_Attribute buff = new GX_Attribute();
+                buff.AttributeName = GXAttribName.GX_VA_TEX0;
+                buff.AttributeType = GXAttribType.GX_INDEX16;
+                buff.CompCount = GXCompCnt.TexST;
+                buff.CompType = GXCompType.Int16;
+                buff.Scale = 13;
+                buff.Stride = 4;
+                attributeGroup[3] = buff;
+            }
+            {
+                GX_Attribute buff = new GX_Attribute();
+                buff.AttributeName = GXAttribName.GX_VA_NULL;
+                attributeGroup[4] = buff;
+            }
+            return attributeGroup;
+        }
+
+        private GX_Attribute[] MakeSingleAttributes()
+        {
+            // make attribute group
+            GX_Attribute[] attributeGroup = new GX_Attribute[4];
+            {
+                GX_Attribute buff = new GX_Attribute();
+                buff.AttributeName = GXAttribName.GX_VA_POS;
+                buff.AttributeType = GXAttribType.GX_INDEX16;
+                buff.CompCount = GXCompCnt.PosXYZ;
+                buff.CompType = GXCompType.Int16;
+                buff.Scale = 3;
+                buff.Stride = 6;
+                attributeGroup[0] = buff;
+            }
+            {
+                GX_Attribute buff = new GX_Attribute();
+                buff.AttributeName = GXAttribName.GX_VA_NRM;
+                buff.AttributeType = GXAttribType.GX_INDEX16;
+                buff.CompCount = GXCompCnt.NrmXYZ;
+                buff.CompType = GXCompType.Int8;
+                buff.Scale = 6;
+                buff.Stride = 3;
+                attributeGroup[1] = buff;
+            }
+            {
+                GX_Attribute buff = new GX_Attribute();
+                buff.AttributeName = GXAttribName.GX_VA_TEX0;
+                buff.AttributeType = GXAttribType.GX_INDEX16;
+                buff.CompCount = GXCompCnt.TexST;
+                buff.CompType = GXCompType.Int16;
+                buff.Scale = 13;
+                buff.Stride = 4;
+                attributeGroup[2] = buff;
+            }
+            {
+                GX_Attribute buff = new GX_Attribute();
+                buff.AttributeName = GXAttribName.GX_VA_NULL;
+                attributeGroup[3] = buff;
+            }
+            return attributeGroup;
         }
 
         public override IOModel GetIOModel()
@@ -398,6 +535,15 @@ namespace StudioSB.Scenes.Melee
             foreach (SBHsdBone bone in Skeleton.Bones)
                 bones.Add(bone);
 
+            Dictionary<HSDStruct, string> tobjToName = new Dictionary<HSDStruct, string>();
+
+            foreach(var tex in tobjToSurface)
+            {
+                tex.Value.Name = $"TOBJ_{iomodel.Textures.Count}";
+                tobjToName.Add(tex.Key, tex.Value.Name);
+                iomodel.Textures.Add(tex.Value);
+            }
+
             foreach (SBHsdMesh me in GetMeshObjects())
             {
                 var dobj = me.DOBJ;
@@ -407,8 +553,8 @@ namespace StudioSB.Scenes.Melee
                 {
                     if (b is SBHsdBone bone)
                     {
-                        if (bone.GetJOBJ().DOBJ != null)
-                            if (bone.GetJOBJ().DOBJ.List.Contains(dobj))
+                        if (bone.GetJOBJ().Dobj != null)
+                            if (bone.GetJOBJ().Dobj.List.Contains(dobj))
                             {
                                 parent = b;
                                 break;
@@ -426,20 +572,20 @@ namespace StudioSB.Scenes.Melee
                 iomesh.HasBoneWeights = true;
                 iomesh.HasUV0 = true;
 
-                if (dobj.POBJ != null)
-                    foreach (var pobj in dobj.POBJ.List)
+                if (dobj.Pobj != null)
+                    foreach (var pobj in dobj.Pobj.List)
                     {
-                        var vertices = VertexAccessor.GetDecodedVertices(pobj);
-                        var dl = VertexAccessor.GetDisplayList(pobj);
+                        var dl = pobj.ToDisplayList();
+                        var vertices = GX_VertexAttributeAccessor.GetDecodedVertices(dl, pobj);
 
-                        HSD_JOBJWeight[] bindGroups = null; ;
-                        if (pobj.BindGroups != null)
-                            bindGroups = pobj.BindGroups.Elements;
+                        HSD_Envelope[] bindGroups = null; ;
+                        if (pobj.EnvelopeWeights != null)
+                            bindGroups = pobj.EnvelopeWeights;
 
                         var offset = 0;
                         foreach (var v in dl.Primitives)
                         {
-                            List<GXVertex> strip = new List<GXVertex>();
+                            List<GX_Vertex> strip = new List<GX_Vertex>();
                             for (int i = 0; i < v.Count; i++)
                                 strip.Add(vertices[offset + i]);
                             offset += v.Count;
@@ -447,10 +593,37 @@ namespace StudioSB.Scenes.Melee
                         }
                     }
                 
-                for (int i = 0; i < iomesh.Vertices.Count; i++)
-                    iomesh.Indices.Add((uint)i);
 
                 iomesh.Optimize();
+
+                // flip faces
+                var temp = iomesh.Indices.ToArray();
+                iomesh.Indices.Clear();
+                for (int i = 0; i < temp.Length; i += 3)
+                {
+                    if (i + 2 < temp.Length)
+                    {
+                        iomesh.Indices.Add(temp[i + 2]);
+                        iomesh.Indices.Add(temp[i + 1]);
+                        iomesh.Indices.Add(temp[i]);
+                    }
+                    else
+                        break;
+                }
+
+                iomesh.MaterialIndex = iomodel.Materials.Count;
+
+                IOMaterialPhong mat = new IOMaterialPhong();
+                mat.Name = iomesh.Name + "_material";
+                if(dobj.Mobj.MaterialColor != null)
+                {
+                    mat.DiffuseColor = Color.FromArgb(dobj.Mobj.MaterialColor.DiffuseColorABGR);
+                    mat.SpecularColor = Color.FromArgb(dobj.Mobj.MaterialColor.SpecularColorABGR);
+                    mat.AmbientColor = Color.FromArgb(dobj.Mobj.MaterialColor.AmbientColorABGR);
+                }
+                if(dobj.Mobj.Textures != null)
+                    mat.DiffuseTexture = tobjToName[dobj.Mobj.Textures._s];
+                iomodel.Materials.Add(mat);
             }
 
             return iomodel;
@@ -491,6 +664,9 @@ namespace StudioSB.Scenes.Melee
 
             if (type == GXPrimitiveType.TriangleStrip)
                 TriangleConvert.StripToList(list, out list);
+
+            if (type == GXPrimitiveType.Quads)
+                TriangleConvert.QuadToList(list, out list);
 
             return list;
         }
@@ -565,7 +741,7 @@ namespace StudioSB.Scenes.Melee
             base.RenderShader(camera);
 
             // render zones
-            if(HSDFile != null && HSDFile.Roots.Count > 1 && HSDFile.Roots[1].Node is KAR_GrModel model)
+            /*if(HSDFile != null && HSDFile.Roots.Count > 1 && HSDFile.Roots[1].Node is KAR_GrModel model)
             {
                 foreach( var el in model.MainModel.ModelUnk1.GroupsUnk1_1.Elements)
                 {
@@ -575,7 +751,7 @@ namespace StudioSB.Scenes.Melee
                     var size = max - min;
                     Rendering.Shapes.RectangularPrism.DrawRectangularPrism(camera, mid, size, Matrix4.Identity);
                 }
-            }
+            }*/
         }
 
         #endregion

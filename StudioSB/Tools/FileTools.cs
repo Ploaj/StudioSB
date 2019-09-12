@@ -1,4 +1,9 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace StudioSB.Tools
 {
@@ -69,6 +74,33 @@ namespace StudioSB.Tools
             }
             fileName = "";
             return false;
+        }
+
+        /// <summary>
+        /// Write RGBA8 data to PNG file
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="imageData"></param>
+        public static void WriteBitmapFile(string filename, int width, int height, byte[] imageData)
+        {
+            using (var stream = new MemoryStream(imageData))
+            using (var bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb))
+            {
+                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0,
+                                                                bmp.Width,
+                                                                bmp.Height),
+                                                  ImageLockMode.WriteOnly,
+                                                  bmp.PixelFormat);
+                IntPtr pNative = bmpData.Scan0;
+
+                Marshal.Copy(imageData, 0, pNative, imageData.Length);
+
+                bmp.UnlockBits(bmpData);
+
+                bmp.Save(filename);
+            }
         }
     }
 }

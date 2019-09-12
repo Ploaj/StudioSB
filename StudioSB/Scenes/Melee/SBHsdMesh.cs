@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HSDLib.Common;
-using HSDLib.Helpers;
+using HSDRaw.Common;
+using HSDRaw.Tools;
+using HSDRaw.GX;
 using SFGenericModel;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
@@ -30,7 +28,7 @@ namespace StudioSB.Scenes.Melee
         public override int VertexCount => base.VertexCount;
 
         private List<SBHsdRenderMesh> renderMesh = new List<SBHsdRenderMesh>();
-
+        
         private SBHsdMaterial material;
 
         //TODO: update dobj when parent string name changes
@@ -58,6 +56,10 @@ namespace StudioSB.Scenes.Melee
             RefreshRendering(scene.Skeleton);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="skeleton"></param>
         private void RefreshRendering(ISBSkeleton skeleton)
         {
             BoundingSphere = new Rendering.Bounding.BoundingSphere(0, 0, 0, 0);
@@ -67,23 +69,25 @@ namespace StudioSB.Scenes.Melee
             foreach (SBHsdBone bone in skeleton.Bones)
                 bones.Add(bone);
 
-            if (_dobj.POBJ != null)
-                foreach (var pobj in _dobj.POBJ.List)
+            GX_VertexAttributeAccessor accessor = new GX_VertexAttributeAccessor();
+
+            if (_dobj.Pobj != null)
+                foreach (var pobj in _dobj.Pobj.List)
                 {
-                    //foreach (var va in pobj.VertexAttributes.Attributes)
-                    //    Console.WriteLine($"{va.Name} {va.AttributeType} {va.CompCount} {va.CompType} {va.Scale} {va.Stride}");
-                    var vertices = VertexAccessor.GetDecodedVertices(pobj);
-                    var dl = VertexAccessor.GetDisplayList(pobj);
+                    //foreach (var va in pobj.Attributes)
+                    //    Console.WriteLine($"{va.AttributeName} {va.AttributeType} {va.CompCount} {va.CompType} {va.Scale} {va.Stride}");
+                    var dl = pobj.ToDisplayList();
+                    var vertices = GX_VertexAttributeAccessor.GetDecodedVertices(dl, pobj);
 
                     var offset = 0;
                     foreach (var v in dl.Primitives)
                     {
-                        List<GXVertex> strip = new List<GXVertex>();
+                        List<GX_Vertex> strip = new List<GX_Vertex>();
                         for (int i = 0; i < v.Count; i++)
                             strip.Add(vertices[offset + i]);
                         offset += v.Count;
 
-                        var rm = new SBHsdRenderMesh(GXVertexToHsdVertex(strip, bones, pobj.BindGroups == null ? null : pobj.BindGroups.Elements), GXtoGL.GLPrimitiveType(v.PrimitiveType));
+                        var rm = new SBHsdRenderMesh(GXVertexToHsdVertex(strip, bones, pobj.EnvelopeWeights == null ? null : pobj.EnvelopeWeights), GXtoGL.GLPrimitiveType(v.PrimitiveType));
                         
                         renderMesh.Add(rm);
                     }
@@ -95,60 +99,73 @@ namespace StudioSB.Scenes.Melee
         /// <summary>
         /// 
         /// </summary>
-        public void ImportPBOJs(IOMesh mesh, SBSkeleton skeleton, VertexCompressor compressor, HSD_AttributeGroup attrGroup, bool singleBind = false)
+        public void ImportPOBJs(IOMesh mesh, SBSkeleton skeleton, GX_VertexCompressor compressor, GX_Attribute[] attrGroup, bool singleBind = false)
         {
-            DOBJ.POBJ = null;
+            DOBJ.Pobj = null;
 
             // get gx vertices and rigging groups
-            List<HSD_JOBJWeight> weightList = null;
+            List<HSD_Envelope> weightList = null;
             var verts = IOVertexToGXVertex(mesh.Vertices, skeleton, out weightList);
 
             // reorder to triangle strips
-            List<GXVertex> triStrip = new List<GXVertex>();
+            List<GX_Vertex> triStrip = new List<GX_Vertex>();
             foreach (var i in mesh.Indices)
                 triStrip.Add(verts[(int)i]);
             
             // compress and generate display lists
-            DOBJ.POBJ = compressor.CreatePOBJ(triStrip, attrGroup, weightList);
-            if (singleBind)
+            DOBJ.Pobj = compressor.CreatePOBJsFromTriangleList(triStrip, attrGroup, weightList);
+            if (singleBind || ParentBone != "JOBJ_0")
             {
-                DOBJ.POBJ.BindGroups = null;
-                DOBJ.POBJ.Flags = 0;
+                DOBJ.Pobj.EnvelopeWeights = null;
+                DOBJ.Pobj.Flags = 0;
             }
         }
 
-        private List<GXVertex> IOVertexToGXVertex(List<IOVertex> ioverts, SBSkeleton skeleton, out List<HSD_JOBJWeight> weightList)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ioverts"></param>
+        /// <param name="skeleton"></param>
+        /// <param name="weightList"></param>
+        /// <returns></returns>
+        private List<GX_Vertex> IOVertexToGXVertex(List<IOVertex> ioverts, SBSkeleton skeleton, out List<HSD_Envelope> weightList)
         {
-            weightList = new List<HSD_JOBJWeight>();
+            weightList = new List<HSD_Envelope>();
 
-            List<GXVertex> gxverts = new List<GXVertex>();
+            Dictionary<Tuple<Vector4, Vector4>, int> weightToWeightListIndex = new Dictionary<Tuple<Vector4, Vector4>, int>();
+
+            List<GX_Vertex> gxverts = new List<GX_Vertex>();
             foreach(var iovert in ioverts)
             {
-                HSD_JOBJWeight weight = new HSD_JOBJWeight();
-                for(int i = 0; i < 4; i++)
+                var tuple = new Tuple<Vector4, Vector4>(iovert.BoneIndices, iovert.BoneWeights);
+                if (!weightToWeightListIndex.ContainsKey(tuple))
                 {
-                    if(iovert.BoneWeights[i] != 0)
+                    HSD_Envelope weight = new HSD_Envelope();
+                    for (int i = 0; i < 4; i++)
                     {
-                        var jobj = ((SBHsdBone)skeleton.Bones[(int)iovert.BoneIndices[i]]).GetJOBJ();
-                        if (jobj == null)
-                            throw new Exception("Error getting JOBJ for rigging");
-                        weight.JOBJs.Add(jobj);
-                        weight.Weights.Add(iovert.BoneWeights[i]);
+                        if (iovert.BoneWeights[i] != 0)
+                        {
+                            var jobj = ((SBHsdBone)skeleton.Bones[(int)iovert.BoneIndices[i]]).GetJOBJ();
+                            if (jobj == null)
+                                throw new Exception("Error getting JOBJ for rigging");
+                            weight.Add(jobj, iovert.BoneWeights[i]);
+                        }
                     }
-                }
-                int index = weightList.IndexOf(weight);
-                if(index == -1)
-                {
-                    index = weightList.Count;
+                    weightToWeightListIndex.Add(tuple, weightList.Count);
                     weightList.Add(weight);
                 }
 
-                GXVertex gxvert = new GXVertex();
-                gxvert.PMXID = (byte)(index*3);
-                gxvert.Pos = new GXVector3(iovert.Position.X, iovert.Position.Y, iovert.Position.Z);
-                gxvert.Nrm = new GXVector3(iovert.Normal.X, iovert.Normal.Y, iovert.Normal.Z);
+                int index = weightToWeightListIndex[tuple];
+
+                if (index * 3 > byte.MaxValue)
+                    throw new InvalidOperationException("To many weights for one polygon object");
+
+                GX_Vertex gxvert = new GX_Vertex();
+                gxvert.PNMTXIDX = (byte)(index*3);
+                gxvert.POS = new GXVector3(iovert.Position.X, iovert.Position.Y, iovert.Position.Z);
+                gxvert.NRM = new GXVector3(iovert.Normal.X, iovert.Normal.Y, iovert.Normal.Z);
                 gxvert.TEX0 = new GXVector2(iovert.UV0.X, iovert.UV0.Y);
-                gxvert.Clr0 = new GXColor4(iovert.Color.X, iovert.Color.Y, iovert.Color.Z, iovert.Color.W);
+                gxvert.CLR0 = new GXColor4(iovert.Color.X, iovert.Color.Y, iovert.Color.Z, iovert.Color.W);
                 gxverts.Add(gxvert);
             }
             return gxverts;
@@ -159,10 +176,15 @@ namespace StudioSB.Scenes.Melee
         /// </summary>
         public void ClearTextures()
         {
-            DOBJ.MOBJ.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE;
-            DOBJ.MOBJ.Textures = null;
+            DOBJ.Mobj.RenderFlags = RENDER_MODE.ALPHA_COMPAT | RENDER_MODE.DIFFUSE;
+            DOBJ.Mobj.Textures = null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scene"></param>
+        /// <param name="shader"></param>
         public void Draw(HSDScene scene, Shader shader)
         {
             if (!Visible)
@@ -178,7 +200,14 @@ namespace StudioSB.Scenes.Melee
             }
         }
         
-        public static List<SBHsdVertex> GXVertexToHsdVertex(List<GXVertex> vertices, List<SBHsdBone> bones, HSD_JOBJWeight[] jobjweights)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <param name="bones"></param>
+        /// <param name="jobjweights"></param>
+        /// <returns></returns>
+        public static List<SBHsdVertex> GXVertexToHsdVertex(List<GX_Vertex> vertices, List<SBHsdBone> bones, HSD_Envelope[] jobjweights)
         {
             List<SBHsdVertex> newvertices = new List<SBHsdVertex>();
 
@@ -189,18 +218,19 @@ namespace StudioSB.Scenes.Melee
 
                 if (jobjweights != null)
                 {
-                    if(v.PMXID / 3 >= jobjweights.Length)
-                        Console.WriteLine(jobjweights.Length+ " " + (v.PMXID));
-                    var jobjWeight = jobjweights[v.PMXID / 3];
+                    if(v.PNMTXIDX / 3 >= jobjweights.Length)
+                        Console.WriteLine(jobjweights.Length+ " " + (v.PNMTXIDX));
 
-                    for (int i = 0; i < Math.Min(4, jobjWeight.JOBJs.Count); i++)
-                        bone[i] = bones.FindIndex(e=>e.GetJOBJ() == jobjWeight.JOBJs[i]);
+                    var jobjWeight = jobjweights[v.PNMTXIDX / 3];
 
-                    for (int i = 0; i < Math.Min(4, jobjWeight.Weights.Count); i++)
+                    for (int i = 0; i < Math.Min(4, jobjWeight.JOBJs.Length); i++)
+                        bone[i] = bones.FindIndex(e=>e.GetJOBJ()._s == jobjWeight.JOBJs[i]._s);
+
+                    for (int i = 0; i < Math.Min(4, jobjWeight.JOBJs.Length); i++)
                         weights[i] = jobjWeight.Weights[i];
                 }
-
-                newvertices.Add(new SBHsdVertex(v.Pos, v.Nrm, v.TEX0, bone, weights));
+                
+                newvertices.Add(new SBHsdVertex(v.POS, v.NRM, v.TEX0, bone, weights));
 
             } 
 

@@ -104,16 +104,13 @@ void main()
 	if(Weight.x > 0 || Weight.y > 0 || Weight.z > 0 || Weight.w > 0)
     {
         vec4 transformedPosition = vec4(position, 1);
-		position = vec3(0);
         vec4 transformedNormal = vec4(0);
+		position = vec3(0);
 
         for (int i = 0; i < 4; i++)
         {
-			//if(Weight[i] > 0) // this may not be necessary
-			{
-				position += (binds[int(Bone[i])] * transformedPosition * Weight[i]).xyz;
-				transformedNormal.xyz += (inverse(transpose(binds[int(Bone[i])])) * vec4(normal, 1) * Weight[i]).xyz;
-			}
+			position += (binds[int(Bone[i])] * transformedPosition * Weight[i]).xyz;
+			transformedNormal.xyz += (inverse(transpose(binds[int(Bone[i])])) * vec4(normal, 1) * Weight[i]).xyz;
         }
 
 		normal = transformedNormal.xyz;

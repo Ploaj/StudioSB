@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using StudioSB.Scenes;
 using StudioSB.Scenes.Animation;
-using HSDLib;
-using HSDLib.Helpers;
-using HSDLib.Animation;
+using HSDRaw;
+using HSDRaw.Tools;
+using HSDRaw.Common.Animation;
 
 namespace StudioSB.IO.Formats
 {
@@ -30,14 +27,14 @@ namespace StudioSB.IO.Formats
         {
             SBAnimation anim = new SBAnimation();
 
-            HSDFile f = new HSDFile(FileName);
+            HSDRawFile f = new HSDRawFile(FileName);
 
             foreach(var root in f.Roots)
             {
-                if (root == null || root.Node == null)
+                if (root == null || root.Data == null)
                     continue;
                 anim.Name = root.Name;
-                if (root.Node is HSD_FigaTree tree)
+                if (root.Data is HSD_FigaTree tree)
                 {
                     anim.FrameCount = tree.FrameCount;
                     int nodeIndex = 0;
@@ -49,11 +46,11 @@ namespace StudioSB.IO.Formats
 
                         foreach (var att in node.Tracks)
                         {
-                            if (att.Track == null)
+                            if (att.FOBJ == null)
                                 continue;
 
                             SBTrackType trackType = SBTrackType.TranslateX;
-                            switch ((JointTrackType)att.Track.AnimationType)
+                            switch (att.FOBJ.AnimationType)
                             {
                                 case JointTrackType.HSD_A_J_ROTX: trackType = SBTrackType.RotateX; break;
                                 case JointTrackType.HSD_A_J_ROTY: trackType = SBTrackType.RotateY; break;
@@ -69,7 +66,7 @@ namespace StudioSB.IO.Formats
                             SBTransformTrack track = new SBTransformTrack(trackType);
                             a.Tracks.Add(track);
                             
-                            FOBJFrameDecoder decoder = new FOBJFrameDecoder(att.Track);
+                            FOBJFrameDecoder decoder = new FOBJFrameDecoder(att.FOBJ);
                             var keys = decoder.GetKeys();
 
                             float prevCurve = 0;
@@ -77,28 +74,28 @@ namespace StudioSB.IO.Formats
                             {
                                 var key = keys[k];
 
-                                if (key.InterpolationType == HSDLib.Animation.InterpolationType.HermiteCurve)
+                                if (key.InterpolationType == GXInterpolationType.HermiteCurve)
                                 {
                                     prevCurve = key.Tan;
                                     continue;
                                 }
 
-                                if(key.InterpolationType == HSDLib.Animation.InterpolationType.HermiteValue)
+                                if(key.InterpolationType == GXInterpolationType.HermiteValue)
                                 {
-                                    if (k < keys.Count - 1 && keys[k + 1].InterpolationType == HSDLib.Animation.InterpolationType.HermiteCurve)
-                                        track.AddKey(key.Frame, key.Value, Scenes.Animation.InterpolationType.Hermite, prevCurve, keys[k + 1].Tan);
+                                    if (k < keys.Count - 1 && keys[k + 1].InterpolationType == GXInterpolationType.HermiteCurve)
+                                        track.AddKey(key.Frame, key.Value, InterpolationType.Hermite, prevCurve, keys[k + 1].Tan);
                                     else
-                                        track.AddKey(key.Frame, key.Value, Scenes.Animation.InterpolationType.Hermite, prevCurve);
+                                        track.AddKey(key.Frame, key.Value, InterpolationType.Hermite, prevCurve);
                                 }
                                 else
                                 {
-                                    if (k < keys.Count-1 && keys[k + 1].InterpolationType == HSDLib.Animation.InterpolationType.HermiteCurve)
+                                    if (k < keys.Count-1 && keys[k + 1].InterpolationType == GXInterpolationType.HermiteCurve)
                                         track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan, keys[k + 1].Tan);
                                     else
                                         track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan);
                                 }
 
-                                if(key.InterpolationType == HSDLib.Animation.InterpolationType.Hermite)
+                                if(key.InterpolationType == GXInterpolationType.Hermite)
                                 prevCurve = key.Tan;
                             }
                         }
@@ -111,8 +108,8 @@ namespace StudioSB.IO.Formats
 
         public void ExportSBAnimation(string FileName, SBAnimation animation, SBSkeleton skeleton)
         {
-            HSDFile file = new HSDFile();
-            HSDRoot root = new HSDRoot();
+            HSDRawFile file = new HSDRawFile();
+            HSDRootNode root = new HSDRootNode();
             
             if (HSDSettings.RootName == "" || HSDSettings.RootName == null)
                 HSDSettings.RootName = System.IO.Path.GetFileNameWithoutExtension(FileName);
@@ -129,16 +126,13 @@ namespace StudioSB.IO.Formats
 
             file.Roots.Add(root);
 
-            HSD_FigaTree tree = new HSD_FigaTree();
-            tree.FrameCount = animation.FrameCount;
-            tree.Type = 1;
-            root.Node = tree;
+            var nodes = new List<FigaTreeNode>();
 
             int boneIndex = -1;
             foreach(var skelnode in skeleton.Bones)
             {
-                HSD_AnimNode animNode = new HSD_AnimNode();
-                tree.Nodes.Add(animNode);
+                FigaTreeNode animNode = new FigaTreeNode();
+                nodes.Add(animNode);
 
                 boneIndex++;
                 // skip trans n and rotn tracks
@@ -171,7 +165,7 @@ namespace StudioSB.IO.Formats
                         {
                             Frame = 0,
                             Value = v,
-                            InterpolationType = HSDLib.Animation.InterpolationType.Constant
+                            InterpolationType = GXInterpolationType.Constant
                         });
                     }
                     else
@@ -183,7 +177,7 @@ namespace StudioSB.IO.Formats
                                 {
                                     Frame = key.Frame,
                                     Tan = track.Keys.Keys[i - 1].OutTan,
-                                    InterpolationType = HSDLib.Animation.InterpolationType.HermiteCurve
+                                    InterpolationType = GXInterpolationType.HermiteCurve
                                 });
 
                             if (key.InterpolationType == Scenes.Animation.InterpolationType.Hermite &&
@@ -194,7 +188,7 @@ namespace StudioSB.IO.Formats
                                 {
                                     Frame = key.Frame,
                                     Value = key.Value,
-                                    InterpolationType = HSDLib.Animation.InterpolationType.HermiteValue
+                                    InterpolationType = GXInterpolationType.HermiteValue
                                 });
                             else
                                 keys.Add(new FOBJKey()
@@ -206,36 +200,45 @@ namespace StudioSB.IO.Formats
                                 });
                             prevKey = key;
                         }
-                    animTrack.Track = FOBJFrameEncoder.EncodeFrames(keys, ToGXTrackType(track.Type));
+                    animTrack.FOBJ = FOBJFrameEncoder.EncodeFrames(keys, ToGXTrackType(track.Type));
+                    animTrack.DataLength = (short)animTrack.FOBJ.Buffer.Length;
                     animNode.Tracks.Add(animTrack);
                 }
             }
 
+            HSD_FigaTree tree = new HSD_FigaTree();
+            tree.FrameCount = animation.FrameCount;
+            tree.Type = 1;
+            tree.Nodes = nodes;
+
+            SBConsole.WriteLine(tree.FrameCount);
+
+            root.Data = tree;
             file.Save(FileName);
         }
 
-        public Dictionary<HSDLib.Animation.InterpolationType, StudioSB.Scenes.Animation.InterpolationType> hsdInterToInter = new Dictionary<HSDLib.Animation.InterpolationType, StudioSB.Scenes.Animation.InterpolationType>()
+        public Dictionary<GXInterpolationType, InterpolationType> hsdInterToInter = new Dictionary<GXInterpolationType, InterpolationType>()
         {
-            { HSDLib.Animation.InterpolationType.Constant,  StudioSB.Scenes.Animation.InterpolationType.Constant},
-            { HSDLib.Animation.InterpolationType.Hermite,  StudioSB.Scenes.Animation.InterpolationType.Hermite},
-            { HSDLib.Animation.InterpolationType.Linear,  StudioSB.Scenes.Animation.InterpolationType.Linear},
-            { HSDLib.Animation.InterpolationType.Step,  StudioSB.Scenes.Animation.InterpolationType.Step}
+            { GXInterpolationType.Constant,  InterpolationType.Constant},
+            { GXInterpolationType.Hermite,  InterpolationType.Hermite},
+            { GXInterpolationType.Linear,  InterpolationType.Linear},
+            { GXInterpolationType.Step,  InterpolationType.Step}
         };
         
-        private HSDLib.Animation.InterpolationType ToGXInterpolation(StudioSB.Scenes.Animation.InterpolationType i)
+        private GXInterpolationType ToGXInterpolation(InterpolationType i)
         {
             switch (i)
             {
-                case Scenes.Animation.InterpolationType.Constant:
-                    return HSDLib.Animation.InterpolationType.Constant;
-                case Scenes.Animation.InterpolationType.Hermite:
-                    return HSDLib.Animation.InterpolationType.Hermite;
-                case Scenes.Animation.InterpolationType.Linear:
-                    return HSDLib.Animation.InterpolationType.Linear;
-                case Scenes.Animation.InterpolationType.Step:
-                    return HSDLib.Animation.InterpolationType.Step;
+                case InterpolationType.Constant:
+                    return GXInterpolationType.Constant;
+                case InterpolationType.Hermite:
+                    return GXInterpolationType.Hermite;
+                case InterpolationType.Linear:
+                    return GXInterpolationType.Linear;
+                case InterpolationType.Step:
+                    return GXInterpolationType.Step;
                 default:
-                    return HSDLib.Animation.InterpolationType.Constant;
+                    return GXInterpolationType.Constant;
             }
         }
 
