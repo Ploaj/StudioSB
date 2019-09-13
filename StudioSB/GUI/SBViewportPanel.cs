@@ -289,6 +289,9 @@ namespace StudioSB.GUI
             Clear();
             Viewport.Scene = scene;
 
+            if (scene == null)
+                return;
+
             // basic attachments
             foreach(var v in scene.AttachmentTypes)
             {

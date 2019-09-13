@@ -158,7 +158,7 @@ namespace StudioSB.Scenes.Melee
                 int index = weightToWeightListIndex[tuple];
 
                 if (index * 3 > byte.MaxValue)
-                    throw new InvalidOperationException("To many weights for one polygon object");
+                    throw new InvalidOperationException("To many weights for one polygon object, try splitting the polygons to more DOBJs");
 
                 GX_Vertex gxvert = new GX_Vertex();
                 gxvert.PNMTXIDX = (byte)(index*3);
