@@ -29,6 +29,8 @@ deploy:
 after_build:
   - 7z a "StudioSB.zip" "%APPVEYOR_BUILD_FOLDER%\StudioSB\bin\Release\StudioSB.exe"
   - 7z a "StudioSB.zip" "%APPVEYOR_BUILD_FOLDER%\StudioSB\bin\Release\StudioSB.exe.config"
+  - 7z a "StudioSB.zip" "%APPVEYOR_BUILD_FOLDER%\StudioSB\bin\Release\OpenTK.dll"
+  - 7z a "StudioSB.zip" "%APPVEYOR_BUILD_FOLDER%\StudioSB\bin\Release\OpenTK.GLControl.dll"
   - 7z a "StudioSB.zip" "%APPVEYOR_BUILD_FOLDER%\StudioSB\bin\Release\lib"
   - 7z a "StudioSB.zip" "%APPVEYOR_BUILD_FOLDER%\StudioSB\bin\Release\DefaultTextures"
   - 7z a "StudioSB.zip" "%APPVEYOR_BUILD_FOLDER%\StudioSB\bin\Release\Shaders"
