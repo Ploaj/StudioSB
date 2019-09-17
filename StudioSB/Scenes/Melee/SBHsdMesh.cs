@@ -157,11 +157,11 @@ namespace StudioSB.Scenes.Melee
 
                 int index = weightToWeightListIndex[tuple];
 
-                if (index * 3 > byte.MaxValue)
-                    throw new InvalidOperationException("To many weights for one polygon object, try splitting the polygons to more DOBJs");
+                if (index * 3 > ushort.MaxValue)
+                    SBConsole.WriteLine("Warning!: To many weights for one polygon object, try splitting the polygons to more DOBJs");
 
                 GX_Vertex gxvert = new GX_Vertex();
-                gxvert.PNMTXIDX = (byte)(index*3);
+                gxvert.PNMTXIDX = (ushort)(index * 3);
                 gxvert.POS = new GXVector3(iovert.Position.X, iovert.Position.Y, iovert.Position.Z);
                 gxvert.NRM = new GXVector3(iovert.Normal.X, iovert.Normal.Y, iovert.Normal.Z);
                 gxvert.TEX0 = new GXVector2(iovert.UV0.X, iovert.UV0.Y);

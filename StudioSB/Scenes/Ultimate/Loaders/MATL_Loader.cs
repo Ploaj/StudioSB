@@ -7,19 +7,6 @@ using System.Reflection;
 
 namespace StudioSB.Scenes.Ultimate
 {
-    /// <summary>
-    /// Used to make the names used when reading/writing a mat file
-    /// </summary>
-    public class MATLLoaderAttributeName : Attribute
-    {
-        public string Name { get; set; }
-
-        public MATLLoaderAttributeName(string name)
-        {
-            Name = name;
-        }
-    }
-
     public class MATL_Loader
     {
         /// <summary>
@@ -42,9 +29,9 @@ namespace StudioSB.Scenes.Ultimate
                     Dictionary<string, PropertyInfo> NameToProperty = new Dictionary<string, PropertyInfo>();
                     foreach (var prop in MaterialProps)
                     {
-                        var attrName = (MATLLoaderAttributeName)prop.GetCustomAttribute(typeof(MATLLoaderAttributeName));
+                        var attrName = prop.Name;
                         if(attrName != null)
-                            NameToProperty.Add(attrName.Name, prop);
+                            NameToProperty.Add(attrName, prop);
                     }
 
                     foreach(var entry in matl.Entries)

@@ -13,9 +13,8 @@ uniform sampler2D bakeLitMap;
 uniform sampler2D gaoMap;
 uniform sampler2D inkNorMap;
 
-// TODO: Cubemap loading doesn't work yet.
-uniform int hasDifCubemap;
-uniform samplerCube difCubemap;
+uniform int hasDifCubeMap;
+uniform samplerCube difCubeMap;
 
 uniform int hasDiffuse;
 uniform sampler2D difMap;
@@ -30,11 +29,11 @@ uniform samplerCube diffusePbrCube;
 uniform samplerCube specularPbrCube;
 
 // UV scrolling animations.
-uniform int paramEE;
-uniform int paramED;
+uniform int CustomBoolean6;
+uniform int CustomBoolean5;
 uniform float currentFrame;
 
-uniform float paramC4;
+uniform float CustomFloat4;
 
 uniform int emissionOverride;
 
@@ -50,7 +49,7 @@ vec2 TransformUv(vec2 uv, vec4 transform)
     vec2 translate = vec2(-1.0 * transform.z, transform.w);
 
     // TODO: Does this affect all layers?
-    if (paramEE == 1 || paramED == 1)
+    if (CustomBoolean5 == 1 || CustomBoolean6 == 1)
         translate *= currentFrame / 60.0;
 
     vec2 scale = transform.xy;
@@ -59,7 +58,7 @@ vec2 TransformUv(vec2 uv, vec4 transform)
     // TODO: du dv map?
     vec2 textureOffset = vec2(1) - texture(norMap, uv).xy;
     textureOffset = textureOffset * 2 - 1; // Remap [0,1] to [-1,1]
-    result = result + (textureOffset * paramC4 * renderExperimental);
+    result = result + (textureOffset * CustomFloat4 * renderExperimental);
 
     return result;
 }
@@ -77,7 +76,7 @@ vec4 GetEmissionColor(vec2 uv1, vec2 uv2, vec4 transform1, vec4 transform2)
     return emissionColor;
 }
 
-vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec4 transform1, vec4 transform2, vec4 transform3, vec4 colorSet5)
+vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec3 R, vec4 transform1, vec4 transform2, vec4 transform3, vec4 colorSet5)
 {
     // HACK: The default albedo color is white, which won't work with emission.
     if (emissionOverride == 1)
@@ -99,8 +98,8 @@ vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec4 transform1, vec4 transfor
         albedoColor.rgb = Blend(albedoColor, albedoColor2 * vec4(vec3(1), colorSet5.a));
 
     // Materials won't have col and diffuse cubemaps.
-    // if (hasDifCubemap == 1)
-    //     albedoColor.rgb = texture(difCubemap, uvLayer1).rgb;
+    if (hasDifCubeMap == 1)
+        albedoColor.rgb = texture(difCubeMap, R).rgb;
 
     if (hasDiffuse == 1)
         albedoColor.rgb = Blend(albedoColor, diffuseColor);

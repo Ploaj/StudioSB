@@ -3,7 +3,7 @@
 layout (triangles) in;
 layout (triangle_strip, max_vertices = 3) out;
 
-in vec3 geomN[];
+in vec3 geomVertexNormal[];
 in vec3 geomPosition[];
 in vec3 geomTangent[];
 in vec3 geomBitangent[];
@@ -14,7 +14,7 @@ in vec4 geomColorSet1[];
 in vec4 geomColorSet5[];
 in vec2 geomBake1[];
 
-out vec3 N;
+out vec3 vertexNormal;
 out vec3 tangent;
 out vec3 bitangent;
 out vec2 map1;
@@ -51,7 +51,7 @@ void main()
     for (int i = 0; i < 3; i++)
     {
         gl_Position = gl_in[i].gl_Position;
-        N = geomN[i];
+        vertexNormal = geomVertexNormal[i];
         tangent = geomTangent[i];
         bitangent = geomBitangent[i];
 

@@ -261,7 +261,7 @@ namespace StudioSB.Scenes.Ultimate
             {
                 var m = new IOMaterial();
                 m.Name = mat.Name;
-                m.DiffuseTexture = mat.colMap.Value;
+                m.DiffuseTexture = mat.Texture0.Value;
                 iomodel.Materials.Add(m);
             }
 
@@ -622,6 +622,7 @@ namespace StudioSB.Scenes.Ultimate
         private void SetShaderCamera(Shader shader, Camera camera)
         {
             Matrix4 mvp = camera.MvpMatrix;
+
             shader.SetMatrix4x4("mvp", ref mvp);
             
             shader.SetVector3("cameraPos", camera.Position);
@@ -645,6 +646,19 @@ namespace StudioSB.Scenes.Ultimate
 
             shader.SetBoolToInt("renderNormalMaps", ApplicationSettings.RenderNormalMaps);
             shader.SetBoolToInt("renderVertexColor", ApplicationSettings.RenderVertexColor);
+
+            shader.SetFloat("iblIntensity", 1.0f);
+            shader.SetFloat("directLightIntensity", 1.0f);
+
+            shader.SetVector3("chrLightDir", GetLightDirectionFromQuaternion(-0.453154f, -0.365998f, -0.211309f, 0.784886f));
+        }
+
+        private static Vector3 GetLightDirectionFromQuaternion(float x, float y, float z, float w)
+        {
+            var quaternion = new Quaternion(x, y, z, w);
+            var matrix = Matrix4.CreateFromQuaternion(quaternion);
+            var lightDirection = Vector4.Transform(new Vector4(0, 0, 1, 0), matrix);
+            return lightDirection.Normalized().Xyz;
         }
 
         #endregion

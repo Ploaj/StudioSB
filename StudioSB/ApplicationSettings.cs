@@ -33,8 +33,7 @@ namespace StudioSB
         Tangents,
         Bitangents,
         BakeUV,
-        UVPattern,
-        ParamID
+        UVPattern
     }
 
     public enum TransitionMode

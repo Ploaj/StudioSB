@@ -26,157 +26,139 @@ namespace StudioSB.Scenes.Ultimate
         
         #region Vectors
         
-        [MATLLoaderAttributeName("CustomVector0")]
-        public SBMatAttrib<Vector4> param98 { get; } = new SBMatAttrib<Vector4>("CustomVector0", new Vector4(0), description: "Alpha offset.");
+        public SBMatAttrib<Vector4> CustomVector0 { get; } = new SBMatAttrib<Vector4>("CustomVector0", new Vector4(0), description: "Alpha offset.");
+        
+        public SBMatAttrib<Vector4> CustomVector3 { get; } = new SBMatAttrib<Vector4>("CustomVector3", new Vector4(1), description: "Some sort of emission color.");
+        
+        public SBMatAttrib<Vector4> CustomVector6 { get; } = new SBMatAttrib<Vector4>("CustomVector6", new Vector4(1, 1, 0, 0), description: "UV Transform layer 1 for emissive map layer 1");
+        
+        public SBMatAttrib<Vector4> CustomVector8 { get; } = new SBMatAttrib<Vector4>("CustomVector8", new Vector4(1), description: "Diffuse color multiplier?");
 
-        [MATLLoaderAttributeName("CustomVector3")]
-        public SBMatAttrib<Vector4> param9B { get; } = new SBMatAttrib<Vector4>("CustomVector3", new Vector4(1), description: "Some sort of emission color.");
-
-        [MATLLoaderAttributeName("CustomVector6")]
-        public SBMatAttrib<Vector4> param9E { get; } = new SBMatAttrib<Vector4>("CustomVector6", new Vector4(1, 1, 0, 0), description: "UV Transform layer 1 for emissive map layer 1");
-
-        [MATLLoaderAttributeName("CustomVector8")]
-        public SBMatAttrib<Vector4> paramA0 { get; } = new SBMatAttrib<Vector4>("CustomVector8", new Vector4(1), description: "Diffuse color multiplier?");
-
-        [Browsable(false), MATLLoaderAttributeName("CustomVector11")]
-        public SBMatAttrib<Vector4> paramA3 { get; } = new SBMatAttrib<Vector4>("CustomVector11", new Vector4(0), description: "Some sort of skin subsurface color", isColor: true);
+        [Browsable(false)]
+        public SBMatAttrib<Vector4> CustomVector11 { get; } = new SBMatAttrib<Vector4>("CustomVector11", new Vector4(0), description: "Some sort of skin subsurface color", isColor: true);
 
         [Category("Colors"), DisplayName("CustomVector11"), Description("Some sort of skin subsurface color")]
         public Color paramA3View
         {
-            get => Color.FromArgb((byte)(paramA3.Value.W * 255), (byte)(paramA3.Value.X * 255), (byte)(paramA3.Value.Y * 255), (byte)(paramA3.Value.Z* 255));
-            set => paramA3.Value = new Vector4(value.R / 255f, value.B / 255f, value.G / 255f, value.A / 255f);
+            get => Color.FromArgb((byte)(CustomVector11.Value.W * 255), (byte)(CustomVector11.Value.X * 255), (byte)(CustomVector11.Value.Y * 255), (byte)(CustomVector11.Value.Z* 255));
+            set => CustomVector11.Value = new Vector4(value.R / 255f, value.B / 255f, value.G / 255f, value.A / 255f);
         } 
-
-        [MATLLoaderAttributeName("CustomVector13")]
-        public SBMatAttrib<Vector4> paramA5 { get; } = new SBMatAttrib<Vector4>("CustomVector13", new Vector4(1), description: "Diffuse color multiplier?");
-
-        [MATLLoaderAttributeName("CustomVector14")]
-        public SBMatAttrib<Vector4> paramA6 { get; } = new SBMatAttrib<Vector4>("CustomVector14", new Vector4(0), description: "Assume no edge lighting if not present.");
-
-        [MATLLoaderAttributeName("CustomVector18")]
-        public SBMatAttrib<Vector4> paramAA { get; } = new SBMatAttrib<Vector4>("CustomVector18", new Vector4(1), description: "Sprite sheet UV parameters.");
         
-        [MATLLoaderAttributeName("CustomVector30")]
-        public SBMatAttrib<Vector4> param145 { get; } = new SBMatAttrib<Vector4>("CustomVector30", new Vector4(1, 0, 0, 0), description: "");
+        public SBMatAttrib<Vector4> CustomVector13 { get; } = new SBMatAttrib<Vector4>("CustomVector13", new Vector4(1), description: "Diffuse color multiplier?");
+        
+        public SBMatAttrib<Vector4> CustomVector14 { get; } = new SBMatAttrib<Vector4>("CustomVector14", new Vector4(1), description: "Assume no edge lighting if not present.");
+        
+        public SBMatAttrib<Vector4> CustomVector18 { get; } = new SBMatAttrib<Vector4>("CustomVector18", new Vector4(1), description: "Sprite sheet UV parameters.");
+        
+        public SBMatAttrib<Vector4> CustomVector30 { get; } = new SBMatAttrib<Vector4>("CustomVector30", new Vector4(1, 0, 0, 0), description: "");
+        
+        public SBMatAttrib<Vector4> CustomVector31 { get; } = new SBMatAttrib<Vector4>("CustomVector31", new Vector4(1, 1, 0, 0), description: "UV transform");
+        
+        public SBMatAttrib<Vector4> CustomVector32 { get; } = new SBMatAttrib<Vector4>("CustomVector32", new Vector4(1, 1, 0, 0), description: "UV transform");
+        
+        public SBMatAttrib<Vector4> CustomVector42 { get; } = new SBMatAttrib<Vector4>("CustomVector42", new Vector4(0), description: "");
 
-        [MATLLoaderAttributeName("CustomVector31")]
-        public SBMatAttrib<Vector4> param146 { get; } = new SBMatAttrib<Vector4>("CustomVector31", new Vector4(1, 1, 0, 0), description: "UV transform");
+        public bool hasCustomVector42 { get => CustomVector42.Used; }
+        
+        public SBMatAttrib<Vector4> CustomVector44 { get; } = new SBMatAttrib<Vector4>("CustomVector44", new Vector4(0), description: "Wii Fit trainer stage color.");
 
-        [MATLLoaderAttributeName("CustomVector32")]
-        public SBMatAttrib<Vector4> param147 { get; } = new SBMatAttrib<Vector4>("CustomVector32", new Vector4(1, 1, 0, 0), description: "UV transform");
+        public bool hasCustomVector44 { get => CustomVector44.Used; }
+        
+        public SBMatAttrib<Vector4> CustomVector45 { get; } = new SBMatAttrib<Vector4>("CustomVector45", new Vector4(0), description: "Wii Fit trainer stage color.");
+        
+        public SBMatAttrib<Vector4> CustomVector47 { get; } = new SBMatAttrib<Vector4>("CustomVector47", new Vector4(0), description: "");
 
-        [MATLLoaderAttributeName("CustomVector42")]
-        public SBMatAttrib<Vector4> param151 { get; } = new SBMatAttrib<Vector4>("CustomVector42", new Vector4(0), description: "");
-
-        public bool hasParam151 { get => param151.Used; }
-
-        [MATLLoaderAttributeName("CustomVector44")]
-        public SBMatAttrib<Vector4> param153 { get; } = new SBMatAttrib<Vector4>("CustomVector44", new Vector4(0), description: "Wii Fit trainer stage color.");
-
-        public bool hasParam153 { get => param153.Used; }
-
-        [MATLLoaderAttributeName("CustomVector45")]
-        public SBMatAttrib<Vector4> param154 { get; } = new SBMatAttrib<Vector4>("CustomVector45", new Vector4(0), description: "Wii Fit trainer stage color.");
-
-        [MATLLoaderAttributeName("CustomVector47")]
-        public SBMatAttrib<Vector4> param156 { get; } = new SBMatAttrib<Vector4>("CustomVector47", new Vector4(0), description: "");
-
-        public bool hasParam156 { get => param156.Used; }
+        public bool hasCustomVector47 { get => CustomVector47.Used; }
 
         #endregion
 
         #region Booleans
-        [MATLLoaderAttributeName("CustomBoolean1")]
-        public SBMatAttrib<bool> paramE9 { get; } = new SBMatAttrib<bool>("CustomBoolean1", true, description: "Enables/disables specular occlusion");
+        public SBMatAttrib<bool> CustomBoolean1 { get; } = new SBMatAttrib<bool>("CustomBoolean1", false, description: "Enables/disables specular occlusion");
+        
+        public SBMatAttrib<bool> CustomBoolean2 { get; } = new SBMatAttrib<bool>("CustomBoolean2", true, description: "");
 
-        [MATLLoaderAttributeName("CustomBoolean2")]
-        public SBMatAttrib<bool> paramEA { get; } = new SBMatAttrib<bool>("CustomBoolean2", true, description: "");
+        public SBMatAttrib<bool> CustomBoolean5 { get; } = new SBMatAttrib<bool>("CustomBoolean5", false, description: "Enables/disables UV scrolling animations");
 
-        [MATLLoaderAttributeName("CustomBoolean6")]
-        public SBMatAttrib<bool> paramEE { get; } = new SBMatAttrib<bool>("CustomBoolean6", true, description: "Enables/disables UV scrolling animations");
-
-        [MATLLoaderAttributeName("CustomBoolean7")]
-        public SBMatAttrib<bool> paramEF { get; } = new SBMatAttrib<bool>("CustomBoolean7", true, description: "Enables/disables UV scrolling animations");
-
-        [MATLLoaderAttributeName("CustomBoolean9")]
-        public SBMatAttrib<bool> paramF1 { get; } = new SBMatAttrib<bool>("CustomBoolean9", true, description: "Some sort of sprite sheet scale toggle");
+        public SBMatAttrib<bool> CustomBoolean6 { get; } = new SBMatAttrib<bool>("CustomBoolean6", false, description: "Enables/disables UV scrolling animations");
+        
+        public SBMatAttrib<bool> CustomBoolean7 { get; } = new SBMatAttrib<bool>("CustomBoolean7", true, description: "Enables/disables UV scrolling animations");
+        
+        public SBMatAttrib<bool> CustomBoolean9 { get; } = new SBMatAttrib<bool>("CustomBoolean9", true, description: "Some sort of sprite sheet scale toggle");
 
         #endregion
 
         #region Floats
 
-        [MATLLoaderAttributeName("CustomFloat8")]
-        public SBMatAttrib<float> paramC8 { get; } = new SBMatAttrib<float>("CustomFloat8", 0.0f, description: "Controls specular IOR");
+        public SBMatAttrib<float> CustomFloat4 { get; } = new SBMatAttrib<float>("CustomFloat4", 0.0f, description: "");
 
-        [MATLLoaderAttributeName("CustomFloat10")]
-        public SBMatAttrib<float> paramCA { get; } = new SBMatAttrib<float>("CustomFloat10", 0.0f, description: "Controls anisotropic specular");
-
-        [MATLLoaderAttributeName("CustomFloat19")]
-        public SBMatAttrib<float> paramD3 { get; } = new SBMatAttrib<float>("CustomFloat19", 0.0f, description: "");
+        public SBMatAttrib<float> CustomFloat8 { get; } = new SBMatAttrib<float>("CustomFloat8", 0.0f, description: "Controls specular IOR");
+        
+        public SBMatAttrib<float> CustomFloat10 { get; } = new SBMatAttrib<float>("CustomFloat10", 0.0f, description: "Controls anisotropic specular");
+        
+        public SBMatAttrib<float> CustomFloat19 { get; } = new SBMatAttrib<float>("CustomFloat19", 0.0f, description: "");
 
         #endregion
 
         #region Textures
 
-        [MATLLoaderAttributeName("Texture0"), DefaultTextureName("defaultBlack")]
-        public SBMatAttrib<string> colMap { get; } = new SBMatAttrib<string>("Texture0", "");
-        public bool hasColMap { get => colMap.Used; }
+        [DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> Texture0 { get; } = new SBMatAttrib<string>("colMap", "", description: "Color Map");
+        public bool hasColMap { get => Texture0.Used; }
         
-        [MATLLoaderAttributeName("Texture1"), DefaultTextureName("defaultWhite")]
-        public SBMatAttrib<string> col2Map { get; } = new SBMatAttrib<string>("Texture1", "");
-        public bool hasCol2Map { get => col2Map.Used; }
+        [DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> Texture1 { get; } = new SBMatAttrib<string>("col2Map", "", description: "Color Map 2");
+        public bool hasCol2Map { get => Texture1.Used; }
 
-        [MATLLoaderAttributeName("Texture2"), DefaultTextureName("defaultBlackCube")]
-        public SBMatAttrib<string> irrCubemap { get; } = new SBMatAttrib<string>("Texture2", "");
-        public bool hasIrrCubemap { get => irrCubemap.Used; }
+        [DefaultTextureName("defaultBlackCube")]
+        public SBMatAttrib<string> Texture2 { get; } = new SBMatAttrib<string>("irrCubemap", "", description: "Irradiance Cubemap");
+        public bool hasIrrCubemap { get => Texture2.Used; }
 
-        [MATLLoaderAttributeName("Texture3"), DefaultTextureName("defaultWhite")]
-        public SBMatAttrib<string> gaoMap { get; } = new SBMatAttrib<string>("Texture3", "");
+        [DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> Texture3 { get; } = new SBMatAttrib<string>("gaoMap", "", description: "GAO Map");
 
-        [MATLLoaderAttributeName("Texture4"), DefaultTextureName("defaultNormal")]
-        public SBMatAttrib<string> norMap { get; } = new SBMatAttrib<string>("Texture4", "");
+        [DefaultTextureName("defaultNormal")]
+        public SBMatAttrib<string> Texture4 { get; } = new SBMatAttrib<string>("norMap", "", description: "Normal Map");
 
-        [MATLLoaderAttributeName("Texture5"), DefaultTextureName("defaultBlack")]
-        public SBMatAttrib<string> emiMap { get; } = new SBMatAttrib<string>("Texture5", "");
-        public bool hasEmi { get => emiMap != null; }
+        [DefaultTextureName("defaultBlack")]
+        public SBMatAttrib<string> Texture5 { get; } = new SBMatAttrib<string>("emiMap", "", description: "Emission Map");
+        public bool hasEmi { get => Texture5 != null; }
 
-        [MATLLoaderAttributeName("Texture6"), DefaultTextureName("defaultPrm")]
-        public SBMatAttrib<string> prmMap { get; } = new SBMatAttrib<string>("Texture6", "");
-        public bool hasPrmMap { get => prmMap.Used; }
+        [DefaultTextureName("defaultPrm")]
+        public SBMatAttrib<string> Texture6 { get; } = new SBMatAttrib<string>("prmMap", "", description: "PRM Map");
+        public bool hasPrmMap { get => Texture6.Used; }
 
-        [MATLLoaderAttributeName("Texture7"), DefaultTextureName("defaultSpecCube")]
-        public SBMatAttrib<string> specularPbrCube { get; } = new SBMatAttrib<string>("Texture7", "");
+        [DefaultTextureName("defaultBlackCube")]
+        public SBMatAttrib<string> Texture7 { get; } = new SBMatAttrib<string>("specularPbrCube", "", description: "Specular PBR Map");
 
-        [MATLLoaderAttributeName("Texture8"), DefaultTextureName("defaultBlackCube")]
-        public SBMatAttrib<string> difCubemap { get; } = new SBMatAttrib<string>("Texture8", "");
-        public bool hasDifCubemap { get => difCubemap.Used; }
+        [DefaultTextureName("defaultBlackCube")]
+        public SBMatAttrib<string> Texture8 { get; } = new SBMatAttrib<string>("difCubeMap", "", description: "Diffuse Cube Map");
+        public bool hasDifCubeMap { get => Texture8.Used; }
 
-        [MATLLoaderAttributeName("Texture9"), DefaultTextureName("defaultBlack")]
-        public SBMatAttrib<string> bakeLitMap { get; } = new SBMatAttrib<string>("Texture9", "");
+        [DefaultTextureName("defaultBlack")]
+        public SBMatAttrib<string> Texture9 { get; } = new SBMatAttrib<string>("bakeLitMap", "", description: "Bake Light Map");
 
-        [MATLLoaderAttributeName("Texture10"), DefaultTextureName("defaultWhite")]
-        public SBMatAttrib<string> difMap { get; } = new SBMatAttrib<string>("Texture10", "");
-        public bool hasDiffuse { get => difMap.Used; }
+        [DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> Texture10 { get; } = new SBMatAttrib<string>("difMap", "", description: "Diffuse Map");
+        public bool hasDiffuse { get => Texture10.Used; }
         
-        [MATLLoaderAttributeName("Texture11"), DefaultTextureName("defaultWhite")]
-        public SBMatAttrib<string> dif2Map { get; } = new SBMatAttrib<string>("Texture11", "");
-        public bool hasDiffuse2 { get => dif2Map.Used; }
+        [DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> Texture11 { get; } = new SBMatAttrib<string>("dif2Map", "", description: "Diffuse Map 2nd Layer");
+        public bool hasDiffuse2 { get => Texture11.Used; }
         
-        [MATLLoaderAttributeName("Texture12"), DefaultTextureName("defaultWhite")]
-        public SBMatAttrib<string> dif3Map { get; } = new SBMatAttrib<string>("Texture12", "");
-        public bool hasDiffuse3 { get => dif3Map.Used; }
+        [DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> Texture12 { get; } = new SBMatAttrib<string>("dif3Map", "", description: "Diffuse Map 3rd Layer");
+        public bool hasDiffuse3 { get => Texture12.Used; }
 
-        [MATLLoaderAttributeName("Texture13"), DefaultTextureName("defaultWhite")]
-        public SBMatAttrib<string> projMap { get; } = new SBMatAttrib<string>("Texture13", "");
+        [DefaultTextureName("defaultBlack")]
+        public SBMatAttrib<string> Texture13 { get; } = new SBMatAttrib<string>("projMap", "", description: "Projection Map");
 
-        [MATLLoaderAttributeName("Texture14"), DefaultTextureName("defaultBlack")]
-        public SBMatAttrib<string> emi2Map { get; } = new SBMatAttrib<string>("Texture14", "");
-        public bool hasEmi2 { get => emi2Map != null; }
+        [DefaultTextureName("defaultBlack")]
+        public SBMatAttrib<string> Texture14 { get; } = new SBMatAttrib<string>("emi2Map", "", description: "Emission Map 2");
+        public bool hasEmi2 { get => Texture14 != null; }
 
-        [MATLLoaderAttributeName("Texture16"), DefaultTextureName("defaultWhite")]
-        public SBMatAttrib<string> inkNorMap { get; } = new SBMatAttrib<string>("Texture16", "");
-        public bool hasInkNorMap { get => inkNorMap.Used; }
+        [DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> Texture16 { get; } = new SBMatAttrib<string>("inkNorMap", "", description: "Ink Normal Map");
+        public bool hasInkNorMap { get => Texture16.Used; }
 
         public bool HasBlending { get { return (BlendState.BlendFactor1 != 0 || BlendState.BlendFactor2 != 0); } }
 
@@ -223,9 +205,9 @@ namespace StudioSB.Scenes.Ultimate
         {
             foreach(var prop in Properties)
             {
-                var paramname = prop.GetCustomAttribute(typeof(MATLLoaderAttributeName));
+                var paramname = prop.Name;
                 if (paramname != null)
-                    paramNameToPropertyName.Add(((MATLLoaderAttributeName)paramname).Name, prop.Name);
+                    paramNameToPropertyName.Add(paramname, prop.Name);
                 var deftex = prop.GetCustomAttribute(typeof(DefaultTextureName));
                 if (deftex != null)
                     nameToDefaultTexture.Add(prop.Name, (DefaultTextureName)(deftex));
@@ -253,16 +235,18 @@ namespace StudioSB.Scenes.Ultimate
             
             foreach (var p in Properties)
             {
-                if(shader.GetUniformLocation(p.Name) != -1 || shader.GetAttribLocation(p.Name) != -1)
+                if (p.PropertyType == typeof(SBMatAttrib<string>))
                 {
-                    if(p.PropertyType == typeof(SBMatAttrib<string>))
-                    {
-                        var value = ((SBMatAttrib<string>)MatAttribs[p.Name]).AnimatedValue.ToLower();
-                        SBSurface surface = ssbhScene.GetSurfaceFromName(value);//.nameToSurface.ContainsKey(value) ? ssbhScene.nameToSurface[value] : null;
-                        var surfaceInfo = nameToDefaultTexture[p.Name]; 
-                        BindSurface(shader, ssbhScene, surface, surfaceInfo, p.Name, TextureUnit++);
-                    }
-                    else
+                    var texName = ((SBMatAttrib<string>)MatAttribs[p.Name]).Name;
+                    if (shader.GetUniformLocation(texName) == -1)
+                        continue;
+                    var value = ((SBMatAttrib<string>)MatAttribs[p.Name]).AnimatedValue.ToLower();
+                    SBSurface surface = ssbhScene.GetSurfaceFromName(value);
+                    var surfaceInfo = nameToDefaultTexture[p.Name];
+                    BindSurface(shader, ssbhScene, surface, surfaceInfo, texName, TextureUnit++);
+                }
+                if (shader.GetUniformLocation(p.Name) != -1 || shader.GetAttribLocation(p.Name) != -1)
+                {
                     if (p.PropertyType == typeof(SBMatAttrib<Vector4>))
                         shader.SetVector4(p.Name, ((SBMatAttrib<Vector4>)MatAttribs[p.Name]).AnimatedValue);
                     else
@@ -281,7 +265,6 @@ namespace StudioSB.Scenes.Ultimate
             }
 
             shader.SetTexture("diffusePbrCube", DefaultTextures.Instance.diffusePbr, TextureUnit++);
-            //shader.SetTexture("specularPbrCube", DefaultTextures.Instance.specularPbr, TextureUnit++);
             shader.SetTexture("iblLut", DefaultTextures.Instance.iblLut, TextureUnit++);
             shader.SetTexture("uvPattern", DefaultTextures.Instance.uvPattern, TextureUnit++);
         }

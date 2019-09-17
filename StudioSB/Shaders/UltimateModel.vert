@@ -17,7 +17,7 @@ in vec2 uvSet1;
 in ivec4 boneIndices;
 in vec4 boneWeights;
 
-out vec3 geomN;
+out vec3 geomVertexNormal;
 out vec3 geomTangent;
 out vec3 geomBitangent;
 out vec2 geomMap1;
@@ -31,22 +31,16 @@ out vec3 geomPosition;
 uniform mat4 mvp;
 uniform mat4 transform;
 
-// Sprite sheet animations.
-uniform vec4 paramAA;
-uniform int paramF1;
-
 uniform Bones
 {
-    mat4 transforms[200];
-} bones;
+    mat4 transforms[300];
+};
 
 void main()
 {
     // Single bind transform
-    vec4 transformedPosition = transform * vec4(Position0, 1);
+    vec4 position = transform * vec4(Position0, 1);
     vec4 transformedNormal = transform * vec4(Normal0, 0);
-
-	vec4 position = transformedPosition;
 
     // Vertex skinning
     if (boneWeights.x != 0) {
@@ -55,22 +49,23 @@ void main()
 
         for (int i = 0; i < 4; i++)
         {
-            position += bones.transforms[boneIndices[i]] * vec4(transformedPosition.xyz, 1) * boneWeights[i];
-            transformedNormal.xyz += (inverse(transpose(bones.transforms[boneIndices[i]])) * vec4(Normal0, 1) * boneWeights[i]).xyz;
+            position += transforms[boneIndices[i]] * vec4(Position0, 1) * boneWeights[i];
+            transformedNormal.xyz += (inverse(transpose(transforms[boneIndices[i]])) * vec4(Normal0, 1) * boneWeights[i]).xyz;
         }
     }
 
     // Assign geometry inputs
-    geomN = transformedNormal.xyz;
+    geomVertexNormal = transformedNormal.xyz;
     geomColorSet1 = colorSet1;
     geomColorSet5 = colorSet5;
     geomBake1 = bake1;
     geomPosition = position.xyz;
 
-    // Sprite sheet uvs.
+    // TODO: Sprite sheet uvs.
     geomMap1 = map1;
-    if (paramF1 == 1)
-        geomMap1 /= paramAA.xy;
+    // if (CustomBoolean1 == 1)
+    //     geomMap1 /= CustomVector18.xy;
+
     geomUvSet = uvSet;
     geomUvSet1 = uvSet1;
 
