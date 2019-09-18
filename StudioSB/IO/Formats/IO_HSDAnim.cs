@@ -5,6 +5,7 @@ using StudioSB.Scenes.Animation;
 using HSDRaw;
 using HSDRaw.Tools;
 using HSDRaw.Common.Animation;
+using System.ComponentModel;
 
 namespace StudioSB.IO.Formats
 {
@@ -13,6 +14,9 @@ namespace StudioSB.IO.Formats
         public class HSDAnimSettings
         {
             public string RootName { get; set; }
+
+            [Description("Used for fighter animations, set to false for stages")]
+            public bool FigaTree { get; set; } = true;
         }
 
         public string Name => "Dat Anim File";
@@ -34,6 +38,31 @@ namespace StudioSB.IO.Formats
                 if (root == null || root.Data == null)
                     continue;
                 anim.Name = root.Name;
+                if (root.Data is HSD_AnimJoint joint)
+                {
+                    var joints = joint.DepthFirstList;
+
+                    int nodeIndex = -1;
+                    foreach(var j in joints)
+                    {
+                        nodeIndex++;
+                        if (j.AOBJ == null || j.AOBJ.FObjDesc == null)
+                            continue;
+
+                        SBConsole.WriteLine(j.Flags.ToString("X8") + " " + j.AOBJ.Flags.ToString());
+
+                        SBTransformAnimation a = new SBTransformAnimation();
+                        a.Name = "JOBJ_" + nodeIndex;
+                        anim.TransformNodes.Add(a);
+
+                        anim.FrameCount = Math.Max(anim.FrameCount, j.AOBJ.EndFrame);
+
+                        foreach (var fobj in j.AOBJ.FObjDesc.List)
+                        {
+                            a.Tracks.Add(DecodeFOBJ(fobj.FOBJ));
+                        }
+                    }
+                }
                 if (root.Data is HSD_FigaTree tree)
                 {
                     anim.FrameCount = tree.FrameCount;
@@ -48,56 +77,8 @@ namespace StudioSB.IO.Formats
                         {
                             if (att.FOBJ == null)
                                 continue;
-
-                            SBTrackType trackType = SBTrackType.TranslateX;
-                            switch (att.FOBJ.AnimationType)
-                            {
-                                case JointTrackType.HSD_A_J_ROTX: trackType = SBTrackType.RotateX; break;
-                                case JointTrackType.HSD_A_J_ROTY: trackType = SBTrackType.RotateY; break;
-                                case JointTrackType.HSD_A_J_ROTZ: trackType = SBTrackType.RotateZ; break;
-                                case JointTrackType.HSD_A_J_TRAX: trackType = SBTrackType.TranslateX; break;
-                                case JointTrackType.HSD_A_J_TRAY: trackType = SBTrackType.TranslateY; break;
-                                case JointTrackType.HSD_A_J_TRAZ: trackType = SBTrackType.TranslateZ; break;
-                                case JointTrackType.HSD_A_J_SCAX: trackType = SBTrackType.ScaleX; break;
-                                case JointTrackType.HSD_A_J_SCAY: trackType = SBTrackType.ScaleY; break;
-                                case JointTrackType.HSD_A_J_SCAZ: trackType = SBTrackType.ScaleZ; break;
-                            }
-
-                            SBTransformTrack track = new SBTransformTrack(trackType);
-                            a.Tracks.Add(track);
                             
-                            FOBJFrameDecoder decoder = new FOBJFrameDecoder(att.FOBJ);
-                            var keys = decoder.GetKeys();
-
-                            float prevCurve = 0;
-                            for (int k = 0; k < keys.Count; k++)
-                            {
-                                var key = keys[k];
-
-                                if (key.InterpolationType == GXInterpolationType.HermiteCurve)
-                                {
-                                    prevCurve = key.Tan;
-                                    continue;
-                                }
-
-                                if(key.InterpolationType == GXInterpolationType.HermiteValue)
-                                {
-                                    if (k < keys.Count - 1 && keys[k + 1].InterpolationType == GXInterpolationType.HermiteCurve)
-                                        track.AddKey(key.Frame, key.Value, InterpolationType.Hermite, prevCurve, keys[k + 1].Tan);
-                                    else
-                                        track.AddKey(key.Frame, key.Value, InterpolationType.Hermite, prevCurve);
-                                }
-                                else
-                                {
-                                    if (k < keys.Count-1 && keys[k + 1].InterpolationType == GXInterpolationType.HermiteCurve)
-                                        track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan, keys[k + 1].Tan);
-                                    else
-                                        track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan);
-                                }
-
-                                if(key.InterpolationType == GXInterpolationType.Hermite)
-                                prevCurve = key.Tan;
-                            }
+                            a.Tracks.Add(DecodeFOBJ(att.FOBJ));
                         }
                     }
                 }
@@ -106,17 +87,167 @@ namespace StudioSB.IO.Formats
             return anim;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="track"></param>
+        /// <returns></returns>
+        private static HSD_FOBJ EncodeFOBJ(SBTransformTrack track)
+        {
+            List<FOBJKey> keys = new List<FOBJKey>();
+            SBAnimKey<float> prevKey = null;
+
+            var constant = true;
+            var v = track.Keys.Keys.Count > 0 ? track.Keys.Keys[0].Value : 0;
+            foreach (var key in track.Keys.Keys)
+            {
+                if (key.Value != v)
+                {
+                    constant = false;
+                    break;
+                }
+            }
+            if (constant)
+            {
+                keys.Add(new FOBJKey()
+                {
+                    Frame = 0,
+                    Value = v,
+                    InterpolationType = GXInterpolationType.Constant
+                });
+            }
+            else
+            {
+                for (int i = 0; i < track.Keys.Keys.Count; i++)
+                {
+                    var key = track.Keys.Keys[i];
+                    if (i > 0 && track.Keys.Keys[i - 1].InTan != track.Keys.Keys[i - 1].OutTan)
+                        keys.Add(new FOBJKey()
+                        {
+                            Frame = key.Frame,
+                            Tan = track.Keys.Keys[i - 1].OutTan,
+                            InterpolationType = GXInterpolationType.HermiteCurve
+                        });
+
+                    if (key.InterpolationType == Scenes.Animation.InterpolationType.Hermite &&
+                        prevKey != null &&
+                        prevKey.InterpolationType == key.InterpolationType &&
+                        prevKey.InTan == key.InTan && prevKey.OutTan == key.OutTan)
+                        keys.Add(new FOBJKey()
+                        {
+                            Frame = key.Frame,
+                            Value = key.Value,
+                            InterpolationType = GXInterpolationType.HermiteValue
+                        });
+                    else
+                        keys.Add(new FOBJKey()
+                        {
+                            Frame = key.Frame,
+                            Value = key.Value,
+                            Tan = key.InTan,
+                            InterpolationType = ToGXInterpolation(key.InterpolationType)
+                        });
+                    prevKey = key;
+                }
+            }
+
+            return FOBJFrameEncoder.EncodeFrames(keys, ToGXTrackType(track.Type));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fobj"></param>
+        /// <returns></returns>
+        private static SBTransformTrack DecodeFOBJ(HSD_FOBJ fobj)
+        {
+            SBTrackType trackType = SBTrackType.TranslateX;
+            switch (fobj.AnimationType)
+            {
+                case JointTrackType.HSD_A_J_ROTX: trackType = SBTrackType.RotateX; break;
+                case JointTrackType.HSD_A_J_ROTY: trackType = SBTrackType.RotateY; break;
+                case JointTrackType.HSD_A_J_ROTZ: trackType = SBTrackType.RotateZ; break;
+                case JointTrackType.HSD_A_J_TRAX: trackType = SBTrackType.TranslateX; break;
+                case JointTrackType.HSD_A_J_TRAY: trackType = SBTrackType.TranslateY; break;
+                case JointTrackType.HSD_A_J_TRAZ: trackType = SBTrackType.TranslateZ; break;
+                case JointTrackType.HSD_A_J_SCAX: trackType = SBTrackType.ScaleX; break;
+                case JointTrackType.HSD_A_J_SCAY: trackType = SBTrackType.ScaleY; break;
+                case JointTrackType.HSD_A_J_SCAZ: trackType = SBTrackType.ScaleZ; break;
+            }
+
+            SBTransformTrack track = new SBTransformTrack(trackType);
+
+            FOBJFrameDecoder decoder = new FOBJFrameDecoder(fobj);
+            var keys = decoder.GetKeys();
+
+            float prevCurve = 0;
+            for (int k = 0; k < keys.Count; k++)
+            {
+                var key = keys[k];
+
+                if (key.InterpolationType == GXInterpolationType.HermiteCurve)
+                {
+                    prevCurve = key.Tan;
+                    continue;
+                }
+
+                if (key.InterpolationType == GXInterpolationType.HermiteValue)
+                {
+                    if (k < keys.Count - 1 && keys[k + 1].InterpolationType == GXInterpolationType.HermiteCurve)
+                        track.AddKey(key.Frame, key.Value, InterpolationType.Hermite, prevCurve, keys[k + 1].Tan);
+                    else
+                        track.AddKey(key.Frame, key.Value, InterpolationType.Hermite, prevCurve);
+                }
+                else
+                {
+                    if (k < keys.Count - 1 && keys[k + 1].InterpolationType == GXInterpolationType.HermiteCurve)
+                        track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan, keys[k + 1].Tan);
+                    else
+                        track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan);
+                }
+
+                if (key.InterpolationType == GXInterpolationType.Hermite)
+                    prevCurve = key.Tan;
+            }
+
+            return track;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <param name="animation"></param>
+        /// <param name="skeleton"></param>
         public void ExportSBAnimation(string FileName, SBAnimation animation, SBSkeleton skeleton)
+        {
+            if (HSDSettings.FigaTree)
+            {
+                ExportFigaTree(FileName, animation, skeleton);
+            }
+            else
+            {
+                ExportAnimJoint(FileName, animation, skeleton);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <param name="animation"></param>
+        /// <param name="skeleton"></param>
+        private void ExportFigaTree(string FileName, SBAnimation animation, SBSkeleton skeleton)
         {
             HSDRawFile file = new HSDRawFile();
             HSDRootNode root = new HSDRootNode();
-            
+
             if (HSDSettings.RootName == "" || HSDSettings.RootName == null)
                 HSDSettings.RootName = System.IO.Path.GetFileNameWithoutExtension(FileName);
 
             if (HSDSettings.RootName == "" || HSDSettings.RootName == null)
                 HSDSettings.RootName = animation.Name;
-            
+
             root.Name = HSDSettings.RootName;
 
             if (root.Name == null || !root.Name.EndsWith("_figatree"))
@@ -129,7 +260,7 @@ namespace StudioSB.IO.Formats
             var nodes = new List<FigaTreeNode>();
 
             int boneIndex = -1;
-            foreach(var skelnode in skeleton.Bones)
+            foreach (var skelnode in skeleton.Bones)
             {
                 FigaTreeNode animNode = new FigaTreeNode();
                 nodes.Add(animNode);
@@ -146,61 +277,7 @@ namespace StudioSB.IO.Formats
                 foreach (var track in node.Tracks)
                 {
                     HSD_Track animTrack = new HSD_Track();
-                    List<FOBJKey> keys = new List<FOBJKey>();
-                    SBAnimKey<float> prevKey = null;
-
-                    var constant = true;
-                    var v = track.Keys.Keys.Count > 0 ? track.Keys.Keys[0].Value : 0;
-                    foreach (var key in track.Keys.Keys)
-                    {
-                        if (key.Value != v)
-                        {
-                            constant = false;
-                            break;
-                        }
-                    }
-                    if (constant)
-                    {
-                        keys.Add(new FOBJKey()
-                        {
-                            Frame = 0,
-                            Value = v,
-                            InterpolationType = GXInterpolationType.Constant
-                        });
-                    }
-                    else
-                    for(int i = 0; i < track.Keys.Keys.Count; i++)
-                        {
-                            var key = track.Keys.Keys[i];
-                            if (i > 0 && track.Keys.Keys[i-1].InTan != track.Keys.Keys[i - 1].OutTan)
-                                keys.Add(new FOBJKey()
-                                {
-                                    Frame = key.Frame,
-                                    Tan = track.Keys.Keys[i - 1].OutTan,
-                                    InterpolationType = GXInterpolationType.HermiteCurve
-                                });
-
-                            if (key.InterpolationType == Scenes.Animation.InterpolationType.Hermite &&
-                                prevKey != null &&
-                                prevKey.InterpolationType == key.InterpolationType &&
-                                prevKey.InTan == key.InTan && prevKey.OutTan == key.OutTan)
-                                keys.Add(new FOBJKey()
-                                {
-                                    Frame = key.Frame,
-                                    Value = key.Value,
-                                    InterpolationType = GXInterpolationType.HermiteValue
-                                });
-                            else
-                                keys.Add(new FOBJKey()
-                                {
-                                    Frame = key.Frame,
-                                    Value = key.Value,
-                                    Tan = key.InTan,
-                                    InterpolationType = ToGXInterpolation(key.InterpolationType)
-                                });
-                            prevKey = key;
-                        }
-                    animTrack.FOBJ = FOBJFrameEncoder.EncodeFrames(keys, ToGXTrackType(track.Type));
+                    animTrack.FOBJ = EncodeFOBJ(track);
                     animTrack.DataLength = (short)animTrack.FOBJ.Buffer.Length;
                     animNode.Tracks.Add(animTrack);
                 }
@@ -211,13 +288,96 @@ namespace StudioSB.IO.Formats
             tree.Type = 1;
             tree.Nodes = nodes;
 
-            SBConsole.WriteLine(tree.FrameCount);
-
             root.Data = tree;
             file.Save(FileName);
         }
 
-        public Dictionary<GXInterpolationType, InterpolationType> hsdInterToInter = new Dictionary<GXInterpolationType, InterpolationType>()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <param name="animation"></param>
+        /// <param name="skeleton"></param>
+        private void ExportAnimJoint(string FileName, SBAnimation animation, SBSkeleton skeleton)
+        {
+            HSDRawFile file = new HSDRawFile();
+            HSDRootNode root = new HSDRootNode();
+
+            if (HSDSettings.RootName == "" || HSDSettings.RootName == null)
+                HSDSettings.RootName = System.IO.Path.GetFileNameWithoutExtension(FileName);
+
+            if (HSDSettings.RootName == "" || HSDSettings.RootName == null)
+                HSDSettings.RootName = animation.Name;
+
+            root.Name = HSDSettings.RootName;
+
+            if (root.Name == null)
+            {
+                System.Windows.Forms.MessageBox.Show($"Warning, the root name does not end with \"_figatree\"\n{root.Name}");
+            }
+
+            file.Roots.Add(root);
+
+            var joint = new HSD_AnimJoint();
+            EncodeAnimJoint(skeleton.Bones[0], joint, animation);
+            root.Data = joint;
+
+            file.Save(FileName);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bone"></param>
+        /// <param name="joint"></param>
+        /// <param name="animation"></param>
+        private void EncodeAnimJoint(SBBone bone, HSD_AnimJoint joint, SBAnimation animation)
+        {
+            var node = animation.TransformNodes.Find(e => e.Name == bone.Name);
+
+            if(node != null)
+            {
+                // encode tracks
+                joint.Flags = 1;
+                joint.AOBJ = new HSD_AOBJ();
+                joint.AOBJ.EndFrame = animation.FrameCount;
+                joint.AOBJ.Flags = AOBJ_Flags.ANIM_LOOP;
+                
+                if (node.Tracks.Count == 0)
+                    joint.AOBJ.Flags = AOBJ_Flags.NO_ANIM;
+
+                var prev = new HSD_FOBJDesc();
+
+                foreach(var track in node.Tracks)
+                {
+                    var fobjdesc = new HSD_FOBJDesc();
+                    fobjdesc.FOBJ = EncodeFOBJ(track);
+                    fobjdesc.DataLength = fobjdesc.FOBJ.Buffer.Length;
+
+                    if (joint.AOBJ.FObjDesc == null)
+                        joint.AOBJ.FObjDesc = fobjdesc;
+                    else
+                        prev.Next = fobjdesc;
+
+                    prev = fobjdesc;
+                }
+            }
+
+            // continue adding children
+            var prevChild = new HSD_AnimJoint();
+            foreach(var c in bone.Children)
+            {
+                HSD_AnimJoint child = new HSD_AnimJoint();
+                EncodeAnimJoint(c, child, animation);
+                if (joint.Child == null)
+                    joint.Child = child;
+                else
+                    prevChild.Next = child;
+                prevChild = child;
+            }
+        }
+
+        public static Dictionary<GXInterpolationType, InterpolationType> hsdInterToInter = new Dictionary<GXInterpolationType, InterpolationType>()
         {
             { GXInterpolationType.Constant,  InterpolationType.Constant},
             { GXInterpolationType.Hermite,  InterpolationType.Hermite},
@@ -225,7 +385,7 @@ namespace StudioSB.IO.Formats
             { GXInterpolationType.Step,  InterpolationType.Step}
         };
         
-        private GXInterpolationType ToGXInterpolation(InterpolationType i)
+        private static GXInterpolationType ToGXInterpolation(InterpolationType i)
         {
             switch (i)
             {

@@ -107,9 +107,16 @@ vec3 ColorMapDiffusePass(vec3 N, vec3 V)
 // basic lambert diffuse
 vec3 DiffusePass(vec3 N, vec3 V)
 {
+	vec3 colorPass = ColorMapDiffusePass(N, V);
+
     float lambert = clamp(dot(N, V), 0, 1);
 	
-    vec3 diffuseTerm = diffuseColor.rgb * lambert;
+    vec3 diffuseTerm = colorPass * lambert;
+	
+	diffuseTerm = clamp(diffuseTerm, ambientColor.rgb * colorPass, vec3(1));
+	
+    if (hasDiffuse == 0)
+		diffuseTerm *= diffuseColor.rgb;
 
 	diffuseTerm *= enableDiffuseLighting;
 
@@ -135,7 +142,7 @@ void main()
 	fragColor = vec4(0, 0, 0, 1);
 	
 	vec3 V = normalize(vertPosition - cameraPos);
-    vec3 N = normal;
+    vec3 N = normalize(normal);
     /*if (renderNormalMap == 1)
     {
         // This seems to only affect diffuse.
@@ -144,10 +151,10 @@ void main()
     }*/
 
 	// Render passes
+
 	if(renderDiffuse == 1)
-		fragColor.rgb += ambientColor.rgb * ColorMapDiffusePass(N, V) * 0.5;
-	if(renderDiffuse == 1)
-		fragColor.rgb += DiffusePass(N, V) * ColorMapDiffusePass(N, V) * renderDiffuse;
+		fragColor.rgb = DiffusePass(N, V) * renderDiffuse;
+
 	if(renderSpecular == 1)
 		fragColor.rgb += specularPass * renderSpecular;//SpecularPass(N, V) * renderSpecular;
 
