@@ -127,7 +127,7 @@ namespace StudioSB.Scenes.Ultimate
         public SBMatAttrib<string> Texture6 { get; } = new SBMatAttrib<string>("prmMap", "", description: "PRM Map");
         public bool hasPrmMap { get => Texture6.Used; }
 
-        [DefaultTextureName("defaultBlackCube")]
+        [DefaultTextureName("defaultSpecCube")]
         public SBMatAttrib<string> Texture7 { get; } = new SBMatAttrib<string>("specularPbrCube", "", description: "Specular PBR Map");
 
         [DefaultTextureName("defaultBlackCube")]
