@@ -34,8 +34,21 @@ namespace StudioSB.Scenes.Melee
 
             if (_mobj == null)
                 return;
-            
-            shader.SetBoolToInt("enableDiffuseLighting", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE));
+
+            if (_mobj.RenderFlags.HasFlag(RENDER_MODE.XLU))
+            {
+                GL.Enable(EnableCap.Blend);
+                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            }
+            else
+            {
+                GL.Disable(EnableCap.Blend);
+            }
+
+            shader.SetBoolToInt("hasDF", _mobj.RenderFlags.HasFlag(RENDER_MODE.DF_NONE));
+            shader.SetBoolToInt("hasDiffuseMaterial", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFSE_MAT));
+            shader.SetBoolToInt("enableDiffuseLighting", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE) || _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFSE_VTX));
+            shader.SetBoolToInt("enableDiffuseVertex", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFSE_VTX));
             shader.SetBoolToInt("enableSpecular", _mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
 
             shader.SetFloat("glossiness", 0);
@@ -84,6 +97,8 @@ namespace StudioSB.Scenes.Melee
                         hasDiffuse = true;
                         shader.SetInt("diffuseCoordType", coordType);
                         shader.SetVector2("diffuseScale", texScale);
+                        shader.SetFloat("diffuseBlending", texture.Blending);
+                        shader.SetBoolToInt("hasDiffuseAlphaBlend", texture.Flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_BLEND) || texture.Flags.HasFlag(TOBJ_FLAGS.ALPHAMAP_REPLACE));
                         shader.SetTexture("diffuseTex", rTexture, TextureUnit++);
                     }
                     if (texture.Flags.HasFlag(TOBJ_FLAGS.LIGHTMAP_SPECULAR))

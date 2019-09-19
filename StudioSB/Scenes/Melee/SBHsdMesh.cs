@@ -71,6 +71,8 @@ namespace StudioSB.Scenes.Melee
 
             GX_VertexAttributeAccessor accessor = new GX_VertexAttributeAccessor();
 
+            List<GX_Vertex> allVerts = new List<GX_Vertex>();
+
             if (_dobj.Pobj != null)
                 foreach (var pobj in _dobj.Pobj.List)
                 {
@@ -78,6 +80,7 @@ namespace StudioSB.Scenes.Melee
                     //    Console.WriteLine($"{va.AttributeName} {va.AttributeType} {va.CompCount} {va.CompType} {va.Scale} {va.Stride}");
                     var dl = pobj.ToDisplayList();
                     var vertices = GX_VertexAttributeAccessor.GetDecodedVertices(dl, pobj);
+                    allVerts.AddRange(vertices);
 
                     var offset = 0;
                     foreach (var v in dl.Primitives)
@@ -93,7 +96,16 @@ namespace StudioSB.Scenes.Melee
                     }
 
                 }
-            
+
+            GenerateBoundingSphere(allVerts);
+        }
+
+        private void GenerateBoundingSphere(List<GX_Vertex> vertices)
+        {
+            List<Vector3> positions = new List<Vector3>();
+            foreach (var v in vertices)
+                positions.Add(GXtoGL.GLVector3(v.POS));
+            BoundingSphere = new Rendering.Bounding.BoundingSphere(positions);
         }
 
         /// <summary>

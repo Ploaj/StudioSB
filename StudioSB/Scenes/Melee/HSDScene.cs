@@ -677,7 +677,6 @@ namespace StudioSB.Scenes.Melee
 
         public override void RenderLegacy()
         {
-
             base.RenderLegacy();
         }
 
@@ -730,7 +729,28 @@ namespace StudioSB.Scenes.Melee
             //TODO update sf grapics so it can be used to bind this
             shader.SetMatrix4x4("binds", boneBinds);
 
-            foreach (var rm in Mesh)
+            List<SBHsdMesh> sortedMesh = new List<SBHsdMesh>();
+            List<SBHsdMesh> opaqueMesh = new List<SBHsdMesh>();
+
+            for(int i = Mesh.Count - 1; i >= 0; i--)
+            {
+                var m = Mesh[i];
+                if (m.ParentBone == null || m.ParentBone == "")
+                    opaqueMesh.Add(m);
+                else
+                    sortedMesh.Add(m);
+            }
+            sortedMesh = sortedMesh.OrderBy(c =>
+                {
+                    Matrix4 transform = Skeleton[c.ParentBone].WorldTransform * camera.MvpMatrix;
+                    var v = Vector3.TransformPosition(c.BoundingSphere.Position, transform);
+                    v = Vector3.TransformPosition(c.BoundingSphere.Position, camera.MvpMatrix);
+                    return v.Z + c.BoundingSphere.Radius;
+                }).ToList();
+            opaqueMesh.AddRange(sortedMesh);
+
+            // TODO: sort opaque mesh
+            foreach(var rm in opaqueMesh)
             {
                 if (!rm.Visible)
                     continue;
@@ -752,6 +772,12 @@ namespace StudioSB.Scenes.Melee
                     Rendering.Shapes.RectangularPrism.DrawRectangularPrism(camera, mid, size, Matrix4.Identity);
                 }
             }*/
+        }
+
+        private static int JOBJDistance(Vector3 p1, Vector3 p2)
+        {
+            // no need for square root
+            return (int)(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2) + Math.Pow(p1.Z - p2.Z, 2));
         }
 
         #endregion
