@@ -245,7 +245,7 @@ namespace StudioSB.IO.Formats
                                                 key.t1 = float.Parse(keyArgs[7]);
                                                 key.w1 = float.Parse(keyArgs[8]);
                                             }
-                                            if (key.outtan == "fixed")
+                                            if (key.outtan == "fixed" && keyArgs.Length > 9)
                                             {
                                                 key.t2 = float.Parse(keyArgs[9]);
                                                 key.w2 = float.Parse(keyArgs[10]);

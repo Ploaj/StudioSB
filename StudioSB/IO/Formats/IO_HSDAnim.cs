@@ -17,6 +17,9 @@ namespace StudioSB.IO.Formats
 
             [Description("Used for fighter animations, set to false for stages")]
             public bool FigaTree { get; set; } = true;
+
+            [Category("Anim Joint Only"), DisplayName("Loop Animation"), Description("Determines whether the animation should loop once completing")]
+            public bool LoopAnimation { get; set; } = false;
         }
 
         public string Name => "Dat Anim File";
@@ -342,6 +345,11 @@ namespace StudioSB.IO.Formats
                 joint.AOBJ = new HSD_AOBJ();
                 joint.AOBJ.EndFrame = animation.FrameCount;
                 joint.AOBJ.Flags = AOBJ_Flags.ANIM_LOOP;
+
+                if (!HSDSettings.LoopAnimation)
+                {
+                    joint.AOBJ.Flags = AOBJ_Flags.FIRST_PLAY;
+                }
                 
                 if (node.Tracks.Count == 0)
                     joint.AOBJ.Flags = AOBJ_Flags.NO_ANIM;
