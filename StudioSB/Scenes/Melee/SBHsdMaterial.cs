@@ -1,9 +1,12 @@
 ﻿using System;
 using SFGraphics.GLObjects.Shaders;
 using HSDRaw.Common;
+using HSDRaw.GX;
 using StudioSB.Rendering;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
+using System.Collections.Generic;
+using SFGraphics.GLObjects.Textures;
 
 namespace StudioSB.Scenes.Melee
 {
@@ -14,6 +17,8 @@ namespace StudioSB.Scenes.Melee
         public string Name { get; set; }
         public string Label { get; set; }
 
+        public Dictionary<GXTexMapID, Texture> mapIdToAnimSurface = new Dictionary<GXTexMapID, Texture>();
+
         public SBHsdMaterial(HSD_DOBJ dobj)
         {
             _mobj = dobj.Mobj;
@@ -21,10 +26,6 @@ namespace StudioSB.Scenes.Melee
             /*if (_mobj.Textures != null)
                 foreach (var tex in _mobj.Textures.List)
                     Console.WriteLine(tex.Flags.ToString());*/
-        }
-
-        public void AnimateParam(string ParamName, object Value)
-        {
         }
 
         public void Bind(SBScene scene, Shader shader)
@@ -81,14 +82,22 @@ namespace StudioSB.Scenes.Melee
                 foreach (var texture in _mobj.Textures.List)
                 {
                     var rTexture = ((HSDScene)scene).TOBJtoRenderTexture(texture);
-                    var texScale = new Vector2(texture.WScale, texture.HScale);
+
                     int coordType = 0;
                     if (texture.Flags.HasFlag(TOBJ_FLAGS.COORD_REFLECTION))
                         coordType = 1;
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GXtoGL.GLWrapMode(texture.WrapS));
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GXtoGL.GLWrapMode(texture.WrapT));
+
+                    if (mapIdToAnimSurface.ContainsKey(texture.TexMapID))
+                        rTexture = mapIdToAnimSurface[texture.TexMapID];
+
+                    var texScale = new Vector2(texture.WScale, texture.HScale);
+
                     // bugged
                     GL.ActiveTexture(OpenTK.Graphics.OpenGL.TextureUnit.Texture0);
+
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GXtoGL.GLWrapMode(texture.WrapS));
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GXtoGL.GLWrapMode(texture.WrapT));
+
                     rTexture.TextureWrapS = GXtoGL.GLWrapMode(texture.WrapS);
                     rTexture.TextureWrapT = GXtoGL.GLWrapMode(texture.WrapT);
 
@@ -138,6 +147,21 @@ namespace StudioSB.Scenes.Melee
 
         public void ImportMaterial(string FileName)
         {
+        }
+
+        public void AnimateParam(string ParamName, object Value)
+        {
+            GXTexMapID mapid;
+            if (Enum.TryParse<GXTexMapID>(ParamName, out mapid) && Value is Texture tex)
+            {
+                if(!mapIdToAnimSurface.ContainsKey(mapid))
+                    mapIdToAnimSurface.Add(mapid, tex);
+            }
+        }
+
+        public void ClearAnimations()
+        {
+            mapIdToAnimSurface.Clear();
         }
     }
 }

@@ -379,5 +379,10 @@ namespace StudioSB.Scenes.Ultimate
         {
 
         }
+
+        public void ClearAnimations()
+        {
+            
+        }
     }
 }

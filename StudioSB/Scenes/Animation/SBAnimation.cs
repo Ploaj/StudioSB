@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using StudioSB.Scenes.Melee;
+using System.Collections.Generic;
 
 namespace StudioSB.Scenes.Animation
 {
@@ -20,6 +21,7 @@ namespace StudioSB.Scenes.Animation
         public List<SBTransformAnimation> TransformNodes = new List<SBTransformAnimation>();
         public List<SBVisibilityAnimation> VisibilityNodes = new List<SBVisibilityAnimation>();
         public List<SBMaterialAnimation> MaterialNodes = new List<SBMaterialAnimation>();
+        public List<SBTextureAnimation> TextureNodes = new List<SBTextureAnimation>();
 
         /// <summary>
         /// Applies animation state to given scene
@@ -32,9 +34,10 @@ namespace StudioSB.Scenes.Animation
                 return;
 
             // Materials
-            foreach (SBMaterialAnimation a in MaterialNodes)
+            foreach (var material in scene.GetMaterials())
             {
-                foreach (var material in scene.GetMaterials())
+                material.ClearAnimations();
+                foreach (SBMaterialAnimation a in MaterialNodes)
                 {
                     if (material.Label.Equals(a.MaterialName))
                     {
@@ -42,15 +45,29 @@ namespace StudioSB.Scenes.Animation
                     }
                 }
             }
-            // Visibility
-            foreach (SBVisibilityAnimation a in VisibilityNodes)
+
+            foreach (var mesh in scene.GetMeshObjects())
             {
-                foreach (var mesh in scene.GetMeshObjects())
+                // Visibility
+                foreach (SBVisibilityAnimation a in VisibilityNodes)
                 {
                     // names match with start ignoring the _VIS tags
                     if (a.MeshName != null && mesh.Name.StartsWith(a.MeshName))
                     {
                         mesh.Visible = a.Visibility.GetValue(Frame);
+                    }
+                }
+                // Textures
+                foreach (SBTextureAnimation texanim in TextureNodes)
+                {
+                    if (texanim.MeshName != null && mesh.Name.StartsWith(texanim.MeshName))
+                    {
+                        if(mesh is SBHsdMesh hsdMesh)
+                        {
+                            var mat = hsdMesh.Material as SBHsdMaterial;
+
+                            mat.AnimateParam(texanim.TextureAttibute, texanim.GetTextureAt(Frame));
+                        }
                     }
                 }
             }

@@ -16,6 +16,8 @@ namespace StudioSB.Scenes
 
         void AnimateParam(string ParamName, object Value);
 
+        void ClearAnimations();
+
         void ExportMaterial(string FileName);
 
         void ImportMaterial(string FileName);

@@ -6,6 +6,8 @@ using HSDRaw;
 using HSDRaw.Tools;
 using HSDRaw.Common.Animation;
 using System.ComponentModel;
+using HSDRaw.Common;
+using OpenTK.Graphics.OpenGL;
 
 namespace StudioSB.IO.Formats
 {
@@ -84,6 +86,71 @@ namespace StudioSB.IO.Formats
                             a.Tracks.Add(DecodeFOBJ(att.FOBJ));
                         }
                     }
+                }
+                if (root.Data is HSD_MatAnimJoint matjoint)
+                {
+                    var joints = matjoint.DepthFirstList;
+
+                    anim.FrameCount = 0;
+
+                    int nodeIndex = -1;
+                    foreach (var j in joints)
+                    {
+                        if (j.MaterialAnimation == null)
+                            continue;
+
+                        var matAnims = j.MaterialAnimation.List;
+                        
+                        foreach(var manim in matAnims)
+                        {
+                            nodeIndex++;
+                            var aobj = manim.AnimationObject;
+                            if (aobj != null)
+                                anim.FrameCount = Math.Max(anim.FrameCount, aobj.EndFrame);
+
+                            var texanim = manim.TextureAnimation;
+
+                            if (texanim == null)
+                                continue;
+                            var texAOBJ = texanim.AnimationObject;
+
+                            if (texAOBJ == null || texAOBJ.FObjDesc == null)
+                                continue;
+
+                            anim.FrameCount = Math.Max(anim.FrameCount, texAOBJ.EndFrame);
+
+                            //TODO: tex anim is a list
+                            if (texanim != null)
+                            {
+                                SBTextureAnimation textureAnim = new SBTextureAnimation();
+                                anim.TextureNodes.Add(textureAnim);
+                                textureAnim.MeshName = "DOBJ_" + nodeIndex;
+                                textureAnim.TextureAttibute = texanim.GXTexMapID.ToString();
+
+                                textureAnim.Keys = DecodeFOBJ(texAOBJ.FObjDesc.FOBJ).Keys;
+
+                                for (int i = 0; i < texanim.ImageCount; i++)
+                                {
+                                    HSD_TOBJ tobj = new HSD_TOBJ();
+                                    tobj.ImageData = texanim.ImageBuffers.Array[i].Data;
+                                    if (texanim.TlutCount > i)
+                                        tobj.TlutData = texanim.TlutBuffers.Array[i].Data;
+                                    var surface = new SBSurface();
+                                    surface.Arrays.Add(new MipArray() { Mipmaps = new List<byte[]>() { tobj.GetDecodedImageData() } });
+                                    surface.Width = tobj.ImageData.Width;
+                                    surface.Height = tobj.ImageData.Height;
+                                    surface.PixelFormat = PixelFormat.Bgra;
+                                    surface.PixelType = PixelType.UnsignedByte;
+                                    surface.InternalFormat = InternalFormat.Rgba;
+                                    textureAnim.Surfaces.Add(surface);
+                                }
+                            }
+                        }
+
+                        
+                    }
+
+                    SBConsole.WriteLine( nodeIndex);
                 }
             }
 

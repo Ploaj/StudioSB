@@ -29,7 +29,7 @@ namespace StudioSB.Scenes.Melee
 
         private List<SBHsdRenderMesh> renderMesh = new List<SBHsdRenderMesh>();
         
-        private SBHsdMaterial material;
+        private SBHsdMaterial material { get => Material as SBHsdMaterial; set => Material = value; }
 
         //TODO: update dobj when parent string name changes
 

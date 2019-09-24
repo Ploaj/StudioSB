@@ -39,7 +39,11 @@ namespace StudioSB.GUI
                 if(!value)
                     animationBar.Clear();
                 if (!value && LoadedScene != null && LoadedScene.Skeleton != null)
+                {
+                    foreach (var mat in LoadedScene.GetMaterials())
+                        mat.ClearAnimations();
                     LoadedScene.Skeleton.Reset();
+                }
             }
         }
 
@@ -93,7 +97,9 @@ namespace StudioSB.GUI
             ResetPose.Click += (sender, args) =>
             {
                 if (LoadedScene != null && LoadedScene.Skeleton != null)
+                {
                     LoadedScene.Skeleton.Reset();
+                }
             };
 
             ClearAnimation = new ToolStripButton();

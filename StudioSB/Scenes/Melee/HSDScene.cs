@@ -64,7 +64,7 @@ namespace StudioSB.Scenes.Melee
 
         }*/
 
-        private List<T> GetAllOfType<T>(HSDAccessor root) where T : HSDAccessor
+        /*private List<T> GetAllOfType<T>(HSDAccessor root) where T : HSDAccessor
         {
             List<T> list = new List<T>();
 
@@ -90,11 +90,39 @@ namespace StudioSB.Scenes.Melee
                         list.Add(v);
                 }
             }
+        }*/
+
+        private List<HSD_DOBJ> GetDOBJS()
+        {
+            var dobjs = new List<HSD_DOBJ>();
+            var jobj = RootJOBJ.DepthFirstList;
+            foreach(var j in jobj)
+            {
+                if (j.Dobj == null)
+                    continue;
+
+                dobjs.AddRange(j.Dobj.List);
+            }
+            return dobjs;
+        }
+
+        private List<HSD_TOBJ> GetTOBJS()
+        {
+            var tobjs = new List<HSD_TOBJ>();
+            var dobjs = GetDOBJS();
+            foreach(var d in dobjs)
+            {
+                if (d.Mobj == null || d.Mobj.Textures == null)
+                    continue;
+
+                tobjs.AddRange(d.Mobj.Textures.List);
+            }
+            return tobjs;
         }
 
         private void RemakeVertexData()
         {
-            var dobjs = GetAllOfType<HSD_DOBJ>(RootJOBJ);
+            var dobjs = GetDOBJS();
             GX_VertexCompressor c = new GX_VertexCompressor();
             foreach(var dobj in dobjs)
             {
@@ -147,7 +175,10 @@ namespace StudioSB.Scenes.Melee
 
         public override ISBMaterial[] GetMaterials()
         {
-            return new ISBMaterial[0];
+            ISBMaterial[] material = new ISBMaterial[Mesh.Count];
+            for (int i = 0; i < material.Length; i++)
+                material[i] = Mesh[i].Material;
+            return material;
         }
 
         #endregion
@@ -174,7 +205,7 @@ namespace StudioSB.Scenes.Melee
                 return;
             Surfaces.Clear();
             tobjToSurface.Clear();
-            var tobjs = GetAllOfType<HSD_TOBJ>(RootJOBJ);
+            var tobjs = GetTOBJS();
             List<HSD_Image> Process = new List<HSD_Image>();
             foreach (var tobj in tobjs)
             {
@@ -198,8 +229,8 @@ namespace StudioSB.Scenes.Melee
             if (RootJOBJ == null)
                 return;
 
-            var dobjs = GetAllOfType<HSD_DOBJ>(RootJOBJ);
-            var jobjs = GetAllOfType<HSD_JOBJ>(RootJOBJ);
+            var dobjs = GetDOBJS();
+            var jobjs = RootJOBJ.DepthFirstList;// GetAllOfType<HSD_JOBJ>(RootJOBJ);
             foreach (var dobj in dobjs)
             {
                 //SBConsole.WriteLine(dobj + " " + dobj.List.Count);
@@ -617,9 +648,9 @@ namespace StudioSB.Scenes.Melee
                 mat.Name = iomesh.Name + "_material";
                 if(dobj.Mobj.MaterialColor != null)
                 {
-                    mat.DiffuseColor = Color.FromArgb(dobj.Mobj.MaterialColor.DiffuseColorABGR);
-                    mat.SpecularColor = Color.FromArgb(dobj.Mobj.MaterialColor.SpecularColorABGR);
-                    mat.AmbientColor = Color.FromArgb(dobj.Mobj.MaterialColor.AmbientColorABGR);
+                    mat.DiffuseColor = Color.FromArgb((int)dobj.Mobj.MaterialColor.DiffuseColorABGR);
+                    mat.SpecularColor = Color.FromArgb((int)dobj.Mobj.MaterialColor.SpecularColorABGR);
+                    mat.AmbientColor = Color.FromArgb((int)dobj.Mobj.MaterialColor.AmbientColorABGR);
                 }
                 if(dobj.Mobj.Textures != null)
                     mat.DiffuseTexture = tobjToName[dobj.Mobj.Textures._s];
