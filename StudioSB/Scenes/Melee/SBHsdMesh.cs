@@ -77,7 +77,10 @@ namespace StudioSB.Scenes.Melee
                 foreach (var pobj in _dobj.Pobj.List)
                 {
                     //foreach (var va in pobj.Attributes)
-                    //    Console.WriteLine($"{va.AttributeName} {va.AttributeType} {va.CompCount} {va.CompType} {va.Scale} {va.Stride}");
+                    //    if(va.AttributeName != GXAttribName.GX_VA_POS && va.AttributeName != GXAttribName.GX_VA_NRM
+                    //        && va.AttributeName != GXAttribName.GX_VA_NULL && va.AttributeName != GXAttribName.GX_VA_PNMTXIDX
+                    //        && va.AttributeName != GXAttribName.GX_VA_TEX0)
+                    //    Console.WriteLine($"{Name} {va.AttributeName} {va.AttributeType} {va.CompCount} {va.CompType} {va.Scale} {va.Stride}");
                     var dl = pobj.ToDisplayList();
                     var vertices = GX_VertexAttributeAccessor.GetDecodedVertices(dl, pobj);
                     allVerts.AddRange(vertices);
@@ -111,13 +114,13 @@ namespace StudioSB.Scenes.Melee
         /// <summary>
         /// 
         /// </summary>
-        public void ImportPOBJs(IOMesh mesh, SBSkeleton skeleton, GX_VertexCompressor compressor, GX_Attribute[] attrGroup, bool singleBind = false)
+        public void ImportPOBJs(IOMesh mesh, SBSkeleton skeleton, GX_VertexCompressor compressor, GXAttribName[] attrGroup, bool singleBind = false)
         {
             DOBJ.Pobj = null;
-
+            
             // get gx vertices and rigging groups
             List<HSD_Envelope> weightList = null;
-            var verts = IOVertexToGXVertex(mesh.Vertices, skeleton, out weightList);
+            var verts = IOVertexToGXVertex(mesh.Vertices, skeleton, out weightList, Matrix4.Identity);
 
             // reorder to triangle strips
             List<GX_Vertex> triStrip = new List<GX_Vertex>();
@@ -126,10 +129,14 @@ namespace StudioSB.Scenes.Melee
             
             // compress and generate display lists
             DOBJ.Pobj = compressor.CreatePOBJsFromTriangleList(triStrip, attrGroup, weightList);
+
             if (singleBind || ParentBone != "JOBJ_0")
             {
-                DOBJ.Pobj.EnvelopeWeights = null;
-                DOBJ.Pobj.Flags = 0;
+                foreach(var v in DOBJ.Pobj.List)
+                {
+                    v.EnvelopeWeights = null;
+                    DOBJ.Pobj.Flags = 0;
+                }
             }
         }
 
@@ -140,7 +147,7 @@ namespace StudioSB.Scenes.Melee
         /// <param name="skeleton"></param>
         /// <param name="weightList"></param>
         /// <returns></returns>
-        private List<GX_Vertex> IOVertexToGXVertex(List<IOVertex> ioverts, SBSkeleton skeleton, out List<HSD_Envelope> weightList)
+        private List<GX_Vertex> IOVertexToGXVertex(List<IOVertex> ioverts, SBSkeleton skeleton, out List<HSD_Envelope> weightList, Matrix4 transform)
         {
             weightList = new List<HSD_Envelope>();
 
@@ -174,8 +181,12 @@ namespace StudioSB.Scenes.Melee
 
                 GX_Vertex gxvert = new GX_Vertex();
                 gxvert.PNMTXIDX = (ushort)(index * 3);
-                gxvert.POS = new GXVector3(iovert.Position.X, iovert.Position.Y, iovert.Position.Z);
-                gxvert.NRM = new GXVector3(iovert.Normal.X, iovert.Normal.Y, iovert.Normal.Z);
+
+                var p = Vector3.TransformPosition(iovert.Position, transform);
+                var n = Vector3.TransformNormal(iovert.Normal, transform);
+
+                gxvert.POS = new GXVector3(p.X, p.Y, p.Z);
+                gxvert.NRM = new GXVector3(n.X, n.Y, n.Z);
                 gxvert.TEX0 = new GXVector2(iovert.UV0.X, iovert.UV0.Y);
                 gxvert.CLR0 = new GXColor4(iovert.Color.X, iovert.Color.Y, iovert.Color.Z, iovert.Color.W);
                 gxverts.Add(gxvert);
@@ -236,7 +247,7 @@ namespace StudioSB.Scenes.Melee
                     var jobjWeight = jobjweights[v.PNMTXIDX / 3];
 
                     for (int i = 0; i < Math.Min(4, jobjWeight.JOBJs.Length); i++)
-                        bone[i] = bones.FindIndex(e=>e.GetJOBJ()._s == jobjWeight.JOBJs[i]._s);
+                        bone[i] = bones.FindIndex(e => e.GetJOBJ()._s == jobjWeight.JOBJs[i]._s);
 
                     for (int i = 0; i < Math.Min(4, jobjWeight.JOBJs.Length); i++)
                         weights[i] = jobjWeight.Weights[i];
