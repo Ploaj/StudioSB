@@ -57,7 +57,7 @@ namespace StudioSB.IO.Formats
                         SBConsole.WriteLine(j.Flags.ToString("X8") + " " + j.AOBJ.Flags.ToString());
 
                         SBTransformAnimation a = new SBTransformAnimation();
-                        a.Name = "JOBJ_" + nodeIndex;
+                        a.Name = skeleton.Bones[nodeIndex++].Name;
                         anim.TransformNodes.Add(a);
 
                         anim.FrameCount = Math.Max(anim.FrameCount, j.AOBJ.EndFrame);
@@ -75,7 +75,7 @@ namespace StudioSB.IO.Formats
                     foreach(var node in tree.Nodes)
                     {
                         SBTransformAnimation a = new SBTransformAnimation();
-                        a.Name = "JOBJ_" + nodeIndex++;
+                        a.Name = skeleton.Bones[nodeIndex++].Name;
                         anim.TransformNodes.Add(a);
 
                         foreach (var att in node.Tracks)

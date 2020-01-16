@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using StudioSB.GUI.Attachments;
 using StudioSB.Rendering.Bounding;
 using OpenTK;
+using StudioSB.Tools;
 
 namespace StudioSB.GUI
 {
@@ -15,6 +16,10 @@ namespace StudioSB.GUI
         private SBTreeView BoneList { get; set; }
 
         private SBSkeleton SelectedSkeleton { get; set; }
+        
+        private SBButton LoadJOBJNames;
+
+        private SBScene Scene { get; set; }
 
         public SBBoneTree() : base()
         {
@@ -40,11 +45,44 @@ namespace StudioSB.GUI
 
             BoneEditor = new SBBoneEditor();
             BoneEditor.Dock = DockStyle.Fill;
-            
+
+
+            LoadJOBJNames = new SBButton("Load Bone Labels from File");
+            LoadJOBJNames.Dock = DockStyle.Top;
+            LoadJOBJNames.Click += (sender, args) =>
+            {
+                string f = "";
+                if (FileTools.TryOpenFile(out f, "Bone Name INI(*.ini)|*.ini"))
+                {
+                    var skel = SelectedSkeleton;
+                    Dictionary<string, string> newNames = new Dictionary<string, string>();
+                    foreach (var line in System.IO.File.ReadAllLines(f))
+                    {
+                        var name = line.Split('=');
+                        if (name.Length > 1)
+                        {
+                            var bname = name[0].Trim();
+                            var newName = name[1].Trim();
+                            var bone = skel[bname];
+                            if (bone != null)
+                            {
+                                bone.Name = newName;
+                            }
+                            newNames.Add(bname, newName);
+                        }
+                    }
+                    foreach (var v in Scene.GetMeshObjects())
+                        if (v.ParentBone != null && newNames.ContainsKey(v.ParentBone))
+                            v.ParentBone = newNames[v.ParentBone];
+                    RefreshBoneList();
+                }
+            };
+
             Dock = DockStyle.Fill;
             Controls.Add(BoneEditor);
             Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
             Controls.Add(BoneList);
+            Controls.Add(LoadJOBJNames);
         }
 
         public bool OverlayScene()
@@ -92,13 +130,23 @@ namespace StudioSB.GUI
         /// <param name="Scene"></param>
         private void LoadFromScene(SBScene Scene)
         {
+            this.Scene = Scene;
+            SelectedSkeleton = Scene.Skeleton as SBSkeleton;
+            RefreshBoneList();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void RefreshBoneList()
+        {
             BoneList.Nodes.Clear();
             Dictionary<SBBone, SBTreeNode> boneToNode = new Dictionary<SBBone, SBTreeNode>();
-            if(Scene.Skeleton != null)
+            if (SelectedSkeleton != null)
             {
-                SelectedSkeleton = Scene.Skeleton as SBSkeleton;
+                SelectedSkeleton = SelectedSkeleton as SBSkeleton;
 
-                foreach (var bone in Scene.Skeleton.Bones)
+                foreach (var bone in SelectedSkeleton.Bones)
                 {
                     var node = new SBTreeNode(bone.Name) { Tag = bone };
                     boneToNode.Add(bone, node);
@@ -108,7 +156,7 @@ namespace StudioSB.GUI
                         boneToNode[bone.Parent].Nodes.Add(node);
                 }
             }
-            if(BoneList.Nodes.Count > 0)
+            if (BoneList.Nodes.Count > 0)
                 BoneList.Nodes[0].ExpandAll();
         }
 
