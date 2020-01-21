@@ -83,6 +83,7 @@ namespace StudioSB.GUI
         private ToolStrip toolStrip;
         private ToolStripButton ResetPose;
         private ToolStripButton ClearAnimation;
+        private ToolStripButton SaveRender;
 
         public SBViewportPanel()
         {
@@ -108,9 +109,17 @@ namespace StudioSB.GUI
             {
                 EnableAnimationBar = false;
             };
+            
+            SaveRender = new ToolStripButton();
+            SaveRender.Text = "Save Screenshot";
+            SaveRender.Click += (sender, args) =>
+            {
+                _viewport.SaveRender("render_" + DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".png");
+            };
 
             toolStrip.Items.Add(ResetPose);
             toolStrip.Items.Add(ClearAnimation);
+            toolStrip.Items.Add(SaveRender);
 
             //Application.Idle += new EventHandler(TriggerViewportRender);
             stopWatch = new Stopwatch();

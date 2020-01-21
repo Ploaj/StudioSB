@@ -160,12 +160,17 @@ namespace StudioSB.GUI
         /// </summary>
         protected void Render()
         {
+            Render(true);
+        }
+
+        private void Render(bool renderBackground)
+        {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             // push and pop attributes so no cleanup is needed
             GL.PushAttrib(AttribMask.AllAttribBits);
 
-            if (ApplicationSettings.RenderBackgroundGradient)
+            if (ApplicationSettings.RenderBackgroundGradient && renderBackground)
             {
                 GL.Disable(EnableCap.DepthTest);
                 RenderBackground();
@@ -176,27 +181,30 @@ namespace StudioSB.GUI
             GL.MatrixMode(MatrixMode.Projection);
             Matrix4 modelViewMatrix = Camera.MvpMatrix;
             GL.LoadMatrix(ref modelViewMatrix);
-            
-            if(ApplicationSettings.EnableGridDisplay)
+
+            if (ApplicationSettings.EnableGridDisplay && renderBackground)
                 Rendering.Shapes.GridFloor3D.Draw(ApplicationSettings.GridSize, 25, ApplicationSettings.GridLineColor);
-            
-            if(Scene != null)
+
+            if (Scene != null)
             {
                 Scene.Render(Camera);
             }
 
-            foreach(var attachment in Attachments)
+            if(renderBackground)
             {
-                attachment.Render(this, Frame);
-            }
+                foreach (var attachment in Attachments)
+                {
+                    attachment.Render(this, Frame);
+                }
 
-            if (ApplicationSettings.RenderSceneInformation)
-            {
-                if(Scene != null)
-                    TextRenderer.DrawOrtho(Camera, "Scene Type: " + Scene.GetType().Name, new Vector2(0, 19));
-                TextRenderer.DrawOrtho(Camera, "Polys: " + (polyCount/3).ToString(), new Vector2(0, 35));
-                TextRenderer.DrawOrtho(Camera, "Verts: " + vertexCount.ToString(), new Vector2(0, 51));
-                TextRenderer.DrawOrtho(Camera, "Frame: " + Frame, new Vector2(0, 67));
+                if (ApplicationSettings.RenderSceneInformation)
+                {
+                    if (Scene != null)
+                        TextRenderer.DrawOrtho(Camera, "Scene Type: " + Scene.GetType().Name, new Vector2(0, 19));
+                    TextRenderer.DrawOrtho(Camera, "Polys: " + (polyCount / 3).ToString(), new Vector2(0, 35));
+                    TextRenderer.DrawOrtho(Camera, "Verts: " + vertexCount.ToString(), new Vector2(0, 51));
+                    TextRenderer.DrawOrtho(Camera, "Frame: " + Frame, new Vector2(0, 67));
+                }
             }
 
             GL.PopAttrib();
@@ -233,6 +241,7 @@ namespace StudioSB.GUI
         /// </summary>
         public void SaveRender(string FileName)
         {
+            Render(false);
             using (var bitmap = SFGraphics.GLObjects.Framebuffers.Framebuffer.ReadDefaultFramebufferImagePixels(Width, Height, true))
             {
                 bitmap.Save(FileName);
