@@ -303,7 +303,9 @@ namespace StudioSB.Scenes.Ultimate
             PolygonMode pm = PolygonMode.Fill;
             CullFaceMode cullMode = CullFaceMode.Back;
 
-            if(RasterizerState != null)
+            GL.Enable(EnableCap.CullFace);
+
+            if (RasterizerState != null)
             {
                 switch (RasterizerState.FillMode)
                 {
@@ -321,13 +323,13 @@ namespace StudioSB.Scenes.Ultimate
                         cullMode = CullFaceMode.Front;
                         break;
                     case 2:
+                        GL.Disable(EnableCap.CullFace);
                         mf = MaterialFace.FrontAndBack;
                         cullMode = CullFaceMode.FrontAndBack;
                         break;
                 }
             }
 
-            GL.Enable(EnableCap.CullFace);
             GL.CullFace(cullMode);
             GL.PolygonMode(mf, pm);
         }

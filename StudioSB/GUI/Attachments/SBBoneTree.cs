@@ -85,6 +85,7 @@ namespace StudioSB.GUI
             Controls.Add(LoadJOBJNames);
         }
 
+
         public bool OverlayScene()
         {
             return false;

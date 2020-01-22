@@ -5,6 +5,7 @@ using System;
 using System.Windows.Forms;
 using StudioSB.Rendering.Bounding;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace StudioSB.GUI
 {
@@ -31,6 +32,9 @@ namespace StudioSB.GUI
         private SBListView meshObjectList { get; set; }
 
         private SBButton DeleteButton;
+        private SBButton HideVISButton;
+        private SBButton MoveUpButton;
+        private SBButton MoveDownButton;
 
         public SBMeshList() : base()
         {
@@ -75,11 +79,89 @@ namespace StudioSB.GUI
                 }
             };
             DeleteButton.Dock = DockStyle.Top;
+            
+            HideVISButton = new SBButton("Hide VIS Objects");
+            HideVISButton.Dock = DockStyle.Top;
+            HideVISButton.Click += (sender, args) =>
+            {
+                HideVISObjects();
+            };
+            
+            MoveUpButton = new SBButton("Move Selected Up");
+            MoveUpButton.Dock = DockStyle.Top;
+            MoveUpButton.Click += (sender, args) =>
+            {
+                if (meshObjectList.Items.Count > 0 && !meshObjectList.Items[0].Selected)
+                {
+                    foreach (ListViewItem lvi in meshObjectList.SelectedItems)
+                    {
+                        if (lvi.Index > 0)
+                        {
+                            int index = lvi.Index - 1;
+                            meshObjectList.Items.RemoveAt(lvi.Index);
+                            meshObjectList.Items.Insert(index, lvi);
+                        }
+                    }
+
+                    RefreshMeshItemsFromList();
+                }
+            };
+
+            MoveDownButton = new SBButton("Move Selected Down");
+            MoveDownButton.Dock = DockStyle.Top;
+            MoveDownButton.Click += (sender, args) =>
+            {
+                if (meshObjectList.Items.Count > 0 && !meshObjectList.Items[meshObjectList.Items.Count - 1].Selected)
+                {
+                    foreach (ListViewItem lvi in meshObjectList.SelectedItems)
+                    {
+                        if (lvi.Index < meshObjectList.Items.Count)
+                        {
+                            int index = lvi.Index + 1;
+                            meshObjectList.Items.RemoveAt(lvi.Index);
+                            meshObjectList.Items.Insert(index, lvi);
+                        }
+                    }
+                    RefreshMeshItemsFromList();
+                }
+            };
 
             Controls.Add(MeshPanel);
+            Controls.Add(MoveDownButton);
+            Controls.Add(MoveUpButton);
             Controls.Add(DeleteButton);
             Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
             Controls.Add(meshObjectList);
+            Controls.Add(HideVISButton);
+        }
+
+        /// <summary>
+        /// Updates the scene to contain the mesh items in this list
+        /// </summary>
+        private void RefreshMeshItemsFromList()
+        {
+            var scene = ParentViewportPanel.Viewport.Scene;
+
+            if (scene == null)
+                return;
+
+            List<ISBMesh> meshes = new List<ISBMesh>();
+
+            foreach (ListViewItem v in meshObjectList.Items)
+                if (v.Tag is ISBMesh mesh)
+                    meshes.Add(mesh);
+
+            scene.SetMeshObjects(meshes.ToArray());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void HideVISObjects()
+        {
+            foreach (ListViewItem v in meshObjectList.Items)
+                if (v.Text.Contains("VIS_O"))
+                    v.Checked = false;
         }
 
         public bool OverlayScene()

@@ -30,6 +30,9 @@ namespace StudioSB.Scenes.Ultimate
 
         [DisplayName("Export Textures (.nutexb)")]
         public bool ExportTextures { get; set; } = false;
+
+        [DisplayName("Use \"Model\" as FileName")]
+        public bool UseModelName { get; set; } = true;
     }
 
     public enum UltimateMaterialTransitionMode
@@ -200,6 +203,9 @@ namespace StudioSB.Scenes.Ultimate
 
             string name = Path.GetDirectoryName(FileName) + "/" + Path.GetFileNameWithoutExtension(FileName);
             string simpleName = Path.GetFileNameWithoutExtension(FileName);
+
+            if (ExportSettings.UseModelName)
+                simpleName = "model";
 
             if (ExportSettings.ExportModel)
             {
@@ -433,6 +439,15 @@ namespace StudioSB.Scenes.Ultimate
                 if(mesh != null)
                     Model.Meshes.Remove(mesh);
             }
+            RefreshRendering();
+        }
+        
+        public override void SetMeshObjects(ISBMesh[] mesh)
+        {
+            Model.Meshes.Clear();
+            foreach (var v in mesh)
+                if (v is SBUltimateMesh m)
+                    Model.Meshes.Add(m);
             RefreshRendering();
         }
 
