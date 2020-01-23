@@ -43,10 +43,10 @@ namespace StudioSB.Scenes.Ultimate
                                 foreach (var atstring in attr.AttributeStrings)
                                 {
                                     UltimateVertexAttribute at;
-                                    if(Enum.TryParse<UltimateVertexAttribute>(atstring.Name, out at))
+                                    if(Enum.TryParse(atstring.Name, out at))
                                     {
                                         //SBConsole.WriteLine("\tLoaded:" + at.ToString());
-                                        sbMesh.ExportAttributes.Add(at);
+                                        sbMesh.EnableAttribute(at);
                                     }
                                 }
                             }
@@ -293,19 +293,19 @@ namespace StudioSB.Scenes.Ultimate
                 //maker.SetOrientedBoundingBox(new SSBHVertexAttribute(), new SSBHVertexAttribute(), new float[9]);
 
                 // Add attributes
-                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.Normal0))
+                if (mesh.ExportNormal)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.Normal0, Normal0.ToArray());
-                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.Tangent0))
+                if (mesh.ExportTangent)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.Tangent0, Tangent0.ToArray());
-                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.map1))
+                if (mesh.ExportMap1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.map1, Map1.ToArray());
-                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.uvSet))
+                if (mesh.ExportUVSet1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet, UvSet.ToArray());
-                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.colorSet1))
+                if (mesh.ExportColorSet1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet1, colorSet1.ToArray());
-                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.colorSet2))
+                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet2))
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2, colorSet2.ToArray());
-                if (mesh.ExportAttributes.Contains(UltimateVertexAttribute.colorSet5))
+                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet5))
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet5, colorSet5.ToArray());
 
                 // Add rigging
