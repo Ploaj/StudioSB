@@ -30,6 +30,9 @@ namespace StudioSB.Scenes.Ultimate
 
         [DisplayName("Export Textures (.nutexb)")]
         public bool ExportTextures { get; set; } = false;
+
+        [DisplayName("Use \"Model\" as FileName")]
+        public bool UseModelName { get; set; } = true;
     }
 
     public enum UltimateMaterialTransitionMode
@@ -201,6 +204,9 @@ namespace StudioSB.Scenes.Ultimate
             string name = Path.GetDirectoryName(FileName) + "/" + Path.GetFileNameWithoutExtension(FileName);
             string simpleName = Path.GetFileNameWithoutExtension(FileName);
 
+            if (ExportSettings.UseModelName)
+                simpleName = "model";
+
             if (ExportSettings.ExportModel)
             {
                 SBConsole.WriteLine("Creating MODL...");
@@ -273,13 +279,13 @@ namespace StudioSB.Scenes.Ultimate
 
                 iomesh.MaterialIndex = Materials.IndexOf(mesh.Material);
 
-                iomesh.HasPositions = mesh.ExportAttributes.Contains(UltimateVertexAttribute.Position0);
-                iomesh.HasNormals = mesh.ExportAttributes.Contains(UltimateVertexAttribute.Normal0);
-                iomesh.HasUV0 = mesh.ExportAttributes.Contains(UltimateVertexAttribute.map1);
-                iomesh.HasUV1 = mesh.ExportAttributes.Contains(UltimateVertexAttribute.uvSet);
-                iomesh.HasUV2 = mesh.ExportAttributes.Contains(UltimateVertexAttribute.uvSet1);
-                iomesh.HasUV3 = mesh.ExportAttributes.Contains(UltimateVertexAttribute.uvSet2);
-                iomesh.HasColor = mesh.ExportAttributes.Contains(UltimateVertexAttribute.colorSet1);
+                iomesh.HasPositions = mesh.ExportPosition;
+                iomesh.HasNormals = mesh.ExportNormal;
+                iomesh.HasUV0 = mesh.ExportMap1;
+                iomesh.HasUV1 = mesh.ExportUVSet1;
+                iomesh.HasUV2 = mesh.ExportUVSet2;
+                iomesh.HasUV3 = mesh.ExportUVSet3;
+                iomesh.HasColor = mesh.ExportColorSet1;
 
                 iomesh.HasBoneWeights = true;
 
@@ -388,13 +394,13 @@ namespace StudioSB.Scenes.Ultimate
                     mesh.ParentBone = parentBone.Name;
 
                 //TODO: make more customizable through import settings
-                mesh.ExportAttributes.Add(UltimateVertexAttribute.Position0);
-                mesh.ExportAttributes.Add(UltimateVertexAttribute.Normal0);
-                mesh.ExportAttributes.Add(UltimateVertexAttribute.Tangent0);
-                mesh.ExportAttributes.Add(UltimateVertexAttribute.map1);
+                mesh.EnableAttribute(UltimateVertexAttribute.Position0);
+                mesh.EnableAttribute(UltimateVertexAttribute.Normal0);
+                mesh.EnableAttribute(UltimateVertexAttribute.Tangent0);
+                mesh.EnableAttribute(UltimateVertexAttribute.map1);
                 if(Has2ndUVChannel)
-                    mesh.ExportAttributes.Add(UltimateVertexAttribute.uvSet);
-                mesh.ExportAttributes.Add(UltimateVertexAttribute.colorSet1);
+                    mesh.EnableAttribute(UltimateVertexAttribute.uvSet);
+                mesh.EnableAttribute(UltimateVertexAttribute.colorSet1);
 
                 // calculate bounding information
                 mesh.CalculateBounding();
@@ -433,6 +439,15 @@ namespace StudioSB.Scenes.Ultimate
                 if(mesh != null)
                     Model.Meshes.Remove(mesh);
             }
+            RefreshRendering();
+        }
+        
+        public override void SetMeshObjects(ISBMesh[] mesh)
+        {
+            Model.Meshes.Clear();
+            foreach (var v in mesh)
+                if (v is SBUltimateMesh m)
+                    Model.Meshes.Add(m);
             RefreshRendering();
         }
 

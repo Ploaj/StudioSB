@@ -54,6 +54,8 @@ namespace StudioSB.GUI.Editors
         public SBScene SelectedScene { get; set; } = null;
         private ISBMesh[] SelectedMeshes = null;
 
+        private PropertyGrid PropertyGrid;
+
         public SBMeshPanel()
         {
             Text = "Mesh Panel";
@@ -75,7 +77,11 @@ namespace StudioSB.GUI.Editors
             meshName = new Label();
             meshName.Dock = DockStyle.Top;
             meshName.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            
+
+            PropertyGrid = new PropertyGrid();
+            PropertyGrid.Dock = DockStyle.Fill;
+
+            Controls.Add(PropertyGrid);
             Controls.Add(parentBoneSelector);
             Controls.Add(new Label() { Text = "Parent Bone:", Dock = DockStyle.Top, TextAlign = System.Drawing.ContentAlignment.BottomLeft });
             Controls.Add(materialSelector);
@@ -141,6 +147,7 @@ namespace StudioSB.GUI.Editors
 
             //
             SelectedMeshes = selected.ToArray();
+            PropertyGrid.SelectedObjects = SelectedMeshes;
             SelectedScene = scene;
         }
     }

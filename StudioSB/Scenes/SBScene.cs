@@ -125,6 +125,15 @@ namespace StudioSB.Scenes
         }
 
         /// <summary>
+        /// Sets the mesh in this scene from an external source
+        /// </summary>
+        /// <param name="mesh"></param>
+        public virtual void SetMeshObjects(ISBMesh[] mesh)
+        {
+
+        }
+
+        /// <summary>
         /// Gets the materials inside of the scene
         /// </summary>
         /// <returns></returns>

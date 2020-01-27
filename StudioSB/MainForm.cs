@@ -19,6 +19,17 @@ namespace StudioSB
     /// </summary>
     public partial class MainForm : Form
     {
+        public static MainForm Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    _instance = new MainForm();
+                return _instance;
+            }
+        }
+        private static MainForm _instance;
+
         private SBViewportPanel viewportPanel { get; set; }
 
         private SBMenuBar MenuBar { get; set; }

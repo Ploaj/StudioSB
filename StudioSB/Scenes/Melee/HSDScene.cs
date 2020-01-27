@@ -120,7 +120,7 @@ namespace StudioSB.Scenes.Melee
             return tobjs;
         }
 
-        private void RemakeVertexData()
+        /*private void RemakeVertexData()
         {
             var dobjs = GetDOBJS();
             GX_VertexCompressor c = new GX_VertexCompressor();
@@ -150,13 +150,13 @@ namespace StudioSB.Scenes.Melee
                             vs.Add(vertices[off+i]);
                         }
                         off += dl.Count;
-                        newdl.Primitives.Add(c.Compress(dl.PrimitiveType, vs.ToArray(), pobj.Attributes));
+                        //newdl.Primitives.Add(c.Compress(dl.PrimitiveType, vs.ToArray(), pobj.Attributes));
                     }
                     pobj.FromDisplayList(newdl); 
                 }
             }
             c.SaveChanges();
-        }
+        }*/
 
         #region Properties
             
@@ -453,7 +453,7 @@ namespace StudioSB.Scenes.Melee
                 if (dobjId != -1)
                 {
                     var dobj = (SBHsdMesh)dobjs[dobjId];
-                    dobj.ImportPOBJs(iomesh, (SBSkeleton)Skeleton, compressor, attributeGroup);
+                    dobj.ImportPOBJs(iomesh, (SBSkeleton)Skeleton, compressor, dobj.ParentBone == "JOBJ_0" ? attributeGroup : singleAttributeGroup);
                 }
             }
 
@@ -464,95 +464,25 @@ namespace StudioSB.Scenes.Melee
             RefreshRendering();
         }
 
-        private GX_Attribute[] MakeRiggedAttributes()
+        private GXAttribName[] MakeRiggedAttributes()
         {
-            // make attribute group
-            GX_Attribute[] attributeGroup = new GX_Attribute[5];
-            //TODO: redo how these are generated
+            return new GXAttribName[]
             {
-                GX_Attribute buff = new GX_Attribute();
-                buff.AttributeName = GXAttribName.GX_VA_PNMTXIDX;
-                buff.AttributeType = GXAttribType.GX_DIRECT;
-                attributeGroup[0] = buff;
-            }
-            {
-                GX_Attribute buff = new GX_Attribute();
-                buff.AttributeName = GXAttribName.GX_VA_POS;
-                buff.AttributeType = GXAttribType.GX_INDEX16;
-                buff.CompCount = GXCompCnt.PosXYZ;
-                buff.CompType = GXCompType.Int16;
-                buff.Scale = 3;
-                buff.Stride = 6;
-                attributeGroup[1] = buff;
-            }
-            {
-                GX_Attribute buff = new GX_Attribute();
-                buff.AttributeName = GXAttribName.GX_VA_NRM;
-                buff.AttributeType = GXAttribType.GX_INDEX16;
-                buff.CompCount = GXCompCnt.NrmXYZ;
-                buff.CompType = GXCompType.Int8;
-                buff.Scale = 6;
-                buff.Stride = 3;
-                attributeGroup[2] = buff;
-            }
-            {
-                GX_Attribute buff = new GX_Attribute();
-                buff.AttributeName = GXAttribName.GX_VA_TEX0;
-                buff.AttributeType = GXAttribType.GX_INDEX16;
-                buff.CompCount = GXCompCnt.TexST;
-                buff.CompType = GXCompType.Int16;
-                buff.Scale = 13;
-                buff.Stride = 4;
-                attributeGroup[3] = buff;
-            }
-            {
-                GX_Attribute buff = new GX_Attribute();
-                buff.AttributeName = GXAttribName.GX_VA_NULL;
-                attributeGroup[4] = buff;
-            }
-            return attributeGroup;
+                GXAttribName.GX_VA_PNMTXIDX,
+                GXAttribName.GX_VA_POS,
+                GXAttribName.GX_VA_NRM,
+                GXAttribName.GX_VA_TEX0
+            };
         }
 
-        private GX_Attribute[] MakeSingleAttributes()
+        private GXAttribName[] MakeSingleAttributes()
         {
-            // make attribute group
-            GX_Attribute[] attributeGroup = new GX_Attribute[4];
+            return new GXAttribName[]
             {
-                GX_Attribute buff = new GX_Attribute();
-                buff.AttributeName = GXAttribName.GX_VA_POS;
-                buff.AttributeType = GXAttribType.GX_INDEX16;
-                buff.CompCount = GXCompCnt.PosXYZ;
-                buff.CompType = GXCompType.Int16;
-                buff.Scale = 3;
-                buff.Stride = 6;
-                attributeGroup[0] = buff;
-            }
-            {
-                GX_Attribute buff = new GX_Attribute();
-                buff.AttributeName = GXAttribName.GX_VA_NRM;
-                buff.AttributeType = GXAttribType.GX_INDEX16;
-                buff.CompCount = GXCompCnt.NrmXYZ;
-                buff.CompType = GXCompType.Int8;
-                buff.Scale = 6;
-                buff.Stride = 3;
-                attributeGroup[1] = buff;
-            }
-            {
-                GX_Attribute buff = new GX_Attribute();
-                buff.AttributeName = GXAttribName.GX_VA_TEX0;
-                buff.AttributeType = GXAttribType.GX_INDEX16;
-                buff.CompCount = GXCompCnt.TexST;
-                buff.CompType = GXCompType.Int16;
-                buff.Scale = 13;
-                buff.Stride = 4;
-                attributeGroup[2] = buff;
-            }
-            {
-                GX_Attribute buff = new GX_Attribute();
-                buff.AttributeName = GXAttribName.GX_VA_NULL;
-                attributeGroup[3] = buff;
-            }
-            return attributeGroup;
+                GXAttribName.GX_VA_POS,
+                GXAttribName.GX_VA_NRM,
+                GXAttribName.GX_VA_TEX0
+            };
         }
 
         public override IOModel GetIOModel()

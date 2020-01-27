@@ -15,7 +15,7 @@ namespace StudioSB
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-            Application.Run(new MainForm());
+            Application.Run(MainForm.Instance);
         }
     }
 }

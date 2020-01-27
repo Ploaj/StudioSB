@@ -58,6 +58,7 @@ namespace StudioSB.GUI
             propGrid.Dock = DockStyle.Fill;
             Controls.Add(propGrid);
 
+            CenterToScreen();
         }
         
 
