@@ -252,7 +252,7 @@ namespace StudioSB.GUI
             }
 
             if (LoadedScene != null)
-                if(LoadedScene.HasBones)
+                if(LoadedScene.HasBones && LoadedScene.Skeleton != null)
                     LoadedScene.Skeleton.Reset();
 
             attachment.OnAttach(this);
