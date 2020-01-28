@@ -95,7 +95,7 @@ namespace StudioSB.Scenes.Melee
         private List<HSD_DOBJ> GetDOBJS()
         {
             var dobjs = new List<HSD_DOBJ>();
-            var jobj = RootJOBJ.DepthFirstList;
+            var jobj = RootJOBJ.BreathFirstSearch;
             foreach(var j in jobj)
             {
                 if (j.Dobj == null)
@@ -230,7 +230,7 @@ namespace StudioSB.Scenes.Melee
                 return;
 
             var dobjs = GetDOBJS();
-            var jobjs = RootJOBJ.DepthFirstList;// GetAllOfType<HSD_JOBJ>(RootJOBJ);
+            var jobjs = RootJOBJ.BreathFirstSearch;// GetAllOfType<HSD_JOBJ>(RootJOBJ);
             foreach (var dobj in dobjs)
             {
                 //SBConsole.WriteLine(dobj + " " + dobj.List.Count);
@@ -278,7 +278,7 @@ namespace StudioSB.Scenes.Melee
             {
                 if(roots.Data is HSDRaw.Common.Animation.HSD_MatAnimJoint matjoint)
                 {
-                    foreach (var v in matjoint.DepthFirstList)
+                    foreach (var v in matjoint.BreathFirstSearch)
                     {
                         if(v.MaterialAnimation != null)
                         foreach(var matanim in v.MaterialAnimation.List)
@@ -440,7 +440,7 @@ namespace StudioSB.Scenes.Melee
 
             // get a compressor ready
             // the compressor will handle making the compressed attribute buffers
-            GX_VertexCompressor compressor = new GX_VertexCompressor();
+            POBJ_Generator compressor = new POBJ_Generator();
 
             // import the iomeshes into their respective dobjs
             foreach (var iomesh in iomodel.Meshes)
@@ -537,7 +537,7 @@ namespace StudioSB.Scenes.Melee
                     foreach (var pobj in dobj.Pobj.List)
                     {
                         var dl = pobj.ToDisplayList();
-                        var vertices = GX_VertexAttributeAccessor.GetDecodedVertices(dl, pobj);
+                        var vertices = GX_VertexAccessor.GetDecodedVertices(dl, pobj);
 
                         HSD_Envelope[] bindGroups = null; ;
                         if (pobj.EnvelopeWeights != null)
@@ -576,11 +576,11 @@ namespace StudioSB.Scenes.Melee
 
                 IOMaterialPhong mat = new IOMaterialPhong();
                 mat.Name = iomesh.Name + "_material";
-                if(dobj.Mobj.MaterialColor != null)
+                if(dobj.Mobj.Material != null)
                 {
-                    mat.DiffuseColor = Color.FromArgb((int)dobj.Mobj.MaterialColor.DiffuseColorABGR);
-                    mat.SpecularColor = Color.FromArgb((int)dobj.Mobj.MaterialColor.SpecularColorABGR);
-                    mat.AmbientColor = Color.FromArgb((int)dobj.Mobj.MaterialColor.AmbientColorABGR);
+                    mat.DiffuseColor = Color.FromArgb((int)dobj.Mobj.Material.DiffuseColorRGBA);
+                    mat.SpecularColor = Color.FromArgb((int)dobj.Mobj.Material.SpecularColorRGBA);
+                    mat.AmbientColor = Color.FromArgb((int)dobj.Mobj.Material.AmbientColorRGBA);
                 }
                 if(dobj.Mobj.Textures != null)
                     mat.DiffuseTexture = tobjToName[dobj.Mobj.Textures._s];

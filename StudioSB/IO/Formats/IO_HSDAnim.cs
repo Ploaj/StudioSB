@@ -45,7 +45,7 @@ namespace StudioSB.IO.Formats
                 anim.Name = root.Name;
                 if (root.Data is HSD_AnimJoint joint)
                 {
-                    var joints = joint.DepthFirstList;
+                    var joints = joint.BreathFirstSearch;
 
                     int nodeIndex = -1;
                     foreach(var j in joints)
@@ -92,7 +92,7 @@ namespace StudioSB.IO.Formats
                 }
                 if (root.Data is HSD_MatAnimJoint matjoint)
                 {
-                    var joints = matjoint.DepthFirstList;
+                    var joints = matjoint.BreathFirstSearch;
 
                     anim.FrameCount = 0;
 
@@ -186,7 +186,7 @@ namespace StudioSB.IO.Formats
                 {
                     Frame = 0,
                     Value = v,
-                    InterpolationType = GXInterpolationType.Constant
+                    InterpolationType = GXInterpolationType.HSD_A_OP_CON
                 });
             }
             else
@@ -199,7 +199,7 @@ namespace StudioSB.IO.Formats
                         {
                             Frame = key.Frame,
                             Tan = track.Keys.Keys[i - 1].OutTan,
-                            InterpolationType = GXInterpolationType.HermiteCurve
+                            InterpolationType = GXInterpolationType.HSD_A_OP_SLP
                         });
 
                     if (key.InterpolationType == Scenes.Animation.InterpolationType.Hermite &&
@@ -210,7 +210,7 @@ namespace StudioSB.IO.Formats
                         {
                             Frame = key.Frame,
                             Value = key.Value,
-                            InterpolationType = GXInterpolationType.HermiteValue
+                            InterpolationType = GXInterpolationType.HSD_A_OP_SPL0
                         });
                     else
                         keys.Add(new FOBJKey()
@@ -253,34 +253,87 @@ namespace StudioSB.IO.Formats
             FOBJFrameDecoder decoder = new FOBJFrameDecoder(fobj);
             var keys = decoder.GetKeys();
 
-            float prevCurve = 0;
-            for (int k = 0; k < keys.Count; k++)
+
+            // register
+            float p0 = 0;
+            float p1 = 0;
+            float d0 = 0;
+            float d1 = 0;
+            float t0 = 0;
+            float t1 = 0;
+            GXInterpolationType op_intrp = GXInterpolationType.HSD_A_OP_CON;
+            GXInterpolationType op = GXInterpolationType.HSD_A_OP_CON;
+
+            // get current frame state
+            for (int i = 0; i < keys.Count; i++)
             {
-                var key = keys[k];
+                op_intrp = op;
+                op = keys[i].InterpolationType;
 
-                if (key.InterpolationType == GXInterpolationType.HermiteCurve)
+                switch (op)
                 {
-                    prevCurve = key.Tan;
-                    continue;
+                    case GXInterpolationType.HSD_A_OP_CON:
+                        p0 = p1;
+                        p1 = keys[i].Value;
+                        if (op_intrp != GXInterpolationType.HSD_A_OP_SLP)
+                        {
+                            d0 = d1;
+                            d1 = 0;
+                        }
+                        t0 = t1;
+                        t1 = keys[i].Frame;
+                        break;
+                    case GXInterpolationType.HSD_A_OP_LIN:
+                        p0 = p1;
+                        p1 = keys[i].Value;
+                        if (op_intrp != GXInterpolationType.HSD_A_OP_SLP)
+                        {
+                            d0 = d1;
+                            d1 = 0;
+                        }
+                        t0 = t1;
+                        t1 = keys[i].Frame;
+                        break;
+                    case GXInterpolationType.HSD_A_OP_SPL0:
+                        p0 = p1;
+                        d0 = d1;
+                        p1 = keys[i].Value;
+                        d1 = 0;
+                        t0 = t1;
+                        t1 = keys[i].Frame;
+                        break;
+                    case GXInterpolationType.HSD_A_OP_SPL:
+                        p0 = p1;
+                        p1 = keys[i].Value;
+                        d0 = d1;
+                        d1 = keys[i].Tan;
+                        t0 = t1;
+                        t1 = keys[i].Frame;
+                        break;
+                    case GXInterpolationType.HSD_A_OP_SLP:
+                        d0 = d1;
+                        d1 = keys[i].Tan;
+                        break;
+                    case GXInterpolationType.HSD_A_OP_KEY:
+                        p1 = keys[i].Value;
+                        p0 = keys[i].Value;
+                        break;
                 }
 
-                if (key.InterpolationType == GXInterpolationType.HermiteValue)
-                {
-                    if (k < keys.Count - 1 && keys[k + 1].InterpolationType == GXInterpolationType.HermiteCurve)
-                        track.AddKey(key.Frame, key.Value, InterpolationType.Hermite, prevCurve, keys[k + 1].Tan);
-                    else
-                        track.AddKey(key.Frame, key.Value, InterpolationType.Hermite, prevCurve);
-                }
-                else
-                {
-                    if (k < keys.Count - 1 && keys[k + 1].InterpolationType == GXInterpolationType.HermiteCurve)
-                        track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan, keys[k + 1].Tan);
-                    else
-                        track.AddKey(key.Frame, key.Value, hsdInterToInter[key.InterpolationType], key.Tan);
-                }
+                op_intrp = keys[i].InterpolationType;
 
-                if (key.InterpolationType == GXInterpolationType.Hermite)
-                    prevCurve = key.Tan;
+                if (op_intrp == GXInterpolationType.HSD_A_OP_CON || op_intrp == GXInterpolationType.HSD_A_OP_KEY)
+                {
+                    track.AddKey(t1, p1, InterpolationType.Step);
+                }
+                
+                if (op_intrp == GXInterpolationType.HSD_A_OP_LIN)
+                    track.AddKey(t1, p1, InterpolationType.Linear);
+
+                if (op_intrp == GXInterpolationType.HSD_A_OP_SPL || op_intrp == GXInterpolationType.HSD_A_OP_SPL0)
+                {
+                    track.AddKey(t1, p1, InterpolationType.Hermite, d1, d1);
+                }
             }
 
             return track;
@@ -457,10 +510,10 @@ namespace StudioSB.IO.Formats
 
         public static Dictionary<GXInterpolationType, InterpolationType> hsdInterToInter = new Dictionary<GXInterpolationType, InterpolationType>()
         {
-            { GXInterpolationType.Constant,  InterpolationType.Constant},
-            { GXInterpolationType.Hermite,  InterpolationType.Hermite},
-            { GXInterpolationType.Linear,  InterpolationType.Linear},
-            { GXInterpolationType.Step,  InterpolationType.Step}
+            { GXInterpolationType.HSD_A_OP_KEY,  InterpolationType.Constant},
+            { GXInterpolationType.HSD_A_OP_SPL,  InterpolationType.Hermite},
+            { GXInterpolationType.HSD_A_OP_LIN,  InterpolationType.Linear},
+            { GXInterpolationType.HSD_A_OP_CON,  InterpolationType.Step}
         };
         
         private static GXInterpolationType ToGXInterpolation(InterpolationType i)
@@ -468,15 +521,15 @@ namespace StudioSB.IO.Formats
             switch (i)
             {
                 case InterpolationType.Constant:
-                    return GXInterpolationType.Constant;
+                    return GXInterpolationType.HSD_A_OP_CON;
                 case InterpolationType.Hermite:
-                    return GXInterpolationType.Hermite;
+                    return GXInterpolationType.HSD_A_OP_SPL;
                 case InterpolationType.Linear:
-                    return GXInterpolationType.Linear;
+                    return GXInterpolationType.HSD_A_OP_LIN;
                 case InterpolationType.Step:
-                    return GXInterpolationType.Step;
+                    return GXInterpolationType.HSD_A_OP_CON; // or key?
                 default:
-                    return GXInterpolationType.Constant;
+                    return GXInterpolationType.HSD_A_OP_CON;
             }
         }
 

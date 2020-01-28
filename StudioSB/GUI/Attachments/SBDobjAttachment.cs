@@ -285,8 +285,8 @@ namespace StudioSB.GUI.Attachments
                                 bmp.Dispose();
                             }
 
-                            if (settings.UseBlending && mobj.PixelProcessing == null)
-                                mobj.PixelProcessing = new HSD_PixelProcessing();
+                            if (settings.UseBlending && mobj.PEDesc == null)
+                                mobj.PEDesc = new HSD_PEDesc();
                             
                             //TODO: set flags for texture types
                             if(settings.TextureType == TOBJTextureType.Diffuse)
@@ -428,16 +428,16 @@ namespace StudioSB.GUI.Attachments
         {
             SBTreeNode child = new SBTreeNode("MOBJ");
             child.Tag = mobj;
-            if (mobj.MaterialColor != null)
+            if (mobj.Material != null)
             {
                 SBTreeNode mc = new SBTreeNode("Material Color");
-                mc.Tag = mobj.MaterialColor;
+                mc.Tag = mobj.Material;
                 child.Nodes.Add(mc);
             }
-            if (mobj.PixelProcessing != null)
+            if (mobj.PEDesc != null)
             {
                 SBTreeNode mc = new SBTreeNode("Pixel Processing");
-                mc.Tag = mobj.PixelProcessing;
+                mc.Tag = mobj.PEDesc;
                 child.Nodes.Add(mc);
             }
             if (mobj.Textures != null)

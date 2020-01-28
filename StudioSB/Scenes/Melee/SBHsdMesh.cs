@@ -69,7 +69,7 @@ namespace StudioSB.Scenes.Melee
             foreach (SBHsdBone bone in skeleton.Bones)
                 bones.Add(bone);
 
-            GX_VertexAttributeAccessor accessor = new GX_VertexAttributeAccessor();
+            GX_VertexAccessor accessor = new GX_VertexAccessor();
 
             List<GX_Vertex> allVerts = new List<GX_Vertex>();
 
@@ -82,7 +82,7 @@ namespace StudioSB.Scenes.Melee
                     //        && va.AttributeName != GXAttribName.GX_VA_TEX0)
                     //    Console.WriteLine($"{Name} {va.AttributeName} {va.AttributeType} {va.CompCount} {va.CompType} {va.Scale} {va.Stride}");
                     var dl = pobj.ToDisplayList();
-                    var vertices = GX_VertexAttributeAccessor.GetDecodedVertices(dl, pobj);
+                    var vertices = GX_VertexAccessor.GetDecodedVertices(dl, pobj);
                     allVerts.AddRange(vertices);
 
                     var offset = 0;
@@ -114,7 +114,7 @@ namespace StudioSB.Scenes.Melee
         /// <summary>
         /// 
         /// </summary>
-        public void ImportPOBJs(IOMesh mesh, SBSkeleton skeleton, GX_VertexCompressor compressor, GXAttribName[] attrGroup, bool singleBind = false)
+        public void ImportPOBJs(IOMesh mesh, SBSkeleton skeleton, POBJ_Generator compressor, GXAttribName[] attrGroup, bool singleBind = false)
         {
             DOBJ.Pobj = null;
             

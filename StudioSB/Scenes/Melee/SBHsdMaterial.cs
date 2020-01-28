@@ -60,9 +60,9 @@ namespace StudioSB.Scenes.Melee
 
             shader.SetInt("TEX0Flag", _mobj.RenderFlags.HasFlag(RENDER_MODE.TEX0) ? 1 : 0);
 
-            if (_mobj.MaterialColor != null)
+            if (_mobj.Material != null)
             {
-                var matcol = _mobj.MaterialColor;
+                var matcol = _mobj.Material;
 
                 shader.SetFloat("glossiness", matcol.Shininess);
                 shader.SetFloat("transparency", matcol.Alpha);
