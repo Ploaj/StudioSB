@@ -10,6 +10,7 @@ namespace StudioSB.Scenes.Animation
         RotateX,
         RotateY,
         RotateZ,
+        RotateW,
         ScaleX,
         ScaleY,
         ScaleZ,

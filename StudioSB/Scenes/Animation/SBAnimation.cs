@@ -102,6 +102,17 @@ namespace StudioSB.Scenes.Animation
         /// <summary>
         /// 
         /// </summary>
+        public void ConvertRotationKeysToEuler()
+        {
+            foreach(var v in TransformNodes)
+            {
+                v.ConvertRotationToEuler((int)System.Math.Ceiling(FrameCount));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public void Optimize()
         {
             foreach(var v in TransformNodes)

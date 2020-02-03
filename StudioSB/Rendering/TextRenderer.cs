@@ -38,6 +38,8 @@ namespace StudioSB.Rendering
         private static void Draw(Camera camera, string Text, Matrix4 Transform, Vector3 Color, Vector2 WindowPosition, int Size = 16, bool Blend = false, bool Center = false, bool RelativeToWorld = true)
         {
             GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Disable(EnableCap.CullFace);
             GL.Enable(EnableCap.Texture2D);
 
             if (Blend)

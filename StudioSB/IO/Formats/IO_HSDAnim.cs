@@ -67,7 +67,7 @@ namespace StudioSB.IO.Formats
 
                         foreach (var fobj in j.AOBJ.FObjDesc.List)
                         {
-                            a.Tracks.Add(DecodeFOBJ(fobj.FOBJ));
+                            a.Tracks.Add(DecodeFOBJ(fobj.ToFOBJ()));
                         }
                     }
                 }
@@ -130,7 +130,7 @@ namespace StudioSB.IO.Formats
                                 textureAnim.MeshName = "DOBJ_" + nodeIndex;
                                 textureAnim.TextureAttibute = texanim.GXTexMapID.ToString();
 
-                                textureAnim.Keys = DecodeFOBJ(texAOBJ.FObjDesc.FOBJ).Keys;
+                                textureAnim.Keys = DecodeFOBJ(texAOBJ.FObjDesc.ToFOBJ()).Keys;
 
                                 for (int i = 0; i < texanim.ImageCount; i++)
                                 {
@@ -482,8 +482,8 @@ namespace StudioSB.IO.Formats
                 foreach(var track in node.Tracks)
                 {
                     var fobjdesc = new HSD_FOBJDesc();
-                    fobjdesc.FOBJ = EncodeFOBJ(track);
-                    fobjdesc.DataLength = fobjdesc.FOBJ.Buffer.Length;
+                    fobjdesc.FromFOBJ(EncodeFOBJ(track));
+                    fobjdesc.DataLength = fobjdesc.ToFOBJ().Buffer.Length;
 
                     if (joint.AOBJ.FObjDesc == null)
                         joint.AOBJ.FObjDesc = fobjdesc;

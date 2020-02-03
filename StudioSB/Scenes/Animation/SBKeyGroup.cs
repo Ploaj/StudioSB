@@ -64,7 +64,19 @@ namespace StudioSB.Scenes.Animation
 
             return _keys.Values[left];
         }
-        
+
+        public SBAnimKey<T> GetNextKey(float Frame)
+        {
+            int left = BinarySearchKeys(Frame) + 1;
+
+            if(left >= Keys.Count)
+            {
+                left = 0;
+            }
+
+            return _keys.Values[left];
+        }
+
         private int BinarySearchKeys(float frame)
         {
             int lower = 0;

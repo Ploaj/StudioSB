@@ -7,6 +7,18 @@ namespace StudioSB.GUI
 {
     internal class FilteredFileNameEditor : UITypeEditor
     {
+        public string Filter { get; set; }
+
+        public FilteredFileNameEditor()
+        {
+
+        }
+
+        public FilteredFileNameEditor(string filter = "")
+        {
+            Filter = filter;
+        }
+
         private OpenFileDialog ofd = new OpenFileDialog();
         public override UITypeEditorEditStyle GetEditStyle(
          ITypeDescriptorContext context)
@@ -20,6 +32,7 @@ namespace StudioSB.GUI
          object value)
         {
             ofd.FileName = value.ToString();
+            ofd.Filter = Filter;
             //ofd.Filter = "Text File|*.txt|All Files|*.*";
             if (ofd.ShowDialog() == DialogResult.OK)
             {

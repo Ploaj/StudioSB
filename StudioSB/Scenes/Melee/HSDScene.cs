@@ -41,6 +41,8 @@ namespace StudioSB.Scenes.Melee
                 {
                     if (roots.Data is HSD_JOBJ jobj)
                         return jobj;
+                    if (roots.Data is HSD_SOBJ sobj)
+                        return sobj.JOBJDescs?.Array[0]?.RootJoint;
                     /*if (roots.Data is KAR_VcStarVehicle star)
                         return star.ModelData.JOBJRoot;
                     if (roots.Data is KAR_GrModel model)
@@ -650,6 +652,9 @@ namespace StudioSB.Scenes.Melee
                 return;
 
             shader.UseProgram();
+
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Front);
 
             Matrix4 sphereMatrix = camera.ModelViewMatrix;
             sphereMatrix.Invert();

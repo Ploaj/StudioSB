@@ -11,6 +11,7 @@ using StudioSB.GUI.Projects;
 using StudioSB.GUI.Attachments;
 using StudioSB.Scenes.Animation;
 using StudioSB.Scenes.Ultimate;
+using OpenTK;
 
 namespace StudioSB
 {
