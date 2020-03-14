@@ -9,8 +9,6 @@ using HSDRaw.Common;
 using System.ComponentModel;
 using StudioSB.IO.Formats;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
-using StudioSB.Scenes;
 
 namespace StudioSB.GUI.Attachments
 {

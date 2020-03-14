@@ -53,7 +53,7 @@ namespace StudioSB.Scenes.Melee
 
         public new float RX
         {
-            get => base.RX;
+            get => _jobj.RX;
             set
             {
                 if (_jobj != null)
@@ -63,7 +63,7 @@ namespace StudioSB.Scenes.Melee
         }
         public new float RY
         {
-            get => base.RY;
+            get => _jobj.RY;
             set
             {
                 if (_jobj != null)
@@ -73,7 +73,7 @@ namespace StudioSB.Scenes.Melee
         }
         public new float RZ
         {
-            get => base.RZ;
+            get => _jobj.RZ;
             set
             {
                 if (_jobj != null)

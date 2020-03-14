@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="netstandard" />
     <Reference Include="Fbx, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Fbx.dll</HintPath>
@@ -198,6 +199,7 @@
     <Compile Include="Rendering\Bounding\OrientedBoundingBox.cs" />
     <Compile Include="Rendering\Bounding\Ray.cs" />
     <Compile Include="Rendering\DefaultTextures.cs" />
+    <Compile Include="Rendering\OpenTKResources.cs" />
     <Compile Include="Rendering\Shapes\Capsule.cs" />
     <Compile Include="Rendering\Shapes\RectangularPrism.cs" />
     <Compile Include="Rendering\Shapes\ScreenTriangle.cs" />
@@ -246,6 +248,7 @@
     <Compile Include="Scenes\SBSurface.cs" />
     <Compile Include="Scenes\SceneFileInformation.cs" />
     <Compile Include="Scenes\Ultimate\Loaders\MATL_Loader.cs" />
+    <Compile Include="Scenes\Ultimate\Loaders\MESHEX_Loader.cs" />
     <Compile Include="Scenes\Ultimate\Loaders\MESH_Loader.cs" />
     <Compile Include="Scenes\Ultimate\Loaders\MODL_Loader.cs" />
     <Compile Include="Scenes\SBSampler.cs" />
@@ -296,6 +299,7 @@
     <Compile Include="Tools\ConsoleFunctions.cs" />
     <Compile Include="Tools\CrossMath.cs" />
     <Compile Include="Tools\FileTools.cs" />
+    <Compile Include="Tools\LineSimplification.cs" />
     <Compile Include="Tools\SwitchSwizzler.cs" />
     <Compile Include="Tools\TextureFormatInfo.cs" />
     <Compile Include="Tools\TriangleConvert.cs" />

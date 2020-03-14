@@ -12,6 +12,7 @@ using StudioSB.GUI.Attachments;
 using StudioSB.Scenes.Animation;
 using StudioSB.Scenes.Ultimate;
 using OpenTK;
+using StudioSB.Rendering;
 
 namespace StudioSB
 {
@@ -63,6 +64,8 @@ namespace StudioSB
         private static List<IExportableAnimation> AnimationExporters = new List<IExportableAnimation>();
 
         public static List<IAttachment> AttachmentTypes = new List<IAttachment>();
+
+        public string[] ARGS;
 
         public MainForm()
         {
@@ -178,6 +181,8 @@ namespace StudioSB
 
             if (ApplicationSettings.LastOpenedPath != "")
                 projectTree.SetRoot(ApplicationSettings.LastOpenedPath);
+
+            OpenTKResources.Init();
         }
         
         /// <summary>

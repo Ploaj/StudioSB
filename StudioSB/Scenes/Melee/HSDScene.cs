@@ -97,7 +97,7 @@ namespace StudioSB.Scenes.Melee
         private List<HSD_DOBJ> GetDOBJS()
         {
             var dobjs = new List<HSD_DOBJ>();
-            var jobj = RootJOBJ.BreathFirstSearch;
+            var jobj = RootJOBJ.BreathFirstList;
             foreach(var j in jobj)
             {
                 if (j.Dobj == null)
@@ -189,6 +189,9 @@ namespace StudioSB.Scenes.Melee
 
         public override void LoadFromFile(string FileName)
         {
+            if (System.IO.File.Exists(FileName.Replace(".dat", ".jcv")))
+                IO.Formats.IO_8MOT.Settings.JVCPath = FileName.Replace(".dat", ".jcv");
+
             HSDFile = new HSDRawFile(FileName);
             RefreshSkeleton();
             CreateMesh();
@@ -232,7 +235,7 @@ namespace StudioSB.Scenes.Melee
                 return;
 
             var dobjs = GetDOBJS();
-            var jobjs = RootJOBJ.BreathFirstSearch;// GetAllOfType<HSD_JOBJ>(RootJOBJ);
+            var jobjs = RootJOBJ.BreathFirstList;// GetAllOfType<HSD_JOBJ>(RootJOBJ);
             foreach (var dobj in dobjs)
             {
                 //SBConsole.WriteLine(dobj + " " + dobj.List.Count);
@@ -280,7 +283,7 @@ namespace StudioSB.Scenes.Melee
             {
                 if(roots.Data is HSDRaw.Common.Animation.HSD_MatAnimJoint matjoint)
                 {
-                    foreach (var v in matjoint.BreathFirstSearch)
+                    foreach (var v in matjoint.BreathFirstList)
                     {
                         if(v.MaterialAnimation != null)
                         foreach(var matanim in v.MaterialAnimation.List)
@@ -325,7 +328,32 @@ namespace StudioSB.Scenes.Melee
         {
             Skeleton = new SBSkeleton();
 
-            RecursivlyAddChildren(RootJOBJ, null);
+            Dictionary<HSD_JOBJ, HSD_JOBJ> childToParent = new Dictionary<HSD_JOBJ, HSD_JOBJ>();
+            Dictionary<HSD_JOBJ, SBHsdBone> jobjToBone = new Dictionary<HSD_JOBJ, SBHsdBone>();
+
+            foreach (var jobj in RootJOBJ.BreathFirstList)
+            {
+                foreach (var c in jobj.Children)
+                    childToParent.Add(c, jobj);
+                
+                SBHsdBone bone = new SBHsdBone();
+                bone.Name = "JOBJ_" + Skeleton.Bones.Length;
+
+                bone.Transform = Matrix4.Identity;
+                bone.Translation = new Vector3(jobj.TX, jobj.TY, jobj.TZ);
+                bone.RotationEuler = new Vector3(jobj.RX, jobj.RY, jobj.RZ);
+                bone.Scale = new Vector3(jobj.SX, jobj.SY, jobj.SZ);
+                bone.SetJOBJ(jobj);
+
+                jobjToBone.Add(jobj, bone);
+
+                if(childToParent.ContainsKey(jobj))
+                    bone.Parent = jobjToBone[childToParent[jobj]];
+                else
+                    ((SBSkeleton)Skeleton).AddRoot(bone);
+            }
+
+            //RecursivlyAddChildren(RootJOBJ, null);
         }
 
         /// <summary>
@@ -580,9 +608,9 @@ namespace StudioSB.Scenes.Melee
                 mat.Name = iomesh.Name + "_material";
                 if(dobj.Mobj.Material != null)
                 {
-                    mat.DiffuseColor = Color.FromArgb((int)dobj.Mobj.Material.DiffuseColorRGBA);
-                    mat.SpecularColor = Color.FromArgb((int)dobj.Mobj.Material.SpecularColorRGBA);
-                    mat.AmbientColor = Color.FromArgb((int)dobj.Mobj.Material.AmbientColorRGBA);
+                    mat.DiffuseColor = dobj.Mobj.Material.DiffuseColor;
+                    mat.SpecularColor = dobj.Mobj.Material.SpecularColor;
+                    mat.AmbientColor = dobj.Mobj.Material.AmbientColor;
                 }
                 if(dobj.Mobj.Textures != null)
                     mat.DiffuseTexture = tobjToName[dobj.Mobj.Textures._s];

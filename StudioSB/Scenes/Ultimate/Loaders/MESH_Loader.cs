@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using OpenTK;
 using SSBHLib.Tools;
 using StudioSB.Rendering.Bounding;
+using StudioSB.Scenes.Ultimate.Loaders;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -212,7 +213,7 @@ namespace StudioSB.Scenes.Ultimate
             return new Vector4(values.X, values.Y, values.Z, values.W);
         }
 
-        public static MESH CreateMESH(SBUltimateModel model, SBSkeleton Skeleton)
+        public static MESH CreateMESH(SBUltimateModel model, SBSkeleton Skeleton, out MESHEX_Loader meshEX)
         {
             SSBHMeshMaker maker = new SSBHMeshMaker();
 
@@ -346,7 +347,15 @@ namespace StudioSB.Scenes.Ultimate
                 meshFile.M21 = tr.M21; meshFile.M22 = tr.M22; meshFile.M23 = tr.M23;
                 meshFile.M31 = tr.M31; meshFile.M32 = tr.M32; meshFile.M33 = tr.M33;
             }
-            
+
+            meshEX = new MESHEX_Loader();
+            meshEX.AllBoundingSphere = new BoundingSphere(allVertices);
+
+            foreach(var m in model.Meshes)
+            {
+                meshEX.AddMeshData(m.BoundingSphere, m.Name);
+            }
+
             return meshFile;
         }
         

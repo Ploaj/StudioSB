@@ -45,7 +45,7 @@ namespace StudioSB.IO.Formats
                 anim.Name = root.Name;
                 if (root.Data is HSD_AnimJoint joint)
                 {
-                    var joints = joint.BreathFirstSearch;
+                    var joints = joint.BreathFirstList;
 
                     int nodeIndex = -1;
                     foreach(var j in joints)
@@ -92,7 +92,7 @@ namespace StudioSB.IO.Formats
                 }
                 if (root.Data is HSD_MatAnimJoint matjoint)
                 {
-                    var joints = matjoint.BreathFirstSearch;
+                    var joints = matjoint.BreathFirstList;
 
                     anim.FrameCount = 0;
 
@@ -235,7 +235,7 @@ namespace StudioSB.IO.Formats
         private static SBTransformTrack DecodeFOBJ(HSD_FOBJ fobj)
         {
             SBTrackType trackType = SBTrackType.TranslateX;
-            switch (fobj.AnimationType)
+            switch (fobj.JointTrackType)
             {
                 case JointTrackType.HSD_A_J_ROTX: trackType = SBTrackType.RotateX; break;
                 case JointTrackType.HSD_A_J_ROTY: trackType = SBTrackType.RotateY; break;
@@ -249,11 +249,63 @@ namespace StudioSB.IO.Formats
             }
 
             SBTransformTrack track = new SBTransformTrack(trackType);
+            
+            var Keys = fobj.GetDecodedKeys();
 
-            FOBJFrameDecoder decoder = new FOBJFrameDecoder(fobj);
-            var keys = decoder.GetKeys();
+            // get current frame state
+            AnimState prevState = null;
+            for (int i = 0; i < Keys.Count; i++)
+            {
+                var state = GetState(Keys[i].Frame, Keys);
 
+                bool nextSlope = i + 1 < Keys.Count && Keys[i + 1].InterpolationType == GXInterpolationType.HSD_A_OP_SLP;
+                
+                if (Keys[i].Frame == state.t1)
+                {
+                    state.t0 = state.t1;
+                    state.p0 = state.p1;
+                    state.d0 = state.d1;
+                }
 
+                if (Keys[i].InterpolationType == GXInterpolationType.HSD_A_OP_SLP)
+                    continue;
+
+                if (state.op_intrp == GXInterpolationType.HSD_A_OP_CON || state.op_intrp == GXInterpolationType.HSD_A_OP_KEY)
+                {
+                    track.AddKey(state.t0, state.p0, InterpolationType.Step);
+                }
+
+                if (state.op_intrp == GXInterpolationType.HSD_A_OP_LIN)
+                    track.AddKey(state.t0, state.p0, InterpolationType.Linear);
+
+                if (state.op_intrp == GXInterpolationType.HSD_A_OP_SPL
+                    || state.op_intrp == GXInterpolationType.HSD_A_OP_SPL0
+                    || state.op_intrp == GXInterpolationType.HSD_A_OP_SLP)
+                {
+                    track.AddKey(state.t0, state.p0, InterpolationType.Hermite,
+                            (nextSlope && prevState != null) ? prevState.d1 : state.d0, state.d0);
+                }
+
+                prevState = state;
+            }
+            
+            return track;
+        }
+
+        public class AnimState
+        {
+            public float p0 = 0;
+            public float p1 = 0;
+            public float d0 = 0;
+            public float d1 = 0;
+            public float t0 = 0;
+            public float t1 = 0;
+            public GXInterpolationType op_intrp = GXInterpolationType.HSD_A_OP_CON;
+            public GXInterpolationType op = GXInterpolationType.HSD_A_OP_CON;
+        }
+
+        public static AnimState GetState(float Frame, List<FOBJKey> Keys)
+        {
             // register
             float p0 = 0;
             float p1 = 0;
@@ -265,78 +317,77 @@ namespace StudioSB.IO.Formats
             GXInterpolationType op = GXInterpolationType.HSD_A_OP_CON;
 
             // get current frame state
-            for (int i = 0; i < keys.Count; i++)
+            for (int i = 0; i < Keys.Count; i++)
             {
                 op_intrp = op;
-                op = keys[i].InterpolationType;
+                op = Keys[i].InterpolationType;
 
                 switch (op)
                 {
                     case GXInterpolationType.HSD_A_OP_CON:
                         p0 = p1;
-                        p1 = keys[i].Value;
+                        p1 = Keys[i].Value;
                         if (op_intrp != GXInterpolationType.HSD_A_OP_SLP)
                         {
                             d0 = d1;
                             d1 = 0;
                         }
                         t0 = t1;
-                        t1 = keys[i].Frame;
+                        t1 = Keys[i].Frame;
                         break;
                     case GXInterpolationType.HSD_A_OP_LIN:
                         p0 = p1;
-                        p1 = keys[i].Value;
+                        p1 = Keys[i].Value;
                         if (op_intrp != GXInterpolationType.HSD_A_OP_SLP)
                         {
                             d0 = d1;
                             d1 = 0;
                         }
                         t0 = t1;
-                        t1 = keys[i].Frame;
+                        t1 = Keys[i].Frame;
                         break;
                     case GXInterpolationType.HSD_A_OP_SPL0:
                         p0 = p1;
                         d0 = d1;
-                        p1 = keys[i].Value;
+                        p1 = Keys[i].Value;
                         d1 = 0;
                         t0 = t1;
-                        t1 = keys[i].Frame;
+                        t1 = Keys[i].Frame;
                         break;
                     case GXInterpolationType.HSD_A_OP_SPL:
                         p0 = p1;
-                        p1 = keys[i].Value;
+                        p1 = Keys[i].Value;
                         d0 = d1;
-                        d1 = keys[i].Tan;
+                        d1 = Keys[i].Tan;
                         t0 = t1;
-                        t1 = keys[i].Frame;
+                        t1 = Keys[i].Frame;
                         break;
                     case GXInterpolationType.HSD_A_OP_SLP:
                         d0 = d1;
-                        d1 = keys[i].Tan;
+                        d1 = Keys[i].Tan;
                         break;
                     case GXInterpolationType.HSD_A_OP_KEY:
-                        p1 = keys[i].Value;
-                        p0 = keys[i].Value;
+                        p1 = Keys[i].Value;
+                        p0 = Keys[i].Value;
                         break;
                 }
 
-                op_intrp = keys[i].InterpolationType;
+                if (t1 > Frame && Keys[i].InterpolationType != GXInterpolationType.HSD_A_OP_SLP)
+                    break;
 
-                if (op_intrp == GXInterpolationType.HSD_A_OP_CON || op_intrp == GXInterpolationType.HSD_A_OP_KEY)
-                {
-                    track.AddKey(t1, p1, InterpolationType.Step);
-                }
-                
-                if (op_intrp == GXInterpolationType.HSD_A_OP_LIN)
-                    track.AddKey(t1, p1, InterpolationType.Linear);
-
-                if (op_intrp == GXInterpolationType.HSD_A_OP_SPL || op_intrp == GXInterpolationType.HSD_A_OP_SPL0)
-                {
-                    track.AddKey(t1, p1, InterpolationType.Hermite, d1, d1);
-                }
+                op_intrp = Keys[i].InterpolationType;
             }
-
-            return track;
+            return new AnimState()
+            {
+                t0 = t0,
+                t1 = t1,
+                p0 = p0,
+                p1 = p1,
+                d0 = d0,
+                d1 = d1,
+                op = op,
+                op_intrp = op_intrp
+            };
         }
 
         /// <summary>

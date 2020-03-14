@@ -27,8 +27,19 @@ namespace StudioSB.Tools
         /// <returns></returns>
         public static Quaternion ToQuaternion(Vector3 EulerAngles)
         {
+            Quaternion xRotation = Quaternion.FromAxisAngle(Vector3.UnitX, EulerAngles.X);
+            Quaternion yRotation = Quaternion.FromAxisAngle(Vector3.UnitY, EulerAngles.Y);
+            Quaternion zRotation = Quaternion.FromAxisAngle(Vector3.UnitZ, EulerAngles.Z);
+
+            Quaternion q = (zRotation * yRotation * xRotation);
+
+            if (q.W < 0)
+                q *= -1;
+
+            //return xRotation * yRotation * zRotation;
+            return q;
             // Abbreviations for the various angular functions
-            float yaw = EulerAngles.Z;
+            /*float yaw = EulerAngles.Z;
             float pitch = EulerAngles.Y;
             float roll = EulerAngles.X;
 
@@ -44,7 +55,7 @@ namespace StudioSB.Tools
             q.X = (float)(cy * cp * sr - sy * sp * cr);
             q.Y = (float)(sy * cp * sr + cy * sp * cr);
             q.Z = (float)(sy * cp * cr - cy * sp * sr);
-            return q;
+            return q;*/
         }
 
         /// <summary>

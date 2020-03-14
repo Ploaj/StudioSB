@@ -99,11 +99,12 @@ namespace StudioSB.IO.Formats
                 {
                     if(k.Data is SELib.Utilities.Quaternion q)
                     {
-                        var euler = Tools.CrossMath.ToEulerAngles(new OpenTK.Quaternion((float)q.X, (float)q.Y, (float)q.Z, (float)q.W));
+                        var euler = Tools.CrossMath.ToEulerAngles(new OpenTK.Quaternion((float)q.X, (float)q.Y, (float)q.Z, (float)q.W).Inverted());
                         
-                        a.AddKey(k.Frame, euler.X, SBTrackType.RotateX, InterpolationType.Linear);
-                        a.AddKey(k.Frame, euler.Y, SBTrackType.RotateY, InterpolationType.Linear);
-                        a.AddKey(k.Frame, euler.Z, SBTrackType.RotateZ, InterpolationType.Linear);
+                        a.AddKey(k.Frame, (float)q.X, SBTrackType.RotateX, InterpolationType.Linear);
+                        a.AddKey(k.Frame, (float)q.Y, SBTrackType.RotateY, InterpolationType.Linear);
+                        a.AddKey(k.Frame, (float)q.Z, SBTrackType.RotateZ, InterpolationType.Linear);
+                        a.AddKey(k.Frame, (float)q.W, SBTrackType.RotateW, InterpolationType.Linear);
                     }
                     if (k.Data is SELib.Utilities.Vector3 vc)
                     {

@@ -35,7 +35,7 @@ namespace StudioSB.Scenes.Animation
         {
             if (_keys.ContainsKey(frame))
             {
-                SBConsole.WriteLine("Warning: Two keys cannot share a frame");
+                SBConsole.WriteLine($"Warning: Two keys cannot share a frame {frame}");
                 return;
             }
 

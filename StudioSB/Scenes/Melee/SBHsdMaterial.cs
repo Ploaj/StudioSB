@@ -47,9 +47,9 @@ namespace StudioSB.Scenes.Melee
             }
 
             shader.SetBoolToInt("hasDF", _mobj.RenderFlags.HasFlag(RENDER_MODE.DF_NONE));
-            shader.SetBoolToInt("hasDiffuseMaterial", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFSE_MAT));
-            shader.SetBoolToInt("enableDiffuseLighting", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE) || _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFSE_VTX));
-            shader.SetBoolToInt("enableDiffuseVertex", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFSE_VTX));
+            shader.SetBoolToInt("hasDiffuseMaterial", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_MAT));
+            shader.SetBoolToInt("enableDiffuseLighting", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE) || _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_VTX));
+            shader.SetBoolToInt("enableDiffuseVertex", _mobj.RenderFlags.HasFlag(RENDER_MODE.DIFFUSE_VTX));
             shader.SetBoolToInt("enableSpecular", _mobj.RenderFlags.HasFlag(RENDER_MODE.SPECULAR));
 
             shader.SetFloat("glossiness", 0);

@@ -14,6 +14,7 @@ using System.Linq;
 using StudioSB.GUI.Attachments;
 using System.Diagnostics;
 using System.ComponentModel;
+using StudioSB.Scenes.Ultimate.Loaders;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -21,6 +22,9 @@ namespace StudioSB.Scenes.Ultimate
     {
         [DisplayName("Export Mesh and Model (.numshb, .numdlb)")]
         public bool ExportModel { get; set; } = true;
+
+        [DisplayName("Export Mesh Extended (.numshexb)")]
+        public bool ExportModelEx { get; set; } = false;
 
         [DisplayName("Export Skeleton (.nusktb)")]
         public bool ExportSkeleton { get; set; } = true;
@@ -220,7 +224,10 @@ namespace StudioSB.Scenes.Ultimate
                 SSBH.TrySaveSSBHFile(FileName, modl);
 
                 SBConsole.WriteLine($"Creating MESH... {name}.numshb");
-                var mesh = MESH_Loader.CreateMESH((SBUltimateModel)Model, (SBSkeleton)Skeleton);
+                MESHEX_Loader meshEx;
+                var mesh = MESH_Loader.CreateMESH((SBUltimateModel)Model, (SBSkeleton)Skeleton, out meshEx);
+                if (ExportSettings.ExportModelEx)
+                    meshEx.Save(name + ".numshexb");
                 SBConsole.WriteLine("Done");
                 SSBH.TrySaveSSBHFile(name + ".numshb", mesh);
             }

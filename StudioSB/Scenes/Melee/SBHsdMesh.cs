@@ -29,7 +29,7 @@ namespace StudioSB.Scenes.Melee
 
         private List<SBHsdRenderMesh> renderMesh = new List<SBHsdRenderMesh>();
         
-        private SBHsdMaterial material { get => Material as SBHsdMaterial; set => Material = value; }
+        private SBHsdMaterial _material { get => Material as SBHsdMaterial; set => Material = value; }
 
         //TODO: update dobj when parent string name changes
 
@@ -44,7 +44,7 @@ namespace StudioSB.Scenes.Melee
 
             _dobj = dobj;
 
-            material = new SBHsdMaterial(dobj);
+            _material = new SBHsdMaterial(dobj);
 
             ParentBone = parent.Name;
 
@@ -213,7 +213,7 @@ namespace StudioSB.Scenes.Melee
             if (!Visible)
                 return;
 
-            material.Bind(scene, shader);
+            _material.Bind(scene, shader);
 
             shader.SetMatrix4x4("singleBind", scene.Skeleton[ParentBone].AnimatedWorldTransform);
 

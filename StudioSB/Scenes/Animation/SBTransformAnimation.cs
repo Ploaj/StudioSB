@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenTK;
+using StudioSB.Scenes.Melee;
 
 namespace StudioSB.Scenes.Animation
 {
@@ -15,6 +16,12 @@ namespace StudioSB.Scenes.Animation
         public List<SBTransformTrack> Tracks = new List<SBTransformTrack>();
 
         public bool UseQuat => Tracks.Find(e => e.Type == SBTrackType.RotateW) != null;
+
+        public bool HasTranslation => Tracks.Find(e => e.Type == SBTrackType.TranslateX || e.Type == SBTrackType.TranslateY || e.Type == SBTrackType.TranslateZ) != null;
+
+        public bool HasRotation => Tracks.Find(e => e.Type == SBTrackType.RotateX || e.Type == SBTrackType.RotateY || e.Type == SBTrackType.RotateZ || e.Type == SBTrackType.RotateW) != null;
+
+        public bool HasScale => Tracks.Find(e => e.Type == SBTrackType.ScaleX || e.Type == SBTrackType.ScaleY || e.Type == SBTrackType.ScaleZ) != null;
 
         /// <summary>
         /// adds a new key frame to the animation
@@ -72,14 +79,18 @@ namespace StudioSB.Scenes.Animation
             if (bone == null)
                 return Matrix4.Identity;
 
-            SBBone temp = new SBBone();
-            temp.Transform = bone.Transform;
-
             // temp for less matrix calculations
-            Vector3 newPos = temp.Translation;
-            Vector3 newRot = temp.RotationEuler;
-            Vector3 newSca = temp.Scale;
-            
+            Vector3 newPos = new Vector3(bone.X, bone.Y, bone.Z); ;
+            Vector3 newRot = new Vector3(bone.RX, bone.RY, bone.RZ);
+            Vector3 newSca = bone.Scale;
+
+
+
+            if (bone is SBHsdBone hsdBone)
+            {
+                newRot = new Vector3(hsdBone.RX, hsdBone.RY, hsdBone.RZ);
+            }
+
             bool useQuatRotation = false;
             float f1 = 0;
             float f2 = 0;
@@ -133,11 +144,14 @@ namespace StudioSB.Scenes.Animation
                 }
             }
 
+            SBBone temp = new SBBone();
+            temp.Transform = Matrix4.Identity;
+
             temp.Scale = newSca;
             temp.Translation = newPos;
-            if (useQuatRotation)
+            /*if (useQuatRotation)
                 temp.RotationQuaternion = Quaternion.Slerp(q1, q2, (Frame - f1) / (f2 - f1));
-            else
+            else*/
                 temp.RotationEuler = newRot;
 
             return temp.Transform;

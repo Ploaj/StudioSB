@@ -43,6 +43,14 @@ namespace StudioSB.Tools
             return b;
         }
 
+        public void WriteAt(int pos, int val)
+        {
+            var temp = Position;
+            Position = (uint)pos;
+            Write(val);
+            Position = temp;
+        }
+
         public void PrintPosition()
         {
             Console.WriteLine("Stream at 0x{0}", BaseStream.Position.ToString("X"));
