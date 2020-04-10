@@ -80,11 +80,9 @@ namespace StudioSB.Scenes.Animation
                 return Matrix4.Identity;
 
             // temp for less matrix calculations
-            Vector3 newPos = new Vector3(bone.X, bone.Y, bone.Z); ;
+            Vector3 newPos = new Vector3(bone.X, bone.Y, bone.Z);
             Vector3 newRot = new Vector3(bone.RX, bone.RY, bone.RZ);
             Vector3 newSca = bone.Scale;
-
-
 
             if (bone is SBHsdBone hsdBone)
             {
@@ -149,9 +147,9 @@ namespace StudioSB.Scenes.Animation
 
             temp.Scale = newSca;
             temp.Translation = newPos;
-            /*if (useQuatRotation)
+            if (useQuatRotation)
                 temp.RotationQuaternion = Quaternion.Slerp(q1, q2, (Frame - f1) / (f2 - f1));
-            else*/
+            else
                 temp.RotationEuler = newRot;
 
             return temp.Transform;
