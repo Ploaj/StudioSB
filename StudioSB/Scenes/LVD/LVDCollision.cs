@@ -63,13 +63,13 @@ namespace StudioSB.Scenes.LVD
         public bool Flag1 { get; set; } = false;
 
         [Category("Collision")]
-        public bool Flag2 { get; set; } = false;
+        public bool Rigged { get; set; } = false;
 
         [Category("Collision")]
         public bool Flag3 { get; set; } = false;
 
         [Category("Collision")]
-        public bool Flag4 { get; set; } = false;
+        public bool PassThrough { get; set; } = false;
         
         [Category("Collision")]
         public List<LVDVector2> Vertices { get; set; } = new List<LVDVector2>();
@@ -91,9 +91,9 @@ namespace StudioSB.Scenes.LVD
             base.Read(r);
 
             Flag1 = r.ReadBoolean();
-            Flag2 = r.ReadBoolean();
+            Rigged = r.ReadBoolean();
             Flag3 = r.ReadBoolean();
-            Flag4 = r.ReadBoolean();
+            PassThrough = r.ReadBoolean();
 
             r.ReadByte();
             int vertCount = r.ReadInt32();
@@ -149,9 +149,9 @@ namespace StudioSB.Scenes.LVD
             base.Write(writer);
 
             writer.Write(Flag1);
-            writer.Write(Flag2);
+            writer.Write(Rigged);
             writer.Write(Flag3);
-            writer.Write(Flag4);
+            writer.Write(PassThrough);
 
             writer.Write((byte)1);
             writer.Write(Vertices.Count);

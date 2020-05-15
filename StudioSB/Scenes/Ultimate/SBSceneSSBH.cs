@@ -416,17 +416,40 @@ namespace StudioSB.Scenes.Ultimate
             Model = model;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="iov"></param>
+        /// <param name="singleBound"></param>
+        /// <param name="parentBoneInverse"></param>
+        /// <returns></returns>
         private static UltimateVertex IOToUltimateVertex(IOVertex iov, bool singleBound, Matrix4 parentBoneInverse)
         {
             return new UltimateVertex(
                 singleBound ? Vector3.TransformPosition(iov.Position, parentBoneInverse) : iov.Position,
                 singleBound ? Vector3.TransformNormal(iov.Normal, parentBoneInverse) : iov.Normal, 
-                iov.Tangent, iov.Bitangent, iov.UV0, iov.UV1,
-                iov.UV2, singleBound ? new IVec4() : new IVec4() { X = (int)iov.BoneIndices.X,
+                iov.Tangent, 
+                iov.Bitangent, 
+                iov.UV0, 
+                iov.UV1,
+                iov.UV2,
+                iov.UV3,
+                singleBound ? new IVec4() : new IVec4() { X = (int)iov.BoneIndices.X,
                     Y = (int)iov.BoneIndices.Y,
                     Z = (int)iov.BoneIndices.Z,
                     W = (int)iov.BoneIndices.W },
-                 singleBound ? Vector4.Zero : iov.BoneWeights, Vector2.Zero, iov.Color, Vector4.One, Vector4.One);
+                 singleBound ? Vector4.Zero : iov.BoneWeights, 
+                 Vector2.Zero, 
+                 iov.Color, 
+                 Vector4.One, 
+                 Vector4.One, 
+                 Vector4.One, 
+                 Vector4.One, 
+                 Vector4.One, 
+                 Vector4.One, 
+                 Vector4.One, 
+                 Vector4.One,
+                 Vector4.One);
         }
 
         #endregion

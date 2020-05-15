@@ -79,6 +79,7 @@ namespace StudioSB.GUI.Editors
             meshName.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
 
             PropertyGrid = new PropertyGrid();
+            PropertyGrid.PropertySort = PropertySort.Categorized;
             PropertyGrid.Dock = DockStyle.Fill;
 
             Controls.Add(PropertyGrid);

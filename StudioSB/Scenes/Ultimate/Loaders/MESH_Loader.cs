@@ -46,7 +46,6 @@ namespace StudioSB.Scenes.Ultimate
                                     UltimateVertexAttribute at;
                                     if(Enum.TryParse(atstring.Name, out at))
                                     {
-                                        //SBConsole.WriteLine("\tLoaded:" + at.ToString());
                                         sbMesh.EnableAttribute(at);
                                     }
                                 }
@@ -81,10 +80,18 @@ namespace StudioSB.Scenes.Ultimate
             var map1Values = vertexAccessor.ReadAttribute("map1", 0, meshObject.VertexCount, meshObject);
             var uvSetValues = vertexAccessor.ReadAttribute("uvSet", 0, meshObject.VertexCount, meshObject);
             var uvSet1Values = vertexAccessor.ReadAttribute("uvSet1", 0, meshObject.VertexCount, meshObject);
+            var uvSet2Values = vertexAccessor.ReadAttribute("uvSet2", 0, meshObject.VertexCount, meshObject);
             var bake1Values = vertexAccessor.ReadAttribute("bake1", 0, meshObject.VertexCount, meshObject);
             var colorSet1Values = vertexAccessor.ReadAttribute("colorSet1", 0, meshObject.VertexCount, meshObject);
             var colorSet2Values = vertexAccessor.ReadAttribute("colorSet2", 0, meshObject.VertexCount, meshObject);
+            var colorSet21Values = vertexAccessor.ReadAttribute("colorSet21", 0, meshObject.VertexCount, meshObject);
+            var colorSet22Values = vertexAccessor.ReadAttribute("colorSet22", 0, meshObject.VertexCount, meshObject);
+            var colorSet23Values = vertexAccessor.ReadAttribute("colorSet23", 0, meshObject.VertexCount, meshObject);
+            var colorSet3Values = vertexAccessor.ReadAttribute("colorSet3", 0, meshObject.VertexCount, meshObject);
+            var colorSet4Values = vertexAccessor.ReadAttribute("colorSet4", 0, meshObject.VertexCount, meshObject);
             var colorSet5Values = vertexAccessor.ReadAttribute("colorSet5", 0, meshObject.VertexCount, meshObject);
+            var colorSet6Values = vertexAccessor.ReadAttribute("colorSet6", 0, meshObject.VertexCount, meshObject);
+            var colorSet7Values = vertexAccessor.ReadAttribute("colorSet7", 0, meshObject.VertexCount, meshObject);
 
             var generatedBitangents = GenerateBitangents(vertexIndices, positions, map1Values);
 
@@ -120,6 +127,9 @@ namespace StudioSB.Scenes.Ultimate
                 var uvSet1 = new Vector2(0);
                 if (uvSet1Values.Length != 0)
                     uvSet1 = GetVector4(uvSet1Values[i]).Xy;
+                var uvSet2 = new Vector2(0);
+                if (uvSet2Values.Length != 0)
+                    uvSet2 = GetVector4(uvSet2Values[i]).Xy;
 
                 var bones = boneIndices[i];
                 var weights = boneWeights[i];
@@ -139,11 +149,39 @@ namespace StudioSB.Scenes.Ultimate
                 if (colorSet2Values.Length != 0)
                     colorSet2 = GetVector4(colorSet2Values[i]) / 128.0f;
 
+                var colorSet21 = new Vector4(1);
+                if (colorSet21Values.Length != 0)
+                    colorSet21 = GetVector4(colorSet21Values[i]) / 128.0f;
+
+                var colorSet22 = new Vector4(1);
+                if (colorSet22Values.Length != 0)
+                    colorSet22 = GetVector4(colorSet22Values[i]) / 128.0f;
+
+                var colorSet23 = new Vector4(1);
+                if (colorSet23Values.Length != 0)
+                    colorSet23 = GetVector4(colorSet23Values[i]) / 128.0f;
+
+                var colorSet3 = new Vector4(1);
+                if (colorSet3Values.Length != 0)
+                    colorSet3 = GetVector4(colorSet3Values[i]) / 128.0f;
+
+                var colorSet4 = new Vector4(1);
+                if (colorSet4Values.Length != 0)
+                    colorSet4 = GetVector4(colorSet4Values[i]) / 128.0f;
+
                 var colorSet5 = new Vector4(1);
                 if (colorSet5Values.Length != 0)
                     colorSet5 = GetVector4(colorSet5Values[i]) / 128.0f;
 
-                vertices.Add(new UltimateVertex(position, normal, tangent, bitangent, map1, uvSet, uvSet1, bones, weights, bake1, colorSet1, colorSet2, colorSet5));
+                var colorSet6 = new Vector4(1);
+                if (colorSet6Values.Length != 0)
+                    colorSet6 = GetVector4(colorSet6Values[i]) / 128.0f;
+
+                var colorSet7 = new Vector4(1);
+                if (colorSet7Values.Length != 0)
+                    colorSet7 = GetVector4(colorSet7Values[i]) / 128.0f;
+
+                vertices.Add(new UltimateVertex(position, normal, tangent, bitangent, map1, uvSet, uvSet1, uvSet2, bones, weights, bake1, colorSet1, colorSet2, colorSet21, colorSet22, colorSet23, colorSet3, colorSet4, colorSet5, colorSet6, colorSet7));
             }
 
             return vertices;
@@ -235,9 +273,17 @@ namespace StudioSB.Scenes.Ultimate
                 List<SSBHVertexAttribute> Tangent0 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> Map1 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> UvSet = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> UvSet1 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> colorSet1 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> colorSet2 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> colorSet21 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> colorSet22 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> colorSet23 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> colorSet3 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> colorSet4 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> colorSet5 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> colorSet6 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> colorSet7 = new List<SSBHVertexAttribute>();
 
                 List<SSBHVertexInfluence> Influences = new List<SSBHVertexInfluence>();
 
@@ -254,9 +300,14 @@ namespace StudioSB.Scenes.Ultimate
                     Tangent0.Add(vectorToAttribute(vertex.Tangent0));
                     Map1.Add(vectorToAttribute(vertex.Map1));
                     UvSet.Add(vectorToAttribute(vertex.UvSet));
+                    UvSet1.Add(vectorToAttribute(vertex.UvSet1));
                     colorSet1.Add(vectorToAttribute(vertex.ColorSet1 * 128));
                     colorSet2.Add(vectorToAttribute(vertex.ColorSet2 * 128));
+                    colorSet3.Add(vectorToAttribute(vertex.ColorSet3 * 128));
+                    colorSet4.Add(vectorToAttribute(vertex.ColorSet4 * 128));
                     colorSet5.Add(vectorToAttribute(vertex.ColorSet5 * 128));
+                    colorSet5.Add(vectorToAttribute(vertex.ColorSet6 * 128));
+                    colorSet6.Add(vectorToAttribute(vertex.ColorSet7 * 128));
 
                     if (vertex.BoneWeights.X > 0)
                         Influences.Add(CreateInfluence((ushort)VertexIndex, BoneNames[vertex.BoneIndices.X], vertex.BoneWeights.X));
@@ -302,12 +353,28 @@ namespace StudioSB.Scenes.Ultimate
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.map1, Map1.ToArray());
                 if (mesh.ExportUVSet1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet, UvSet.ToArray());
+                if (mesh.ExportUVSet2)
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet1, UvSet1.ToArray());
                 if (mesh.ExportColorSet1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet1, colorSet1.ToArray());
                 if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet2))
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2, colorSet2.ToArray());
+                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet2_1))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2_1, colorSet21.ToArray());
+                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet2_2))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2_2, colorSet22.ToArray());
+                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet2_3))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2_3, colorSet23.ToArray());
+                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet3))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet3, colorSet3.ToArray());
+                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet4))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet4, colorSet4.ToArray());
                 if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet5))
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet5, colorSet5.ToArray());
+                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet6))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet6, colorSet6.ToArray());
+                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet7))
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet7, colorSet7.ToArray());
 
                 // Add rigging
                 if (mesh.ParentBone == "")
