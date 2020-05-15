@@ -175,6 +175,7 @@
     </Compile>
     <Compile Include="IO\Formats\DAE_Writer.cs" />
     <Compile Include="IO\Formats\IO_8MOT.cs" />
+    <Compile Include="IO\Formats\IO_BVH.cs" />
     <Compile Include="IO\Formats\IO_CSV.cs" />
     <Compile Include="IO\Formats\IO_DAE.cs" />
     <Compile Include="IO\Formats\IO_DDS.cs" />

@@ -71,6 +71,31 @@ namespace StudioSB.Tools
         }
 
         /// <summary>
+        /// Calulates a rotation between two vectors as a Quaternion.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static Quaternion ToQuaternion(Vector3 a, Vector3 b)
+        {
+            Vector3 axis = Vector3.Cross(a, b);
+
+            if (a != Vector3.Zero)
+            {
+                a = a.Normalized();
+            }
+
+            if (b != Vector3.Zero)
+            {
+                b = b.Normalized();
+            }
+
+            float angle = (float)Math.Acos(Vector3.Dot(a, b));
+            Quaternion quat = Quaternion.FromAxisAngle(axis, angle);
+            return quat;
+        }
+
+        /// <summary>
         /// Converts quaternion into euler angles in XYZ order
         /// </summary>
         /// <param name="q"></param>
