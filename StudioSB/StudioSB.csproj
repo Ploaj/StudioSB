@@ -190,6 +190,8 @@
     <Compile Include="IO\Formats\IO_SEANIM.cs" />
     <Compile Include="IO\Formats\IO_SMD.cs" />
     <Compile Include="IO\Formats\IO_XML.cs" />
+    <Compile Include="IO\Formats\IO_SSF.cs" />
+    <Compile Include="IO\Formats\SSF.cs" />
     <Compile Include="IO\IExportableAnimation.cs" />
     <Compile Include="IO\IExportableModelType.cs" />
     <Compile Include="IO\IExportableSkeleton.cs" />

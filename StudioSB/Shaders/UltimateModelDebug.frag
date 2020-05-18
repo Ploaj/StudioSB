@@ -7,7 +7,15 @@ in vec2 map1;
 in vec2 uvSet;
 in vec2 uvSet1;
 in vec4 colorSet1;
+in vec4 colorSet2;
+in vec4 colorSet21;
+in vec4 colorSet22;
+in vec4 colorSet23;
+in vec4 colorSet3;
+in vec4 colorSet4;
 in vec4 colorSet5;
+in vec4 colorSet6;
+in vec4 colorSet7;
 in vec2 bake1;
 in vec3 position;
 noperspective in vec3 edgeDistance;
@@ -170,18 +178,45 @@ void main()
 			fragColor = colorSet1;
 			break;
 		case 10:
-			fragColor = vec4(fragmentNormal * 0.5 + 0.5, 1);
+			fragColor = colorSet2;
 			break;
 		case 11:
+			fragColor = colorSet21;
+			break;
+		case 12:
+			fragColor = colorSet22;
+			break;
+		case 13:
+			fragColor = colorSet23;
+			break;
+		case 14:
+			fragColor = colorSet3;
+			break;
+		case 15:
+			fragColor = colorSet4;
+			break;
+		case 16:
+			fragColor = colorSet5;
+			break;
+		case 17:
+			fragColor = colorSet6;
+			break;
+		case 18:
+			fragColor = colorSet7;
+			break;
+		case 19:
+			fragColor = vec4(fragmentNormal * 0.5 + 0.5, 1);
+			break;
+		case 20:
 			fragColor = vec4(tangent * 0.5 + 0.5, 1);
 			break;
-        case 12:
+        case 21:
             fragColor = vec4(bitangent * 0.5 + 0.5, 1);
             break;
-		case 13:
+		case 22:
 			fragColor = vec4(bake1, 1, 1);
 			break;
-        case 14:
+        case 23:
             fragColor = uvPatternColor;
             break;
 		default:

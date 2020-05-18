@@ -44,6 +44,33 @@ namespace StudioSB.Scenes.Ultimate
         [Category("Export Options")]
         public bool ExportColorSet1 { get; set; } = false;
 
+        [Category("Export Options")]
+        public bool ExportColorSet2 { get; set; } = false;
+
+        [Category("Export Options")]
+        public bool ExportColorSet21 { get; set; } = false;
+
+        [Category("Export Options")]
+        public bool ExportColorSet22 { get; set; } = false;
+
+        [Category("Export Options")]
+        public bool ExportColorSet23 { get; set; } = false;
+
+        [Category("Export Options")]
+        public bool ExportColorSet3 { get; set; } = false;
+
+        [Category("Export Options")]
+        public bool ExportColorSet4 { get; set; } = false;
+
+        [Category("Export Options")]
+        public bool ExportColorSet5 { get; set; } = false;
+
+        [Category("Export Options")]
+        public bool ExportColorSet6 { get; set; } = false;
+
+        [Category("Export Options")]
+        public bool ExportColorSet7 { get; set; } = false;
+
         public SBUltimateMesh()
         {
             Visible = true;
@@ -61,6 +88,15 @@ namespace StudioSB.Scenes.Ultimate
                 case UltimateVertexAttribute.uvSet2: ExportUVSet3 = true; break;
                 case UltimateVertexAttribute.map1: ExportMap1 = true; break;
                 case UltimateVertexAttribute.colorSet1: ExportColorSet1 = true; break;
+                case UltimateVertexAttribute.colorSet2: ExportColorSet2 = true; break;
+                case UltimateVertexAttribute.colorSet2_1: ExportColorSet21 = true; break;
+                case UltimateVertexAttribute.colorSet2_2: ExportColorSet22 = true; break;
+                case UltimateVertexAttribute.colorSet2_3: ExportColorSet23 = true; break;
+                case UltimateVertexAttribute.colorSet3: ExportColorSet3 = true; break;
+                case UltimateVertexAttribute.colorSet4: ExportColorSet4 = true; break;
+                case UltimateVertexAttribute.colorSet5: ExportColorSet5 = true; break;
+                case UltimateVertexAttribute.colorSet6: ExportColorSet6 = true; break;
+                case UltimateVertexAttribute.colorSet7: ExportColorSet7 = true; break;
                 default:
                     ExtraExportAttributes.Add(attr);
                     break;

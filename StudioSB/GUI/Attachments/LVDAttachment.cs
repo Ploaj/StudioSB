@@ -8,6 +8,7 @@ using StudioSB.GUI.Menus;
 using StudioSB.Tools;
 using System.Drawing;
 using OpenTK.Input;
+using StudioSB.IO.Formats;
 
 namespace StudioSB.GUI.Attachments
 {
@@ -69,8 +70,15 @@ namespace StudioSB.GUI.Attachments
             ExportLVD.Click += (sender, args) =>
             {
                 string fileName;
-                if(FileTools.TrySaveFile(out fileName, "Smash Level Data |*.lvd"))
-                    LVD.Save(fileName);
+                if(FileTools.TrySaveFile(out fileName, "Smash Level Data |*.lvd;*.ssf"))
+                {
+                    if (fileName.EndsWith(".ssf"))
+                    {
+                        IO_SSF.Export(LVD, fileName);
+                    }
+                    else
+                        LVD.Save(fileName);
+                }
             };
             
             PointToolStrip = new SBToolStrip();
@@ -97,6 +105,7 @@ namespace StudioSB.GUI.Attachments
             PropertyGrid = new PropertyGrid();
             PropertyGrid.Dock = DockStyle.Top;
             PropertyGrid.Size = new Size(200, 500);
+            PropertyGrid.PropertySort = PropertySort.Categorized;
             PropertyGrid.SelectedObjectsChanged += SelectObjectChanged;
 
             Controls.Add(new Splitter() { Dock = DockStyle.Top, Height = 10 });
@@ -736,7 +745,7 @@ namespace StudioSB.GUI.Attachments
         {
             float angle = (float)(Math.Atan2(normals.Y, normals.X) * 180 / Math.PI);
 
-            if (c.Flag4)
+            if (c.PassThrough)
                 return Color.FromArgb(128, Color.Yellow);
             else if (material.GetFlag(4) && ((angle <= 0 && angle >= -70) || (angle <= -110 && angle >= -180) || angle == 180))
                 return Color.FromArgb(128, Color.Purple);
