@@ -2,11 +2,11 @@ using StudioSB.Scenes;
 
 namespace StudioSB.IO
 {
-    public interface IExportableSkeleton
+    public interface IImportableSkeleton
     {
         string Name { get; }
         string Extension { get; }
 
-        void ExportSBSkeleton(string FileName, SBSkeleton skeleton);
+        void ImportSBSkeleton(string FileName, SBSkeleton skeleton);
     }
 }

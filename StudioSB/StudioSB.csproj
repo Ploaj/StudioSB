@@ -196,6 +196,7 @@
     <Compile Include="IO\IExportableModelType.cs" />
     <Compile Include="IO\IExportableSkeleton.cs" />
     <Compile Include="IO\IImportableModelType.cs" />
+    <Compile Include="IO\IImportableSkeleton.cs" />
     <Compile Include="IO\Models\IOMaterial.cs" />
     <Compile Include="IO\Models\IOMesh.cs" />
     <Compile Include="IO\Models\IOModel.cs" />

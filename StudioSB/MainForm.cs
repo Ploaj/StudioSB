@@ -63,6 +63,7 @@ namespace StudioSB
         private static List<IImportableAnimation> AnimationImporters = new List<IImportableAnimation>();
         private static List<IExportableAnimation> AnimationExporters = new List<IExportableAnimation>();
 
+        private static List<IImportableSkeleton> SkeletonImporters = new List<IImportableSkeleton>();
         private static List<IExportableSkeleton> SkeletonExporters = new List<IExportableSkeleton>();
 
         public static List<IAttachment> AttachmentTypes = new List<IAttachment>();
@@ -120,6 +121,10 @@ namespace StudioSB
                         var animimport = new SBToolStripMenuItem("Animation Into Scene");
                         animimport.Click += ImportAnimationToScene;
                         open.DropDownItems.Add(animimport);
+
+                        var skeletonimport = new SBToolStripMenuItem("Skeleton To Model");
+                        skeletonimport.Click += ImportSkeletonToScene;
+                        open.DropDownItems.Add(skeletonimport);
                     }
                     ts.DropDownItems.Add(open);
                 }
@@ -587,22 +592,55 @@ namespace StudioSB
             string Filter = "";
 
             //Create filter
-            Dictionary<string, IImportableAnimation> extensionToExporter = new Dictionary<string, IImportableAnimation>();
-            foreach (IImportableAnimation exporter in AnimationImporters)
+            Dictionary<string, IImportableAnimation> extensionToImporter = new Dictionary<string, IImportableAnimation>();
+            foreach (IImportableAnimation importer in AnimationImporters)
             {
-                string Extension = exporter.Extension;
+                string Extension = importer.Extension;
                 Filter += $"*{Extension};";
-                extensionToExporter.Add(Extension, exporter);
+                extensionToImporter.Add(Extension, importer);
             }
 
             string FileName;
             if (Tools.FileTools.TryOpenFile(out FileName, "Supported Files|" + Filter))
             {
-                foreach (var extension in extensionToExporter.Keys)
+                foreach (var extension in extensionToImporter.Keys)
                 {
                     if (FileName.EndsWith(extension))
                     {
                         OpenFile(FileName);
+                    }
+                }
+            }
+        }
+
+        public void ImportSkeletonToScene(object sender, EventArgs args)
+        {
+            if (viewportPanel.LoadedScene == null)
+            {
+                MessageBox.Show("No scene is selected");
+                return;
+            }
+
+            string Filter = "";
+
+            //Create filter
+            Dictionary<string, IImportableSkeleton> extensionToImporter = new Dictionary<string, IImportableSkeleton>();
+            foreach (IImportableSkeleton importer in SkeletonImporters)
+            {
+                string Extension = importer.Extension;
+                Filter += $"*{Extension};";
+                extensionToImporter.Add(Extension, importer);
+            }
+
+            string FileName;
+            if (Tools.FileTools.TryOpenFile(out FileName, "Supported Files|" + Filter))
+            {
+                foreach (var extension in extensionToImporter.Keys)
+                {
+                    if (FileName.ToLower().EndsWith(extension))
+                    {
+                        SBSkeleton skeleton = viewportPanel.LoadedScene.GetIOModel().Skeleton;
+                        extensionToImporter[extension].ImportSBSkeleton(FileName, skeleton);
                     }
                 }
             }
@@ -815,7 +853,7 @@ namespace StudioSB
                 }
             }
 
-            // initialize skeleton exporters
+            // initialize skeleton importers/exporters
             var exportableSkeletonTypes = from type in assemblyTypes
                 where typeof(IExportableSkeleton).IsAssignableFrom(type) select type;
 
@@ -823,6 +861,15 @@ namespace StudioSB
             {
                 if (type != typeof(IExportableSkeleton))
                     SkeletonExporters.Add((IExportableSkeleton)Activator.CreateInstance(type));
+            }
+
+            var importableSkeletonTypes = from type in assemblyTypes
+                where typeof(IImportableSkeleton).IsAssignableFrom(type) select type;
+
+            foreach (var type in importableSkeletonTypes)
+            {
+                if (type != typeof(IImportableSkeleton))
+                    SkeletonImporters.Add((IImportableSkeleton)Activator.CreateInstance(type));
             }
 
             var attachments = from type in assemblyTypes
