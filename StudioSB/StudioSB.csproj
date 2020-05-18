@@ -189,8 +189,10 @@
     <Compile Include="IO\Formats\IO_SBAnimation.cs" />
     <Compile Include="IO\Formats\IO_SEANIM.cs" />
     <Compile Include="IO\Formats\IO_SMD.cs" />
+    <Compile Include="IO\Formats\IO_XML.cs" />
     <Compile Include="IO\IExportableAnimation.cs" />
     <Compile Include="IO\IExportableModelType.cs" />
+    <Compile Include="IO\IExportableSkeleton.cs" />
     <Compile Include="IO\IImportableModelType.cs" />
     <Compile Include="IO\Models\IOMaterial.cs" />
     <Compile Include="IO\Models\IOMesh.cs" />
