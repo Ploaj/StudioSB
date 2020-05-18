@@ -1,5 +1,4 @@
 using StudioSB.Scenes;
-using System.IO;
 using System.Xml;
 
 namespace StudioSB.IO.Formats
@@ -30,6 +29,7 @@ namespace StudioSB.IO.Formats
         private void WriteBone(XmlWriter file, SBBone bone)
         {
             file.WriteStartElement("SBBone");
+            file.WriteAttributeString("Name", bone.Name);
             file.WriteAttributeString("TranslateX", "" + bone.Translation.X);
             file.WriteAttributeString("TranslateY", "" + bone.Translation.Y);
             file.WriteAttributeString("TranslateZ", "" + bone.Translation.Z);
