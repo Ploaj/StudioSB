@@ -303,6 +303,9 @@ namespace StudioSB.Scenes.Ultimate
                     UvSet1.Add(vectorToAttribute(vertex.UvSet1));
                     colorSet1.Add(vectorToAttribute(vertex.ColorSet1 * 128));
                     colorSet2.Add(vectorToAttribute(vertex.ColorSet2 * 128));
+                    colorSet2.Add(vectorToAttribute(vertex.ColorSet21 * 128));
+                    colorSet2.Add(vectorToAttribute(vertex.ColorSet22 * 128));
+                    colorSet2.Add(vectorToAttribute(vertex.ColorSet23 * 128));
                     colorSet3.Add(vectorToAttribute(vertex.ColorSet3 * 128));
                     colorSet4.Add(vectorToAttribute(vertex.ColorSet4 * 128));
                     colorSet5.Add(vectorToAttribute(vertex.ColorSet5 * 128));
@@ -357,23 +360,23 @@ namespace StudioSB.Scenes.Ultimate
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet1, UvSet1.ToArray());
                 if (mesh.ExportColorSet1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet1, colorSet1.ToArray());
-                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet2))
+                if (mesh.ExportColorSet2)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2, colorSet2.ToArray());
-                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet2_1))
+                if (mesh.ExportColorSet21)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2_1, colorSet21.ToArray());
-                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet2_2))
+                if (mesh.ExportColorSet22)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2_2, colorSet22.ToArray());
-                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet2_3))
+                if (mesh.ExportColorSet23)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2_3, colorSet23.ToArray());
-                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet3))
+                if (mesh.ExportColorSet3)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet3, colorSet3.ToArray());
-                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet4))
+                if (mesh.ExportColorSet4)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet4, colorSet4.ToArray());
-                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet5))
+                if (mesh.ExportColorSet5)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet5, colorSet5.ToArray());
-                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet6))
+                if (mesh.ExportColorSet6)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet6, colorSet6.ToArray());
-                if (mesh.ExtraExportAttributes.Contains(UltimateVertexAttribute.colorSet7))
+                if (mesh.ExportColorSet7)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet7, colorSet7.ToArray());
 
                 // Add rigging
