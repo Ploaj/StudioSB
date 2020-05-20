@@ -303,14 +303,14 @@ namespace StudioSB.Scenes.Ultimate
                     UvSet1.Add(vectorToAttribute(vertex.UvSet1));
                     colorSet1.Add(vectorToAttribute(vertex.ColorSet1 * 128));
                     colorSet2.Add(vectorToAttribute(vertex.ColorSet2 * 128));
-                    colorSet2.Add(vectorToAttribute(vertex.ColorSet21 * 128));
-                    colorSet2.Add(vectorToAttribute(vertex.ColorSet22 * 128));
-                    colorSet2.Add(vectorToAttribute(vertex.ColorSet23 * 128));
+                    colorSet21.Add(vectorToAttribute(vertex.ColorSet21 * 128));
+                    colorSet22.Add(vectorToAttribute(vertex.ColorSet22 * 128));
+                    colorSet23.Add(vectorToAttribute(vertex.ColorSet23 * 128));
                     colorSet3.Add(vectorToAttribute(vertex.ColorSet3 * 128));
                     colorSet4.Add(vectorToAttribute(vertex.ColorSet4 * 128));
                     colorSet5.Add(vectorToAttribute(vertex.ColorSet5 * 128));
-                    colorSet5.Add(vectorToAttribute(vertex.ColorSet6 * 128));
-                    colorSet6.Add(vectorToAttribute(vertex.ColorSet7 * 128));
+                    colorSet6.Add(vectorToAttribute(vertex.ColorSet6 * 128));
+                    colorSet7.Add(vectorToAttribute(vertex.ColorSet7 * 128));
 
                     if (vertex.BoneWeights.X > 0)
                         Influences.Add(CreateInfluence((ushort)VertexIndex, BoneNames[vertex.BoneIndices.X], vertex.BoneWeights.X));
