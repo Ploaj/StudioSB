@@ -21,7 +21,7 @@ namespace StudioSB.Rendering.Bounding
             XyzRadius = new Vector4(X, Y, Z, Radius);
         }
 
-        public BoundingSphere(IEnumerable<Vector3> points)
+        public BoundingSphere(IList<Vector3> points)
         {
             XyzRadius = SFGraphics.Utils.BoundingSphereGenerator.GenerateBoundingSphere(points);
         }

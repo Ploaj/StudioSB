@@ -297,7 +297,9 @@ namespace StudioSB.Scenes.Ultimate
 
                     Position0.Add(vectorToAttribute(vertex.Position0));
                     Normal0.Add(vectorToAttribute(vertex.Normal0));
-                    Tangent0.Add(vectorToAttribute(vertex.Tangent0));
+                    // Smash Ultimate generates its bitangents, using W to flip mirrored bitangents.
+                    Vector4 tangent4 = new Vector4(vertex.Tangent0, SFGraphics.Utils.VectorUtils.CalculateTangentW(vertex.Normal0, vertex.Tangent0, vertex.Bitangent0));
+                    Tangent0.Add(vectorToAttribute(tangent4));
                     Map1.Add(vectorToAttribute(vertex.Map1));
                     UvSet.Add(vectorToAttribute(vertex.UvSet));
                     UvSet1.Add(vectorToAttribute(vertex.UvSet1));
