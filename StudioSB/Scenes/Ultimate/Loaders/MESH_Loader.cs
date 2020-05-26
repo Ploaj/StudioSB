@@ -93,7 +93,11 @@ namespace StudioSB.Scenes.Ultimate
             var colorSet6Values = vertexAccessor.ReadAttribute("colorSet6", 0, meshObject.VertexCount, meshObject);
             var colorSet7Values = vertexAccessor.ReadAttribute("colorSet7", 0, meshObject.VertexCount, meshObject);
 
-            var generatedBitangents = GenerateBitangents(vertexIndices, positions, map1Values);
+            var positionVectors = GetVectors3d(positions);
+            var normalVectors = GetVectors3d(positions);
+            var map1Vectors = GetVectors2d(positions);
+
+            SFGraphics.Utils.TriangleListUtils.CalculateTangentsBitangents(positionVectors, normalVectors, map1Vectors, (int[])(object)vertexIndices, out Vector3[] tangentVectors, out Vector3[] bitangentVectors);
 
             var riggingAccessor = new SSBHRiggingAccessor(mesh);
             var influences = riggingAccessor.ReadRiggingBuffer(meshObject.Name, (int)meshObject.SubMeshIndex);
@@ -117,7 +121,7 @@ namespace StudioSB.Scenes.Ultimate
 
                 var normal = GetVector4(normals[i]).Xyz;
                 var tangent = GetVector4(tangents[i]).Xyz;
-                var bitangent = GetBitangent(generatedBitangents, i, normal);
+                var bitangent = bitangentVectors[i];
 
                 var map1 = GetVector4(map1Values[i]).Xy;
 
@@ -221,29 +225,28 @@ namespace StudioSB.Scenes.Ultimate
             }
         }
 
-        private static Vector3[] GenerateBitangents(uint[] indices, SSBHVertexAttribute[] positions, SSBHVertexAttribute[] uvs)
+        private static Vector3[] GetVectors3d(SSBHVertexAttribute[] values)
         {
-            var generatedBitangents = new Vector3[positions.Length];
-            for (int i = 0; i < indices.Length; i += 3)
+            var vectors = new Vector3[values.Length];
+            for (int i = 0; i < values.Length; i++)
             {
-                SFGraphics.Utils.VectorUtils.GenerateTangentBitangent(GetVector4(positions[indices[i]]).Xyz, GetVector4(positions[indices[i + 1]]).Xyz, GetVector4(positions[indices[i + 2]]).Xyz,
-                    GetVector4(uvs[indices[i]]).Xy, GetVector4(uvs[indices[i + 1]]).Xy, GetVector4(uvs[indices[i + 2]]).Xy, out Vector3 tangent, out Vector3 bitangent);
-
-                generatedBitangents[indices[i]] += bitangent;
-                generatedBitangents[indices[i + 1]] += bitangent;
-                generatedBitangents[indices[i + 2]] += bitangent;
+                var value = values[i];
+                vectors[i] = new Vector3(value.X, value.Y, value.Z);
             }
 
-            return generatedBitangents;
+            return vectors;
         }
 
-
-        private static Vector3 GetBitangent(Vector3[] generatedBitangents, int i, Vector3 normal)
+        private static Vector2[] GetVectors2d(SSBHVertexAttribute[] values)
         {
-            // Account for mirrored normal maps.
-            var bitangent = SFGraphics.Utils.VectorUtils.Orthogonalize(generatedBitangents[i], normal);
-            bitangent *= -1;
-            return bitangent;
+            var vectors = new Vector2[values.Length];
+            for (int i = 0; i < values.Length; i++)
+            {
+                var value = values[i];
+                vectors[i] = new Vector2(value.X, value.Y);
+            }
+
+            return vectors;
         }
 
         private static Vector4 GetVector4(SSBHVertexAttribute values)
