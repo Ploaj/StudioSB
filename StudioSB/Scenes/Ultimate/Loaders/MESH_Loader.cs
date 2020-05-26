@@ -93,10 +93,11 @@ namespace StudioSB.Scenes.Ultimate
             var colorSet6Values = vertexAccessor.ReadAttribute("colorSet6", 0, meshObject.VertexCount, meshObject);
             var colorSet7Values = vertexAccessor.ReadAttribute("colorSet7", 0, meshObject.VertexCount, meshObject);
 
+            // Generate bitangents.
+            // TODO: Use vec4 tangents instead.
             var positionVectors = GetVectors3d(positions);
-            var normalVectors = GetVectors3d(positions);
-            var map1Vectors = GetVectors2d(positions);
-
+            var normalVectors = GetVectors3d(normals);
+            var map1Vectors = GetVectors2d(map1Values);
             SFGraphics.Utils.TriangleListUtils.CalculateTangentsBitangents(positionVectors, normalVectors, map1Vectors, (int[])(object)vertexIndices, out Vector3[] tangentVectors, out Vector3[] bitangentVectors);
 
             var riggingAccessor = new SSBHRiggingAccessor(mesh);
@@ -292,6 +293,20 @@ namespace StudioSB.Scenes.Ultimate
 
                 List<Vector3> meshVertices = new List<Vector3>();
 
+
+                // Generate tangent vectors with the appropriate W component.
+                // TODO: Preserve tangents for existing models?
+                var positionVectors = new List<Vector3>(mesh.Vertices.Count);
+                var normalVectors = new List<Vector3>(mesh.Vertices.Count);
+                var map1Vectors = new List<Vector2>(mesh.Vertices.Count);
+                foreach (var vertex in mesh.Vertices)
+                {
+                    positionVectors.Add(vertex.Position0);
+                    normalVectors.Add(vertex.Normal0);
+                    map1Vectors.Add(vertex.Map1);
+                }
+                SFGraphics.Utils.TriangleListUtils.CalculateTangents(positionVectors, normalVectors, map1Vectors, (int[])(object)mesh.Indices.ToArray(), out Vector4[] tangentVectors);
+
                 int VertexIndex = 0;
                 foreach (var vertex in mesh.Vertices)
                 {
@@ -300,9 +315,7 @@ namespace StudioSB.Scenes.Ultimate
 
                     Position0.Add(vectorToAttribute(vertex.Position0));
                     Normal0.Add(vectorToAttribute(vertex.Normal0));
-                    // Smash Ultimate generates its bitangents, using W to flip mirrored bitangents.
-                    Vector4 tangent4 = new Vector4(vertex.Tangent0, SFGraphics.Utils.VectorUtils.CalculateTangentW(vertex.Normal0, vertex.Tangent0, vertex.Bitangent0));
-                    Tangent0.Add(vectorToAttribute(tangent4));
+                    Tangent0.Add(vectorToAttribute(tangentVectors[VertexIndex]));
                     Map1.Add(vectorToAttribute(vertex.Map1));
                     UvSet.Add(vectorToAttribute(vertex.UvSet));
                     UvSet1.Add(vectorToAttribute(vertex.UvSet1));
