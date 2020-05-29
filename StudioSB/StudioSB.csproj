@@ -566,7 +566,7 @@
     <Content Include="DefaultTextures\default_cube_black.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DefaultTextures\default_normal.png">
+    <Content Include="DefaultTextures\default_normal.tif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="DefaultTextures\default_Params.tif">

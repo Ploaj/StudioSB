@@ -692,7 +692,7 @@ namespace StudioSB.Scenes.Ultimate
             shader.SetBoolToInt("renderNormalMaps", ApplicationSettings.RenderNormalMaps);
             shader.SetBoolToInt("renderVertexColor", ApplicationSettings.RenderVertexColor);
 
-            shader.SetFloat("iblIntensity", 0.5f);
+            shader.SetFloat("iblIntensity", 1.0f);
             shader.SetFloat("directLightIntensity", 1.0f);
 
             shader.SetVector3("chrLightDir", GetLightDirectionFromQuaternion(-0.453154f, -0.365998f, -0.211309f, 0.784886f));

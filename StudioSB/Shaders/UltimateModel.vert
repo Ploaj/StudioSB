@@ -13,6 +13,7 @@ in vec2 bake1;
 in vec2 map1;
 in vec2 uvSet;
 in vec2 uvSet1;
+in vec2 uvSet2;
 
 in ivec4 boneIndices;
 in vec4 boneWeights;
@@ -23,6 +24,7 @@ out vec3 geomBitangent;
 out vec2 geomMap1;
 out vec2 geomUvSet;
 out vec2 geomUvSet1;
+out vec2 geomUvSet2;
 out vec4 geomColorSet1;
 out vec4 geomColorSet5;
 out vec2 geomBake1;
@@ -35,6 +37,42 @@ uniform Bones
 {
     mat4 transforms[300];
 };
+
+uniform vec4 CustomVector0;
+uniform vec4 CustomVector3;
+uniform vec4 CustomVector6;
+uniform vec4 CustomVector8;
+uniform vec4 CustomVector11;
+uniform vec4 CustomVector13;
+uniform vec4 CustomVector14;
+uniform vec3 CustomVector18;
+uniform vec4 CustomVector30;
+uniform vec4 CustomVector31;
+uniform vec4 CustomVector32;
+uniform vec4 CustomVector42;
+uniform vec4 CustomVector47;
+uniform vec4 CustomVector44;
+uniform vec4 CustomVector45;
+
+uniform vec4 vec4Param;
+
+uniform int CustomBoolean1;
+uniform int CustomBoolean2;
+uniform int CustomBoolean3;
+uniform int CustomBoolean4;
+uniform int CustomBoolean9;
+uniform int CustomBoolean11;
+
+uniform float CustomFloat1;
+uniform float CustomFloat4;
+uniform float CustomFloat8;
+uniform float CustomFloat10;
+uniform float CustomFloat19;
+
+uniform int hasCustomVector11;
+uniform int hasCustomVector47;
+uniform int hasCustomVector44;
+uniform int hasCustomFloat10;
 
 void main()
 {
@@ -61,16 +99,17 @@ void main()
     geomBake1 = bake1;
     geomPosition = position.xyz;
 
-    // TODO: Sprite sheet uvs.
+    // Sprite sheet uvs.
     geomMap1 = map1;
-    // if (CustomBoolean1 == 1)
-    //     geomMap1 /= CustomVector18.xy;
+    if (CustomBoolean9 == 1)
+        geomMap1 /= CustomVector18.xy;
 
     geomUvSet = uvSet;
     geomUvSet1 = uvSet1;
+    geomUvSet2 = uvSet2;
 
-    geomTangent = Tangent0;
-    geomBitangent = Bitangent0;
+    geomTangent = Tangent0.xyz;
+    geomBitangent = Bitangent0.xyz;
 
     gl_Position = mvp * vec4(position.xyz, 1);
 }

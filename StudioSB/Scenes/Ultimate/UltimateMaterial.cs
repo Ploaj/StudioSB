@@ -26,45 +26,46 @@ namespace StudioSB.Scenes.Ultimate
         
         #region Vectors
         
-        public SBMatAttrib<Vector4> CustomVector0 { get; } = new SBMatAttrib<Vector4>("CustomVector0", new Vector4(0), description: "Alpha offset.");
+        public SBMatAttrib<Vector4> CustomVector0 { get; } = new SBMatAttrib<Vector4>("CustomVector0", new Vector4(0), description: "");
         
-        public SBMatAttrib<Vector4> CustomVector3 { get; } = new SBMatAttrib<Vector4>("CustomVector3", new Vector4(1), description: "Some sort of emission color.");
+        public SBMatAttrib<Vector4> CustomVector3 { get; } = new SBMatAttrib<Vector4>("CustomVector3", new Vector4(1), description: "");
         
-        public SBMatAttrib<Vector4> CustomVector6 { get; } = new SBMatAttrib<Vector4>("CustomVector6", new Vector4(1, 1, 0, 0), description: "UV Transform layer 1 for emissive map layer 1");
+        public SBMatAttrib<Vector4> CustomVector6 { get; } = new SBMatAttrib<Vector4>("CustomVector6", new Vector4(1, 1, 0, 0), description: "");
         
-        public SBMatAttrib<Vector4> CustomVector8 { get; } = new SBMatAttrib<Vector4>("CustomVector8", new Vector4(1), description: "Diffuse color multiplier?");
+        public SBMatAttrib<Vector4> CustomVector8 { get; } = new SBMatAttrib<Vector4>("CustomVector8", new Vector4(1), description: "");
 
         [Browsable(false)]
-        public SBMatAttrib<Vector4> CustomVector11 { get; } = new SBMatAttrib<Vector4>("CustomVector11", new Vector4(0), description: "Some sort of skin subsurface color", isColor: true);
+        public SBMatAttrib<Vector4> CustomVector11 { get; } = new SBMatAttrib<Vector4>("CustomVector11", new Vector4(0), description: "", isColor: true);
 
         [Category("Colors"), DisplayName("CustomVector11"), Description("Some sort of skin subsurface color")]
         public Color paramA3View
         {
             get => Color.FromArgb((byte)(CustomVector11.Value.W * 255), (byte)(CustomVector11.Value.X * 255), (byte)(CustomVector11.Value.Y * 255), (byte)(CustomVector11.Value.Z* 255));
             set => CustomVector11.Value = new Vector4(value.R / 255f, value.B / 255f, value.G / 255f, value.A / 255f);
-        } 
+        }
+        public bool hasCustomVector11 { get => CustomVector11.Used; }
+
+        public SBMatAttrib<Vector4> CustomVector13 { get; } = new SBMatAttrib<Vector4>("CustomVector13", new Vector4(1), description: "");
         
-        public SBMatAttrib<Vector4> CustomVector13 { get; } = new SBMatAttrib<Vector4>("CustomVector13", new Vector4(1), description: "Diffuse color multiplier?");
+        public SBMatAttrib<Vector4> CustomVector14 { get; } = new SBMatAttrib<Vector4>("CustomVector14", new Vector4(1), description: "");
         
-        public SBMatAttrib<Vector4> CustomVector14 { get; } = new SBMatAttrib<Vector4>("CustomVector14", new Vector4(1), description: "Assume no edge lighting if not present.");
+        public SBMatAttrib<Vector4> CustomVector18 { get; } = new SBMatAttrib<Vector4>("CustomVector18", new Vector4(1), description: "");
         
-        public SBMatAttrib<Vector4> CustomVector18 { get; } = new SBMatAttrib<Vector4>("CustomVector18", new Vector4(1), description: "Sprite sheet UV parameters.");
+        public SBMatAttrib<Vector4> CustomVector30 { get; } = new SBMatAttrib<Vector4>("CustomVector30", new Vector4(0), description: "");
         
-        public SBMatAttrib<Vector4> CustomVector30 { get; } = new SBMatAttrib<Vector4>("CustomVector30", new Vector4(1, 0, 0, 0), description: "");
+        public SBMatAttrib<Vector4> CustomVector31 { get; } = new SBMatAttrib<Vector4>("CustomVector31", new Vector4(1, 1, 0, 0), description: "");
         
-        public SBMatAttrib<Vector4> CustomVector31 { get; } = new SBMatAttrib<Vector4>("CustomVector31", new Vector4(1, 1, 0, 0), description: "UV transform");
-        
-        public SBMatAttrib<Vector4> CustomVector32 { get; } = new SBMatAttrib<Vector4>("CustomVector32", new Vector4(1, 1, 0, 0), description: "UV transform");
+        public SBMatAttrib<Vector4> CustomVector32 { get; } = new SBMatAttrib<Vector4>("CustomVector32", new Vector4(1, 1, 0, 0), description: "");
         
         public SBMatAttrib<Vector4> CustomVector42 { get; } = new SBMatAttrib<Vector4>("CustomVector42", new Vector4(0), description: "");
 
         public bool hasCustomVector42 { get => CustomVector42.Used; }
         
-        public SBMatAttrib<Vector4> CustomVector44 { get; } = new SBMatAttrib<Vector4>("CustomVector44", new Vector4(0), description: "Wii Fit trainer stage color.");
+        public SBMatAttrib<Vector4> CustomVector44 { get; } = new SBMatAttrib<Vector4>("CustomVector44", new Vector4(0), description: "");
 
         public bool hasCustomVector44 { get => CustomVector44.Used; }
         
-        public SBMatAttrib<Vector4> CustomVector45 { get; } = new SBMatAttrib<Vector4>("CustomVector45", new Vector4(0), description: "Wii Fit trainer stage color.");
+        public SBMatAttrib<Vector4> CustomVector45 { get; } = new SBMatAttrib<Vector4>("CustomVector45", new Vector4(0), description: "");
         
         public SBMatAttrib<Vector4> CustomVector47 { get; } = new SBMatAttrib<Vector4>("CustomVector47", new Vector4(0), description: "");
 
@@ -73,27 +74,34 @@ namespace StudioSB.Scenes.Ultimate
         #endregion
 
         #region Booleans
-        public SBMatAttrib<bool> CustomBoolean1 { get; } = new SBMatAttrib<bool>("CustomBoolean1", false, description: "Enables/disables specular occlusion");
+        public SBMatAttrib<bool> CustomBoolean1 { get; } = new SBMatAttrib<bool>("CustomBoolean1", false, description: "");
         
         public SBMatAttrib<bool> CustomBoolean2 { get; } = new SBMatAttrib<bool>("CustomBoolean2", true, description: "");
 
-        public SBMatAttrib<bool> CustomBoolean5 { get; } = new SBMatAttrib<bool>("CustomBoolean5", false, description: "Enables/disables UV scrolling animations");
+        public SBMatAttrib<bool> CustomBoolean3 { get; } = new SBMatAttrib<bool>("CustomBoolean3", true, description: "");
 
-        public SBMatAttrib<bool> CustomBoolean6 { get; } = new SBMatAttrib<bool>("CustomBoolean6", false, description: "Enables/disables UV scrolling animations");
+        public SBMatAttrib<bool> CustomBoolean4 { get; } = new SBMatAttrib<bool>("CustomBoolean4", true, description: "");
+
+        public SBMatAttrib<bool> CustomBoolean5 { get; } = new SBMatAttrib<bool>("CustomBoolean5", false, description: "");
+
+        public SBMatAttrib<bool> CustomBoolean6 { get; } = new SBMatAttrib<bool>("CustomBoolean6", false, description: "");
         
-        public SBMatAttrib<bool> CustomBoolean7 { get; } = new SBMatAttrib<bool>("CustomBoolean7", true, description: "Enables/disables UV scrolling animations");
+        public SBMatAttrib<bool> CustomBoolean7 { get; } = new SBMatAttrib<bool>("CustomBoolean7", false, description: "");
         
-        public SBMatAttrib<bool> CustomBoolean9 { get; } = new SBMatAttrib<bool>("CustomBoolean9", true, description: "Some sort of sprite sheet scale toggle");
+        public SBMatAttrib<bool> CustomBoolean9 { get; } = new SBMatAttrib<bool>("CustomBoolean9", false, description: "");
+
+        public SBMatAttrib<bool> CustomBoolean11 { get; } = new SBMatAttrib<bool>("CustomBoolean11", true, description: "");
 
         #endregion
 
         #region Floats
+        public SBMatAttrib<float> CustomFloat1 { get; } = new SBMatAttrib<float>("CustomFloat1", 0.0f, description: "");
 
         public SBMatAttrib<float> CustomFloat4 { get; } = new SBMatAttrib<float>("CustomFloat4", 0.0f, description: "");
 
-        public SBMatAttrib<float> CustomFloat8 { get; } = new SBMatAttrib<float>("CustomFloat8", 0.0f, description: "Controls specular IOR");
+        public SBMatAttrib<float> CustomFloat8 { get; } = new SBMatAttrib<float>("CustomFloat8", 0.0f, description: "");
         
-        public SBMatAttrib<float> CustomFloat10 { get; } = new SBMatAttrib<float>("CustomFloat10", 0.0f, description: "Controls anisotropic specular");
+        public SBMatAttrib<float> CustomFloat10 { get; } = new SBMatAttrib<float>("CustomFloat10", 0.0f, description: "");
         
         public SBMatAttrib<float> CustomFloat19 { get; } = new SBMatAttrib<float>("CustomFloat19", 0.0f, description: "");
 
@@ -128,14 +136,14 @@ namespace StudioSB.Scenes.Ultimate
         public bool hasPrmMap { get => Texture6.Used; }
 
         [DefaultTextureName("defaultSpecCube")]
-        public SBMatAttrib<string> Texture7 { get; } = new SBMatAttrib<string>("specularPbrCube", "", description: "Specular PBR Map");
+        public SBMatAttrib<string> Texture7 { get; } = new SBMatAttrib<string>("specularPbrCube", "", description: "Specular Cube Map");
 
         [DefaultTextureName("defaultBlackCube")]
         public SBMatAttrib<string> Texture8 { get; } = new SBMatAttrib<string>("difCubeMap", "", description: "Diffuse Cube Map");
         public bool hasDifCubeMap { get => Texture8.Used; }
 
-        [DefaultTextureName("defaultBlack")]
-        public SBMatAttrib<string> Texture9 { get; } = new SBMatAttrib<string>("bakeLitMap", "", description: "Bake Light Map");
+        [DefaultTextureName("defaultWhite")]
+        public SBMatAttrib<string> Texture9 { get; } = new SBMatAttrib<string>("bakeLitMap", "", description: "Baked Lighting Map");
 
         [DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> Texture10 { get; } = new SBMatAttrib<string>("difMap", "", description: "Diffuse Map");
@@ -265,7 +273,6 @@ namespace StudioSB.Scenes.Ultimate
             }
 
             shader.SetTexture("diffusePbrCube", DefaultTextures.Instance.diffusePbr, TextureUnit++);
-            shader.SetTexture("iblLut", DefaultTextures.Instance.iblLut, TextureUnit++);
             shader.SetTexture("uvPattern", DefaultTextures.Instance.uvPattern, TextureUnit++);
         }
 
@@ -274,6 +281,11 @@ namespace StudioSB.Scenes.Ultimate
         /// </summary>
         private void BindBlendState()
         {
+            if (BlendState.Unk7 == 1 || BlendState.Unk8 == 1)
+                GL.Enable(EnableCap.SampleAlphaToCoverage);
+            else
+                GL.Disable(EnableCap.SampleAlphaToCoverage);
+            
             BlendingFactor src = BlendingFactor.One;
             BlendingFactor dst = BlendingFactor.OneMinusSrcAlpha;
 

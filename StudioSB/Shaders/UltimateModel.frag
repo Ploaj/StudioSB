@@ -6,6 +6,7 @@ in vec3 bitangent;
 in vec2 map1;
 in vec2 uvSet;
 in vec2 uvSet1;
+in vec2 uvSet2;
 in vec4 colorSet1;
 in vec4 colorSet5;
 in vec2 bake1;
@@ -76,20 +77,26 @@ uniform vec4 vec4Param;
 
 uniform int CustomBoolean1;
 uniform int CustomBoolean2;
+uniform int CustomBoolean3;
+uniform int CustomBoolean4;
+uniform int CustomBoolean9;
+uniform int CustomBoolean11;
 
+uniform float CustomFloat1;
+uniform float CustomFloat4;
 uniform float CustomFloat8;
 uniform float CustomFloat10;
 uniform float CustomFloat19;
 
+uniform int hasCustomVector11;
 uniform int hasCustomVector47;
 uniform int hasCustomVector44;
-
-uniform float transitionFactor;
-uniform int transitionEffect;
+uniform int hasCustomFloat10;
 
 uniform vec3 chrLightDir;
 
 uniform mat4 mvp;
+uniform mat4 modelViewMatrix;
 uniform vec3 cameraPos;
 
 out vec4 fragColor;
@@ -97,8 +104,8 @@ out vec4 fragColor;
 uniform float directLightIntensity;
 uniform float iblIntensity;
 
-uniform int useStippleBlend;
-uniform sampler2D stipplePattern;
+uniform float transitionFactor;
+uniform int transitionEffect;
 
 // Defined in Wireframe.frag.
 float WireframeIntensity(vec3 distanceToEdges);
@@ -106,26 +113,19 @@ float WireframeIntensity(vec3 distanceToEdges);
 // Defined in NormalMap.frag.
 vec3 GetBumpMapNormal(vec3 N, vec3 tangent, vec3 bitangent, vec4 norColor);
 
-float LambertShading(vec3 N, vec3 V)
-{
-    float lambert = max(dot(N, V), 0);
-    return lambert;
-}
-
 // Defined in Gamma.frag.
 vec3 GetSrgb(vec3 linear);
 
-vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+vec3 FresnelSchlick(float cosTheta, vec3 F0)
 {
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
-}
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+} 
 
 // GGX calculations adapted from https://learnopengl.com/PBR/IBL/Specular-IBL
-float Ggx(vec3 N, vec3 H, float roughness)
+float Ggx(float nDotH, float roughness)
 {
     float a = roughness * roughness;
     float a2 = a * a;
-    float nDotH = max(dot(N, H), 0.0);
     float nDotH2 = nDotH * nDotH;
 
     float numerator = a2;
@@ -137,21 +137,25 @@ float Ggx(vec3 N, vec3 H, float roughness)
 
 // Code adapted from equations listed here:
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
-float GgxAnisotropic(vec3 N, vec3 H, vec3 tangent, vec3 bitangent, float roughX, float roughY)
+float GgxAnisotropic(float nDotH, vec3 H, vec3 tangent, vec3 bitangent, float roughness, float anisotropy)
 {
-    float normalization = 1 / (3.14159 * roughX * roughY);
+    // This probably works differently in game.
+    // https://developer.blender.org/diffusion/B/browse/master/intern/cycles/kernel/shaders/node_anisotropic_bsdf.osl
+    float roughnessX = roughness * (1.0 + anisotropy);
+    float roughnessY = roughness / (1.0 + anisotropy);
 
-    float nDotH = max(dot(N, H), 0.0);
+    float normalization = 1 / (3.14159 * roughnessX * roughnessY);
+
     float nDotH2 = nDotH * nDotH;
 
-    float roughX2 = roughX * roughX;
-    float roughY2 = roughY * roughY;
+    float roughnessX2 = roughnessX * roughnessX;
+    float roughnessY2 = roughnessY * roughnessY;
 
     float xDotH = dot(tangent, H);
-    float xTerm = (xDotH * xDotH) / roughX2;
+    float xTerm = (xDotH * xDotH) / roughnessX2;
 
     float yDotH = dot(bitangent, H);
-    float yTerm = (yDotH * yDotH) / roughY2;
+    float yTerm = (yDotH * yDotH) / roughnessY2;
 
     float denominator = xTerm + yTerm + nDotH2;
 
@@ -162,25 +166,9 @@ float GgxAnisotropic(vec3 N, vec3 H, vec3 tangent, vec3 bitangent, float roughX,
 vec4 GetEmissionColor(vec2 uv1, vec2 uv2, vec4 transform1, vec4 transform2);
 vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec3 R, vec4 transform1, vec4 transform2, vec4 transform3, vec4 colorSet5);
 
-vec3 DiffuseTerm(vec4 albedoColor, vec3 diffuseIbl, vec3 N, vec3 V, vec3 kDiffuse, float metalness, vec3 sssColor)
+vec3 DiffuseTerm(vec4 albedoColor, vec3 diffuseIbl, vec3 N, vec3 V, float metalness, float sssBlend, vec3 sssColor)
 {
-    vec3 diffuseTerm = kDiffuse * albedoColor.rgb;
-
-    // Some sort of fake SSS color.
-    // TODO: The SSS color may be part of a separate render pass
-    // and not take into account diffuse lighting.
-    diffuseTerm += sssColor * metalness * renderExperimental * albedoColor.rgb;
-
-    // Baked ambient lighting.
-    vec3 diffuseLight = vec3(0);
-    diffuseLight += diffuseIbl;
-    vec4 bakedLitColor = texture(bakeLitMap, bake1);
-    diffuseLight += bakedLitColor.rgb * 2;
-
-    // Direct lighting.
-    diffuseLight += LambertShading(N, normalize(chrLightDir)) * directLightIntensity * bakedLitColor.a;
-
-    diffuseTerm *= diffuseLight;
+    vec3 diffuseTerm = albedoColor.rgb;
 
     // Color multiplier param.
     diffuseTerm *= CustomVector13.rgb;
@@ -189,55 +177,32 @@ vec3 DiffuseTerm(vec4 albedoColor, vec3 diffuseIbl, vec3 N, vec3 V, vec3 kDiffus
     if (hasCustomVector44 == 1)
         diffuseTerm = CustomVector44.rgb + CustomVector45.rgb;
 
+    // Fake subsurface scattering.
+    // Metalness acts as a mask for the sss effect.
+    diffuseTerm = mix(diffuseTerm, CustomVector11.rgb, sssBlend * metalness);
+    diffuseTerm += sssColor * sssBlend * metalness;
+
     return diffuseTerm;
 }
 
-float EdgeTintBlend(vec3 N, vec3 V)
-{   
-    float rimExponent = 3.0; // TODO: ???
-    float facingRatio = (1 - max(dot(N, V), 0));
-    facingRatio = pow(facingRatio, rimExponent) * CustomVector14.w;
-    return facingRatio;
-}
-
-vec3 SpecularTerm(vec3 N, vec3 V, vec3 tangent, vec3 bitangent, float roughness, vec3 specularIbl, vec3 kSpecular, float cavity, float specPower, float metalness)
+float SpecularBrdf(float nDotH, vec3 halfAngle, float roughness)
 {
-    vec3 halfAngle = normalize(chrLightDir + V);
-
-    // Specular calculations adapted from https://learnopengl.com/PBR/IBL/Specular-IBL
-    vec2 brdf  = texture(iblLut, vec2(max(dot(N, V), 0.0), roughness)).rg;
-    vec3 specularTerm = vec3(0);
-    specularTerm += specularIbl * ((kSpecular * brdf.x) + brdf.y) * metalness; // TODO: What passes does IBL affect?
-
-    // TODO: Does image based lighting consider anisotropy?
-    // This probably works differently in game.
-    // https://developer.blender.org/diffusion/B/browse/master/intern/cycles/kernel/shaders/node_anisotropic_bsdf.osl
-    float roughnessX = roughness * (1.0 + CustomFloat10);
-    float roughnessY = roughness / (1.0 + CustomFloat10);
-
-    // Direct lighting.
     // The two BRDFs look very different so don't just use anisotropic for everything.
     float specularBrdf = 0;
-    if (CustomFloat10 != 0)
-        specularBrdf = GgxAnisotropic(N, halfAngle, tangent, bitangent, roughnessX, roughnessY) * directLightIntensity;
+    float anisotropy = CustomFloat10;
+    if (hasCustomFloat10 == 1)
+        specularBrdf = GgxAnisotropic(nDotH, halfAngle, tangent, bitangent, roughness, anisotropy);
     else
-        specularBrdf = pow(Ggx(N, halfAngle, roughness), CustomVector30.x) * directLightIntensity;
+        specularBrdf = Ggx(nDotH, roughness);
 
-    // Some sort of fake SSS.
-    // TODO: Does this affect the whole pass?
-    if (renderExperimental == 1)
-        specularBrdf = pow(specularBrdf, specPower);
+    return specularBrdf;
+}
 
-    specularTerm += kSpecular * vec3(specularBrdf);
-
-    if (renderRimLighting == 1)
-    {
-        // TODO: How does the cavity map work?
-        float edgeBlend = EdgeTintBlend(N, V);
-        if (renderExperimental == 1) 
-            edgeBlend *= cavity;
-        specularTerm = mix(specularTerm, CustomVector14.rgb, edgeBlend);
-    }
+vec3 SpecularTerm(float nDotH, vec3 halfAngle, float roughness, vec3 specularIbl, float metalness)
+{
+    vec3 indirectSpecular = specularIbl;
+    vec3 directSpecular = vec3(SpecularBrdf(nDotH, halfAngle, roughness)) * directLightIntensity;
+    vec3 specularTerm = (directSpecular * CustomBoolean3) + (indirectSpecular * CustomBoolean4);
 
     return specularTerm;
 }
@@ -252,6 +217,55 @@ float GetF0(float ior)
     return pow((1 - ior) / (1 + ior), 2);
 }
 
+float Luminance(vec3 rgb)
+{
+    const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+    return dot(rgb, W);
+}
+
+vec3 GetSpecularWeight(float prmSpec, vec3 diffusePass, float metalness, float nDotV, float roughness)
+{
+    vec3 tintColor = mix(vec3(1), diffusePass, CustomFloat8); 
+
+    // Metals use albedo instead of the specular color/tint.
+    vec3 specularReflectionF0 = vec3(prmSpec * 0.2) * tintColor;
+    vec3 f0Final = mix(specularReflectionF0, diffusePass, metalness);
+
+    return FresnelSchlick(nDotV, f0Final);
+}
+
+vec3 GetDiffuseLighting(float nDotL, vec3 ambientIbl, vec3 ao, float smoothFactor)
+{
+    vec4 bakedLitColor = texture(bakeLitMap, bake1);
+    float directShading = nDotL;
+    if (hasCustomVector11 == 1)
+    {
+        // Only smooth the BRDF to avoid clamping brightness of the lighting.
+        float mid = 0.5; // TODO: ambient intensity and mid value?
+        float smoothWidth = 1 / smoothFactor;
+        directShading = smoothstep(mid - smoothWidth, mid + smoothWidth, directShading);
+    }
+    vec3 directLight = vec3(directShading);
+    vec3 ambientLight = ambientIbl * ao;
+    vec3 result = directLight * directLightIntensity  + ambientLight;
+    return result * bakedLitColor.rgb;
+}
+
+vec3 RimLightingTerm(float nDotV, vec3 fragmentNormal, float occlusion)
+{
+    // TODO: Add lighting vectors to a uniform block.
+    // TODO: Difference between RGB color intensity and W value?
+    vec4 LightCustomVector8 = vec4(1.5,1.5,1.5,1); // training stage 
+    vec3 rimColor = CustomVector14.rgb * LightCustomVector8.rgb;
+    
+    // TODO: The direction may be controlled by some value.
+    // Edge lighting lit only from above.
+    float exponent = 2;
+    float rimHemisphere = (1 - nDotV) * max(dot(fragmentNormal, vec3(0,1,0)),0);
+    float rimIntensity = pow(rimHemisphere, exponent) * occlusion * LightCustomVector8.w * CustomVector14.w;
+    return rimColor * rimIntensity;
+}
+
 float GetTransitionBlend(float blendMap, float transitionFactor)
 {
     // Add a slight offset to prevent black speckles.
@@ -259,27 +273,6 @@ float GetTransitionBlend(float blendMap, float transitionFactor)
         return 1.0;
     else
         return 0.0;
-}
-
-float Luminance(vec3 rgb)
-{
-    const vec3 W = vec3(0.2125, 0.7154, 0.0721);
-    return dot(rgb, W);
-}
-
-vec3 GetSpecularWeight(float prmSpec, vec3 albedoColor, float metalness, float nDotV, float roughness)
-{
-    vec3 albedoTint = albedoColor / Luminance(albedoColor);
-    vec3 tintColor = mix(vec3(1), albedoTint, CustomFloat8); 
-
-    // TODO: What is this value?
-    float dialectricF0Scale = 0.08; 
-
-    // Metals use albedo instead of the specular color/tint.
-    vec3 specularReflectionF0 = vec3(prmSpec * dialectricF0Scale) * tintColor;
-    vec3 f0Final = mix(specularReflectionF0, albedoColor, metalness);
-
-    return FresnelSchlickRoughness(nDotV, f0Final, roughness);
 }
 
 void main()
@@ -294,26 +287,47 @@ void main()
     if (renderNormalMaps == 1)
         fragmentNormal = GetBumpMapNormal(vertexNormal, tangent, bitangent, norColor);
 
-    vec3 viewVector = normalize(position - cameraPos);
-    vec3 reflectionVector = reflect(viewVector, fragmentNormal);
-    float nDotV = max(dot(fragmentNormal, viewVector), 0.0);
+    // Transform the view vector to world space.
+    vec3 viewVector = normalize(vec3(0,0,-1) * mat3(mvp));
 
+    // TODO: Double check the orientation.
+    vec3 reflectionVector = reflect(viewVector, fragmentNormal);
+    reflectionVector.y *= -1;
+
+    // TODO: ???
     float iorRatio = 1.0 / (1.0 + CustomFloat19);
     vec3 refractionVector = refract(viewVector, normalize(fragmentNormal), iorRatio);
+
+    // Shading vectors.
+    vec3 halfAngle = normalize(chrLightDir + viewVector);
+    float nDotV = max(dot(fragmentNormal, viewVector), 0);
+    float nDotL = max(dot(fragmentNormal, chrLightDir), 0);
+    float nDotH = max(dot(fragmentNormal, halfAngle), 0.0);
 
     // Get texture color.
     vec4 albedoColor = GetAlbedoColor(map1, uvSet, uvSet, reflectionVector, CustomVector6, CustomVector31, CustomVector32, colorSet5);
 
+    fragColor.a = max(albedoColor.a, CustomVector0.x);
+    // Alpha testing.
+    // TODO: Not all shaders have this.
+    if (fragColor.a < 0.5)
+        discard;
+
     vec4 emissionColor = GetEmissionColor(map1, uvSet, CustomVector6, CustomVector31);
+    // TODO: There's probably a cleaner way of doing this.
+    if (CustomBoolean11 == 0)
+        emissionColor.rgb *= (1 - texture(col2Map, uvSet).a);
+
     vec4 prmColor = texture(prmMap, map1).xyzw;
 
     // Probably some sort of override for PRM color.
     if (hasCustomVector47 == 1)
         prmColor = CustomVector47;
 
-    // Defined separately so it can be disabled for material transitions.
+        // Defined separately so it can be disabled for material transitions.
     vec3 sssColor = CustomVector11.rgb;
-    float specPower = CustomVector30.x;
+    float sssBlend = CustomVector30.x;
+    float smoothFactor = CustomVector30.y;
 
     // Material masking.
     float transitionBlend = GetTransitionBlend(norColor.b, transitionFactor);
@@ -325,59 +339,78 @@ void main()
             // Ditto
             albedoColor.rgb = mix(vec3(0.302, 0.242, 0.374), albedoColor.rgb, transitionBlend);
             prmColor = mix(vec4(0, 0.65, 1, 1), prmColor, transitionBlend);
+            sssBlend = mix(1, CustomVector30.x, transitionBlend);
             sssColor = mix(vec3(0.1962484, 0.1721312, 0.295082), CustomVector11.rgb, transitionBlend);
-            specPower = mix(1.0, CustomVector30.x, transitionBlend);
+            smoothFactor = mix(1.5, CustomVector30.y, transitionBlend);
             break;
         case 1:
             // Ink
             albedoColor.rgb = mix(vec3(0.758027, 0.115859, 0.04), albedoColor.rgb, transitionBlend);
             prmColor = mix(vec4(0, 0.075, 1, 1), prmColor, transitionBlend);
+            sssBlend = mix(0, CustomVector30.x, transitionBlend);
+            smoothFactor = mix(0, CustomVector30.x, transitionBlend);
             sssColor = mix(vec3(0), CustomVector11.rgb, transitionBlend);
-            specPower = mix(1.0, CustomVector30.x, transitionBlend);
             break;
         case 2:
             // Gold
             albedoColor.rgb = mix(vec3(0.6, 0.5, 0.1), albedoColor.rgb, transitionBlend);
             prmColor = mix(vec4(1, 0.15, 1, 0.3), prmColor, transitionBlend);
+            sssBlend = mix(0, CustomVector30.x, transitionBlend);
+            smoothFactor = mix(0, CustomVector30.y, transitionBlend);
             sssColor = mix(vec3(0), CustomVector11.rgb, transitionBlend);
-            specPower = mix(1.0, CustomVector30.x, transitionBlend);
             break;
         case 3:
             // Metal
-            albedoColor.rgb = mix(vec3(1), albedoColor.rgb, transitionBlend);
+            albedoColor.rgb = mix(vec3(0.5), albedoColor.rgb, transitionBlend);
             prmColor = mix(vec4(1, 0.2, 1, 0.3), prmColor, transitionBlend);
+            sssBlend = mix(0, CustomVector30.x, transitionBlend);
+            smoothFactor = mix(0, CustomVector30.y, transitionBlend);
             sssColor = mix(vec3(0), CustomVector11.rgb, transitionBlend);
-            specPower = mix(1.0, CustomVector30.x, transitionBlend);
             break;
     }
 
     float roughness = prmColor.g;
     float metalness = prmColor.r;
+    // Specular isn't effected by metalness for skin materials.
+    if (hasCustomVector11 == 1)
+        metalness = 0.0;
+
+    float specular = prmColor.a;
+    if (CustomBoolean1 == 0)
+        specular = 0.16;
+
+    vec3 ambientOcclusion = vec3(prmColor.b);
+    ambientOcclusion *= pow(texture(gaoMap, bake1).rgb, vec3(CustomFloat1 + 1.0));
 
     // Image based lighting.
-    vec3 diffuseIbl = textureLod(diffusePbrCube, fragmentNormal, 0).rgb; // TODO: what is the intensity?
+    vec3 diffuseIbl = textureLod(diffusePbrCube, fragmentNormal, 0).rgb * 0.5 * iblIntensity; // TODO: constant?
     int maxLod = 6;
-    vec3 specularIbl = textureLod(specularPbrCube, reflectionVector, roughness * maxLod).rgb * iblIntensity;
+    vec3 specularIbl = textureLod(specularPbrCube, reflectionVector, roughness * maxLod).rgb * iblIntensity * 0.5;
     vec3 refractionIbl = textureLod(specularPbrCube, refractionVector, 0.075 * maxLod).rgb * iblIntensity;
 
-    vec3 kSpecular = GetSpecularWeight(prmColor.a, albedoColor.rgb, metalness, nDotV, roughness);
+    // Render passes.
+    vec3 diffusePass = DiffuseTerm(albedoColor, diffuseIbl, fragmentNormal, viewVector, prmColor.r, sssBlend, sssColor);
+    vec3 diffuseLight = GetDiffuseLighting(nDotL, diffuseIbl, ambientOcclusion, smoothFactor);
+    vec3 specularPass = SpecularTerm(nDotH, halfAngle, roughness, specularIbl, metalness);
+
+    vec3 kSpecular = GetSpecularWeight(specular, diffusePass.rgb, metalness, nDotV, roughness);
     vec3 kDiffuse = (vec3(1) - kSpecular) * (1 - metalness);
 
-    // Render passes.
+
     if (renderDiffuse == 1)
-        fragColor.rgb += DiffuseTerm(albedoColor, diffuseIbl, fragmentNormal, viewVector, kDiffuse, metalness, sssColor);
+        fragColor.rgb += diffusePass * diffuseLight * kDiffuse;
 
     if (renderSpecular == 1)
-        fragColor.rgb += SpecularTerm(fragmentNormal, viewVector, tangent, bitangent, roughness, specularIbl, kSpecular, norColor.a, specPower, metalness);
-
-    // TODO: What passes does ambient occlusion affect?
-    // Ambient Occlusion
-    fragColor.rgb *= prmColor.b;
-    fragColor.rgb *= texture(gaoMap, bake1).rgb;
+        fragColor.rgb += specularPass * kSpecular * ambientOcclusion * norColor.a;
 
     // Emission
     if (renderEmission == 1)
         fragColor.rgb += EmissionTerm(emissionColor);
+
+    if (renderRimLighting == 1)
+    {
+        fragColor.rgb += RimLightingTerm(nDotV, fragmentNormal, norColor.a * prmColor.b);
+    }
 
     // HACK: Some models have black vertex color for some reason.
     if (renderVertexColor == 1 && Luminance(colorSet1.rgb) > 0.0)
@@ -387,21 +420,13 @@ void main()
     if (CustomFloat19 > 0.0)
         fragColor.rgb += refractionIbl * renderExperimental;
 
-
+    // Final color multiplier.
     fragColor.rgb *= CustomVector8.rgb;
 
     // Gamma correction.
     fragColor.rgb = GetSrgb(fragColor.rgb);
 
-    if (renderWireframe == 1)
-    {
-        vec3 edgeColor = vec3(1);
-        float intensity = WireframeIntensity(edgeDistance);
-        fragColor.rgb = mix(fragColor.rgb, edgeColor, intensity);
-    }
-
     // Alpha calculations
-    fragColor.a = albedoColor.a;
     fragColor.a *= emissionColor.a;
 
     // HACK: Some models have black vertex color for some reason.
@@ -410,22 +435,17 @@ void main()
 
     // TODO: Meshes with refraction have some sort of angle fade.
     float f0Refract = GetF0(CustomFloat19 + 1.0);
-    vec3 transmissionAlpha = FresnelSchlickRoughness(nDotV, vec3(f0Refract), roughness);
+    vec3 transmissionAlpha = FresnelSchlick(nDotV, vec3(f0Refract));
     if (CustomFloat19 > 0 && renderExperimental == 1)
         fragColor.a = transmissionAlpha.x;
 
-    // TODO: Alpha testing.
-    if ((fragColor.a + CustomVector0.x) < 0.01)
-        discard;
+    // Premultiplied alpha.
+    fragColor.rgb *= fragColor.a;
 
-    // TODO: What is the stipple pattern?
-    int x = int(mod(gl_FragCoord.x - 0.5, 16));
-    int y = int(mod(gl_FragCoord.y - 0.5, 16));
-    float threshold = texelFetch(stipplePattern, ivec2(x, y), 0).x;
-    if (useStippleBlend == 1 && (fragColor.a < threshold))
-        discard;
-
-    // TODO: How does this work?
-    if (hasInkNorMap == 1 && transitionBlend < 1)
-        discard;
+    if (renderWireframe == 1)
+    {
+        vec3 edgeColor = vec3(1);
+        float intensity = WireframeIntensity(edgeDistance);
+        fragColor.rgb = mix(fragColor.rgb, edgeColor, intensity);
+    }
 }

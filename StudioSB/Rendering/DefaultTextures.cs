@@ -49,7 +49,7 @@ namespace StudioSB.Rendering
 
             LoadBitmap("defaultWhite", defaultWhite, "DefaultTextures/default_White.png");
             LoadBitmap("defaultPrm", defaultPrm, "DefaultTextures/default_Params.tif");
-            LoadBitmap("defaultNormal", defaultNormal, "DefaultTextures/default_normal.png");
+            LoadBitmap("defaultNormal", defaultNormal, "DefaultTextures/default_normal.tif");
             LoadBitmap("defaultBlack", defaultBlack, "DefaultTextures/default_black.png");
 
             LoadBitmap("renderFront", renderFont, "DefaultTextures/render_font.png");

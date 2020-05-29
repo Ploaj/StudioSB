@@ -28,12 +28,40 @@ uniform sampler2D dif3Map;
 uniform samplerCube diffusePbrCube;
 uniform samplerCube specularPbrCube;
 
-// UV scrolling animations.
-uniform int CustomBoolean6;
-uniform int CustomBoolean5;
-uniform float currentFrame;
 
-uniform float CustomFloat4;
+vec4 CustomVector0;
+vec4 CustomVector3;
+vec4 CustomVector6;
+vec4 CustomVector8;
+vec4 CustomVector11;
+vec4 CustomVector13;
+vec4 CustomVector14;
+vec3 CustomVector18;
+vec4 CustomVector30;
+vec4 CustomVector31;
+vec4 CustomVector32;
+vec4 CustomVector42;
+vec4 CustomVector47;
+vec4 CustomVector44;
+vec4 CustomVector45;
+
+vec4 vec4Param;
+
+int CustomBoolean1;
+int CustomBoolean2;
+int CustomBoolean3;
+int CustomBoolean4;
+int CustomBoolean9;
+int CustomBoolean11;
+
+float CustomFloat1;
+float CustomFloat4;
+float CustomFloat8;
+float CustomFloat10;
+float CustomFloat19;
+
+
+uniform float floatTestParam;
 
 uniform int emissionOverride;
 
@@ -49,16 +77,19 @@ vec2 TransformUv(vec2 uv, vec4 transform)
     vec2 translate = vec2(-1.0 * transform.z, transform.w);
 
     // TODO: Does this affect all layers?
-    if (CustomBoolean5 == 1 || CustomBoolean6 == 1)
-        translate *= currentFrame / 60.0;
+    // if (CustomBoolean5 == 1 || CustomBoolean6 == 1)
+    //     translate *= currentFrame / 60.0;
 
     vec2 scale = transform.xy;
     vec2 result = (uv + translate) * scale;
 
-    // TODO: du dv map?
-    vec2 textureOffset = vec2(1) - texture(norMap, uv).xy;
-    textureOffset = textureOffset * 2 - 1; // Remap [0,1] to [-1,1]
-    result = result + (textureOffset * CustomFloat4 * renderExperimental);
+    if (renderExperimental == 1)
+    {
+        // dUdV Map.
+        // Remap [0,1] to [-1,1].
+        vec2 textureOffset = texture(norMap, uv*2).xy * 2 - 1; 
+        result += (textureOffset) * CustomFloat4;
+    }
 
     return result;
 }
@@ -71,9 +102,10 @@ vec4 GetEmissionColor(vec2 uv1, vec2 uv2, vec4 transform1, vec4 transform2)
     vec2 uvLayer2 = TransformUv(uv2, transform2);
     vec4 emission2Color = texture(emi2Map, uvLayer2).rgba;
 
-    // TODO: ???
-    emissionColor.rgb += emission2Color.rgb;
-    return emissionColor;
+    // TODO: Blending?
+    vec4 result = emissionColor;
+    result.rgb += emission2Color.rgb;
+    return result;
 }
 
 vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec3 R, vec4 transform1, vec4 transform2, vec4 transform3, vec4 colorSet5)
@@ -91,11 +123,11 @@ vec4 GetAlbedoColor(vec2 uv1, vec2 uv2, vec2 uv3, vec3 R, vec4 transform1, vec4 
 
     vec4 diffuseColor = texture(difMap, uvLayer1).rgba;
     vec4 diffuse2Color = texture(dif2Map, uvLayer2).rgba;
-    vec4 diffuse3Color = texture(dif3Map, uvLayer2).rgba;
+    vec4 diffuse3Color = texture(dif3Map, uvLayer3).rgba;
 
-    // Vertex color alpha is used for some stages.
+    // TODO: Vertex color alpha is used for some stages.
     if (hasCol2Map == 1)
-        albedoColor.rgb = Blend(albedoColor, albedoColor2 * vec4(vec3(1), colorSet5.a));
+        albedoColor.rgb = Blend(albedoColor, albedoColor2);
 
     // Materials won't have col and diffuse cubemaps.
     if (hasDifCubeMap == 1)
