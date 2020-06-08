@@ -39,6 +39,15 @@ namespace StudioSB.IO.Formats
             file.WriteAttributeString("RotationEulerY", "" + bone.RotationEuler.Y);
             file.WriteAttributeString("RotationEulerZ", "" + bone.RotationEuler.Z);
 
+            if ("" + bone.Scale.X != "1")
+                file.WriteAttributeString("ScaleX", "" + bone.Scale.X);
+
+            if ("" + bone.Scale.Y != "1")
+                file.WriteAttributeString("ScaleY", "" + bone.Scale.Y);
+
+            if ("" + bone.Scale.Z != "1")
+                file.WriteAttributeString("ScaleZ", "" + bone.Scale.Z);
+
             foreach (var child in bone.Children)
             {
                 WriteBone(file, child);
@@ -121,6 +130,18 @@ namespace StudioSB.IO.Formats
             {
                 bone.RZ = value;
             }
+            else if (attribute.Equals("ScaleX"))
+            {
+                bone.SX = value;
+            }
+            else if (attribute.Equals("ScaleY"))
+            {
+                bone.SY = value;
+            }
+            else if (attribute.Equals("ScaleZ"))
+            {
+                bone.SZ = value;
+            }
             else
             {
                 SBConsole.WriteLine("Internal failure");
@@ -130,14 +151,15 @@ namespace StudioSB.IO.Formats
             return true;
         }
 
-        private bool HandleAttribute(XmlReader reader, SBBone bone, string attribute)
+        private bool HandleAttribute(XmlReader reader, SBBone bone, string attribute, bool required = true)
         {
             string value = reader.GetAttribute(attribute);
             float val;
 
             if (value == null)
             {
-                SBConsole.WriteLine("Expected attribute \"" + attribute + "\"");
+                if (required)
+                    SBConsole.WriteLine("Expected attribute \"" + attribute + "\"");
                 return false;
             }
             else if (!float.TryParse(value, out val))
@@ -182,6 +204,11 @@ namespace StudioSB.IO.Formats
             {
                 return null;
             }
+
+            // Optional attributes
+            HandleAttribute(reader, newBone, "ScaleX", false);
+            HandleAttribute(reader, newBone, "ScaleY", false);
+            HandleAttribute(reader, newBone, "ScaleZ", false);
 
             foreach (var child in bone.Children)
             {
