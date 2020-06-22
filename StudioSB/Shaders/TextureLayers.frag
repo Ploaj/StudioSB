@@ -29,36 +29,36 @@ uniform samplerCube diffusePbrCube;
 uniform samplerCube specularPbrCube;
 
 
-vec4 CustomVector0;
-vec4 CustomVector3;
-vec4 CustomVector6;
-vec4 CustomVector8;
-vec4 CustomVector11;
-vec4 CustomVector13;
-vec4 CustomVector14;
-vec3 CustomVector18;
-vec4 CustomVector30;
-vec4 CustomVector31;
-vec4 CustomVector32;
-vec4 CustomVector42;
-vec4 CustomVector47;
-vec4 CustomVector44;
-vec4 CustomVector45;
+uniform vec4 CustomVector0;
+uniform vec4 CustomVector3;
+uniform vec4 CustomVector6;
+uniform vec4 CustomVector8;
+uniform vec4 CustomVector11;
+uniform vec4 CustomVector13;
+uniform vec4 CustomVector14;
+uniform vec3 CustomVector18;
+uniform vec4 CustomVector30;
+uniform vec4 CustomVector31;
+uniform vec4 CustomVector32;
+uniform vec4 CustomVector42;
+uniform vec4 CustomVector47;
+uniform vec4 CustomVector44;
+uniform vec4 CustomVector45;
 
-vec4 vec4Param;
+uniform vec4 vec4Param;
 
-int CustomBoolean1;
-int CustomBoolean2;
-int CustomBoolean3;
-int CustomBoolean4;
-int CustomBoolean9;
-int CustomBoolean11;
+uniform int CustomBoolean1;
+uniform int CustomBoolean2;
+uniform int CustomBoolean3;
+uniform int CustomBoolean4;
+uniform int CustomBoolean9;
+uniform int CustomBoolean11;
 
-float CustomFloat1;
-float CustomFloat4;
-float CustomFloat8;
-float CustomFloat10;
-float CustomFloat19;
+uniform float CustomFloat1;
+uniform float CustomFloat4;
+uniform float CustomFloat8;
+uniform float CustomFloat10;
+uniform float CustomFloat19;
 
 
 uniform float floatTestParam;
