@@ -103,11 +103,11 @@ namespace StudioSB.Scenes.Ultimate
         {
             string folderPath = Path.GetDirectoryName(FileName);
 
-            ISSBH_File File;
-            if (!SSBH.TryParseSSBHFile(FileName, out File))
+            SsbhFile File;
+            if (!Ssbh.TryParseSsbhFile(FileName, out File))
                 return;
 
-            MODL modl = (MODL)File;
+            Modl modl = (Modl)File;
 
             string meshPath = "";
             string skelPath = "";
@@ -219,9 +219,9 @@ namespace StudioSB.Scenes.Ultimate
                 modl.SkeletonFileName = $"{simpleName}.nusktb";
                 modl.MeshString = $"{simpleName}.numshb";
                 modl.UnknownFileName = null;
-                modl.MaterialFileNames = new MODL_MaterialName[] { new MODL_MaterialName() { MaterialFileName = $"{simpleName}.numatb" } };
+                modl.MaterialFileNames = new ModlMaterialName[] { new ModlMaterialName() { MaterialFileName = $"{simpleName}.numatb" } };
                 SBConsole.WriteLine("Done");
-                SSBH.TrySaveSSBHFile(FileName, modl);
+                Ssbh.TrySaveSsbhFile(FileName, modl);
 
                 SBConsole.WriteLine($"Creating MESH... {name}.numshb");
                 MESHEX_Loader meshEx;
@@ -229,7 +229,7 @@ namespace StudioSB.Scenes.Ultimate
                 if (ExportSettings.ExportModelEx)
                     meshEx.Save(name + ".numshexb");
                 SBConsole.WriteLine("Done");
-                SSBH.TrySaveSSBHFile(name + ".numshb", mesh);
+                Ssbh.TrySaveSsbhFile(name + ".numshb", mesh);
             }
 
             if (ExportSettings.ExportSkeleton)
@@ -404,10 +404,10 @@ namespace StudioSB.Scenes.Ultimate
                 mesh.EnableAttribute(UltimateVertexAttribute.Position0);
                 mesh.EnableAttribute(UltimateVertexAttribute.Normal0);
                 mesh.EnableAttribute(UltimateVertexAttribute.Tangent0);
-                mesh.EnableAttribute(UltimateVertexAttribute.map1);
+                mesh.EnableAttribute(UltimateVertexAttribute.Map1);
                 if(Has2ndUVChannel)
-                    mesh.EnableAttribute(UltimateVertexAttribute.uvSet);
-                mesh.EnableAttribute(UltimateVertexAttribute.colorSet1);
+                    mesh.EnableAttribute(UltimateVertexAttribute.UvSet);
+                mesh.EnableAttribute(UltimateVertexAttribute.ColorSet1);
 
                 // calculate bounding information
                 mesh.CalculateBounding();

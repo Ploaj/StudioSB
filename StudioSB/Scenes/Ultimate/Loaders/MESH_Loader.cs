@@ -13,10 +13,10 @@ namespace StudioSB.Scenes.Ultimate
     {
         public static void Open(string FileName, SBScene Scene)
         {
-            ISSBH_File File;
-            if (SSBH.TryParseSSBHFile(FileName, out File))
+            SsbhFile File;
+            if (Ssbh.TryParseSsbhFile(FileName, out File))
             {
-                if (File is MESH mesh)
+                if (File is Mesh mesh)
                 {
                     if (mesh.VersionMajor != 1 && mesh.VersionMinor != 10)
                     {
@@ -34,7 +34,7 @@ namespace StudioSB.Scenes.Ultimate
                     
                     ((SBSceneSSBH)Scene).Model = model;
 
-                    SSBHVertexAccessor accessor = new SSBHVertexAccessor(mesh);
+                    SsbhVertexAccessor accessor = new SsbhVertexAccessor(mesh);
                     {
                         foreach (var meshObject in mesh.Objects)
                         {
@@ -56,8 +56,8 @@ namespace StudioSB.Scenes.Ultimate
                             sbMesh.BoundingSphere = new BoundingSphere(meshObject.BoundingSphereX, meshObject.BoundingSphereY, meshObject.BoundingSphereZ, meshObject.BoundingSphereRadius);
                             sbMesh.AABoundingBox = new AABoundingBox(new Vector3(meshObject.MinBoundingBoxX, meshObject.MinBoundingBoxY, meshObject.MinBoundingBoxZ),
                                  new Vector3(meshObject.MaxBoundingBoxX, meshObject.MaxBoundingBoxY, meshObject.MaxBoundingBoxZ));
-                            sbMesh.OrientedBoundingBox = new OrientedBoundingBox(new Vector3(meshObject.OBBCenterX, meshObject.OBBCenterY, meshObject.OBBCenterZ),
-                                new Vector3(meshObject.OBBSizeX, meshObject.OBBSizeY, meshObject.OBBSizeZ),
+                            sbMesh.OrientedBoundingBox = new OrientedBoundingBox(new Vector3(meshObject.ObbCenterX, meshObject.ObbCenterY, meshObject.ObbCenterZ),
+                                new Vector3(meshObject.ObbSizeX, meshObject.ObbSizeY, meshObject.ObbSizeZ),
                                 new Matrix3(meshObject.M11, meshObject.M12, meshObject.M13,
                                 meshObject.M21, meshObject.M22, meshObject.M23,
                                 meshObject.M31, meshObject.M32, meshObject.M33));
@@ -71,7 +71,7 @@ namespace StudioSB.Scenes.Ultimate
             }
         }
 
-        private static List<UltimateVertex> CreateVertices(MESH mesh, ISBSkeleton Skeleton, MeshObject meshObject, SSBHVertexAccessor vertexAccessor, uint[] vertexIndices)
+        private static List<UltimateVertex> CreateVertices(Mesh mesh, ISBSkeleton Skeleton, MeshObject meshObject, SsbhVertexAccessor vertexAccessor, uint[] vertexIndices)
         {
             // Read attribute values.
             var positions = vertexAccessor.ReadAttribute("Position0", 0, meshObject.VertexCount, meshObject);
@@ -100,7 +100,7 @@ namespace StudioSB.Scenes.Ultimate
             var map1Vectors = GetVectors2d(map1Values);
             SFGraphics.Utils.TriangleListUtils.CalculateTangentsBitangents(positionVectors, normalVectors, map1Vectors, (int[])(object)vertexIndices, out Vector3[] tangentVectors, out Vector3[] bitangentVectors);
 
-            var riggingAccessor = new SSBHRiggingAccessor(mesh);
+            var riggingAccessor = new SsbhRiggingAccessor(mesh);
             var influences = riggingAccessor.ReadRiggingBuffer(meshObject.Name, (int)meshObject.SubMeshIndex);
             var indexByBoneName = new Dictionary<string, int>();
 
@@ -192,11 +192,11 @@ namespace StudioSB.Scenes.Ultimate
             return vertices;
         }
 
-        private static void GetRiggingData(SSBHVertexAttribute[] positions, SSBHVertexInfluence[] influences, Dictionary<string, int> indexByBoneName, out IVec4[] boneIndices, out Vector4[] boneWeights)
+        private static void GetRiggingData(SsbhVertexAttribute[] positions, SsbhVertexInfluence[] influences, Dictionary<string, int> indexByBoneName, out IVec4[] boneIndices, out Vector4[] boneWeights)
         {
             boneIndices = new IVec4[positions.Length];
             boneWeights = new Vector4[positions.Length];
-            foreach (SSBHVertexInfluence influence in influences)
+            foreach (SsbhVertexInfluence influence in influences)
             {
                 // Some influences refer to bones that don't exist in the skeleton.
                 // _eff bones?
@@ -226,7 +226,7 @@ namespace StudioSB.Scenes.Ultimate
             }
         }
 
-        private static Vector3[] GetVectors3d(SSBHVertexAttribute[] values)
+        private static Vector3[] GetVectors3d(SsbhVertexAttribute[] values)
         {
             var vectors = new Vector3[values.Length];
             for (int i = 0; i < values.Length; i++)
@@ -238,7 +238,7 @@ namespace StudioSB.Scenes.Ultimate
             return vectors;
         }
 
-        private static Vector2[] GetVectors2d(SSBHVertexAttribute[] values)
+        private static Vector2[] GetVectors2d(SsbhVertexAttribute[] values)
         {
             var vectors = new Vector2[values.Length];
             for (int i = 0; i < values.Length; i++)
@@ -250,14 +250,14 @@ namespace StudioSB.Scenes.Ultimate
             return vectors;
         }
 
-        private static Vector4 GetVector4(SSBHVertexAttribute values)
+        private static Vector4 GetVector4(SsbhVertexAttribute values)
         {
             return new Vector4(values.X, values.Y, values.Z, values.W);
         }
 
-        public static MESH CreateMESH(SBUltimateModel model, SBSkeleton Skeleton, out MESHEX_Loader meshEX)
+        public static Mesh CreateMESH(SBUltimateModel model, SBSkeleton Skeleton, out MESHEX_Loader meshEX)
         {
-            SSBHMeshMaker maker = new SSBHMeshMaker();
+            SsbhMeshMaker maker = new SsbhMeshMaker();
 
             string[] BoneNames = new string[Skeleton.Bones.Length];
             int BoneIndex = 0;
@@ -272,24 +272,24 @@ namespace StudioSB.Scenes.Ultimate
             {
                 // preprocess
 
-                List<SSBHVertexAttribute> Position0 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> Normal0 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> Tangent0 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> Map1 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> UvSet = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> UvSet1 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet1 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet2 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet21 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet22 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet23 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet3 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet4 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet5 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet6 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet7 = new List<SSBHVertexAttribute>();
+                List<SsbhVertexAttribute> Position0 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> Normal0 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> Tangent0 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> Map1 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> UvSet = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> UvSet1 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet1 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet2 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet21 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet22 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet23 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet3 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet4 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet5 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet6 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet7 = new List<SsbhVertexAttribute>();
 
-                List<SSBHVertexInfluence> Influences = new List<SSBHVertexInfluence>();
+                List<SsbhVertexInfluence> Influences = new List<SsbhVertexInfluence>();
 
                 List<Vector3> meshVertices = new List<Vector3>();
 
@@ -354,7 +354,7 @@ namespace StudioSB.Scenes.Ultimate
                 // set bounding info
 
                 maker.SetBoundingSphere(mesh.BoundingSphere.X, mesh.BoundingSphere.Y, mesh.BoundingSphere.Z, mesh.BoundingSphere.Radius);
-                maker.SetAABoundingBox(vectorToAttribute(mesh.AABoundingBox.Min), vectorToAttribute(mesh.AABoundingBox.Max));
+                maker.SetAaBoundingBox(vectorToAttribute(mesh.AABoundingBox.Min), vectorToAttribute(mesh.AABoundingBox.Max));
                 var tr = mesh.OrientedBoundingBox.Transform;
                 var matxArr = new float[]
                 {
@@ -363,7 +363,7 @@ namespace StudioSB.Scenes.Ultimate
                     tr.M31, tr.M32, tr.M33,
                 };
                 maker.SetOrientedBoundingBox(vectorToAttribute(mesh.OrientedBoundingBox.Position), vectorToAttribute(mesh.OrientedBoundingBox.Size), matxArr);
-                //maker.SetOrientedBoundingBox(new SSBHVertexAttribute(), new SSBHVertexAttribute(), new float[9]);
+                //maker.SetOrientedBoundingBox(new SsbhVertexAttribute(), new SsbhVertexAttribute(), new float[9]);
 
                 // Add attributes
                 if (mesh.ExportNormal)
@@ -371,38 +371,38 @@ namespace StudioSB.Scenes.Ultimate
                 if (mesh.ExportTangent)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.Tangent0, Tangent0.ToArray());
                 if (mesh.ExportMap1)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.map1, Map1.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.Map1, Map1.ToArray());
                 if (mesh.ExportUVSet1)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet, UvSet.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.UvSet, UvSet.ToArray());
                 if (mesh.ExportUVSet2)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet1, UvSet1.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.UvSet1, UvSet1.ToArray());
                 if (mesh.ExportColorSet1)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet1, colorSet1.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet1, colorSet1.ToArray());
                 if (mesh.ExportColorSet2)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2, colorSet2.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet2, colorSet2.ToArray());
                 if (mesh.ExportColorSet21)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2_1, colorSet21.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet21, colorSet21.ToArray());
                 if (mesh.ExportColorSet22)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2_2, colorSet22.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet22, colorSet22.ToArray());
                 if (mesh.ExportColorSet23)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet2_3, colorSet23.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet23, colorSet23.ToArray());
                 if (mesh.ExportColorSet3)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet3, colorSet3.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet3, colorSet3.ToArray());
                 if (mesh.ExportColorSet4)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet4, colorSet4.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet4, colorSet4.ToArray());
                 if (mesh.ExportColorSet5)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet5, colorSet5.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet5, colorSet5.ToArray());
                 if (mesh.ExportColorSet6)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet6, colorSet6.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet6, colorSet6.ToArray());
                 if (mesh.ExportColorSet7)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet7, colorSet7.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet7, colorSet7.ToArray());
 
                 // Add rigging
                 if (mesh.ParentBone == "")
                     maker.AttachRiggingToMeshObject(Influences.ToArray());
             }
 
-            MESH meshFile = maker.GetMeshFile();
+            Mesh meshFile = maker.GetMeshFile();
 
             model.BoundingSphere = new BoundingSphere(allVertices).XyzRadius;
             model.AABoundingBox = new AABoundingBox(allVertices);
@@ -421,13 +421,13 @@ namespace StudioSB.Scenes.Ultimate
             meshFile.MinBoundingBoxY = model.AABoundingBox.Min.Y;
             meshFile.MinBoundingBoxZ = model.AABoundingBox.Min.Z;
 
-            meshFile.OBBCenterX = model.OrientedBoundingBox.Position.X;
-            meshFile.OBBCenterY = model.OrientedBoundingBox.Position.Y;
-            meshFile.OBBCenterZ = model.OrientedBoundingBox.Position.Z;
+            meshFile.ObbCenterX = model.OrientedBoundingBox.Position.X;
+            meshFile.ObbCenterY = model.OrientedBoundingBox.Position.Y;
+            meshFile.ObbCenterZ = model.OrientedBoundingBox.Position.Z;
 
-            meshFile.OBBSizeX = model.OrientedBoundingBox.Size.X;
-            meshFile.OBBSizeY = model.OrientedBoundingBox.Size.Y;
-            meshFile.OBBSizeZ = model.OrientedBoundingBox.Size.Z;
+            meshFile.ObbSizeX = model.OrientedBoundingBox.Size.X;
+            meshFile.ObbSizeY = model.OrientedBoundingBox.Size.Y;
+            meshFile.ObbSizeZ = model.OrientedBoundingBox.Size.Z;
 
             {
                 var tr = model.OrientedBoundingBox.Transform;
@@ -447,9 +447,9 @@ namespace StudioSB.Scenes.Ultimate
             return meshFile;
         }
         
-        private static SSBHVertexInfluence CreateInfluence(ushort VertexIndex, string BoneName, float Weight)
+        private static SsbhVertexInfluence CreateInfluence(ushort VertexIndex, string BoneName, float Weight)
         {
-            return new SSBHVertexInfluence()
+            return new SsbhVertexInfluence()
             {
                 VertexIndex = VertexIndex,
                 BoneName = BoneName,
@@ -457,18 +457,18 @@ namespace StudioSB.Scenes.Ultimate
             };
         }
 
-        private static SSBHVertexAttribute vectorToAttribute(Vector2 value)
+        private static SsbhVertexAttribute vectorToAttribute(Vector2 value)
         {
-            return new SSBHVertexAttribute()
+            return new SsbhVertexAttribute()
             {
                 X = value.X,
                 Y = value.Y
             };
         }
 
-        private static SSBHVertexAttribute vectorToAttribute(Vector3 value)
+        private static SsbhVertexAttribute vectorToAttribute(Vector3 value)
         {
-            return new SSBHVertexAttribute()
+            return new SsbhVertexAttribute()
             {
                 X = value.X,
                 Y = value.Y,
@@ -476,9 +476,9 @@ namespace StudioSB.Scenes.Ultimate
             };
         }
 
-        private static SSBHVertexAttribute vectorToAttribute(Vector4 value)
+        private static SsbhVertexAttribute vectorToAttribute(Vector4 value)
         {
-            return new SSBHVertexAttribute()
+            return new SsbhVertexAttribute()
             {
                 X = value.X,
                 Y = value.Y,
