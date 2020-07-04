@@ -3,6 +3,7 @@ using SSBHLib;
 using StudioSB.Rendering.Bounding;
 using OpenTK;
 using System.ComponentModel;
+using SSBHLib.Formats.Meshes;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -74,6 +75,18 @@ namespace StudioSB.Scenes.Ultimate
         public SBUltimateMesh()
         {
             Visible = true;
+        }
+
+        public void EnableAttributes(MeshObject meshObject)
+        {
+            foreach (var attr in meshObject.Attributes)
+            {
+                foreach (var atstring in attr.AttributeStrings)
+                {
+                    UltimateVertexAttribute at = EnumHelpers.GetAttributeFromInGameString(atstring.Name);
+                    EnableAttribute(at);
+                }
+            }
         }
 
         public void EnableAttribute(UltimateVertexAttribute attr)

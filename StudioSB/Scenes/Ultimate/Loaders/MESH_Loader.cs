@@ -39,17 +39,8 @@ namespace StudioSB.Scenes.Ultimate
                         foreach (var meshObject in mesh.Objects)
                         {
                             SBUltimateMesh sbMesh = new SBUltimateMesh();
-                            foreach (var attr in meshObject.Attributes)
-                            {
-                                foreach (var atstring in attr.AttributeStrings)
-                                {
-                                    UltimateVertexAttribute at;
-                                    if(Enum.TryParse(atstring.Name, out at))
-                                    {
-                                        sbMesh.EnableAttribute(at);
-                                    }
-                                }
-                            }
+                            sbMesh.EnableAttributes(meshObject);
+
                             sbMesh.Name = meshObject.Name;
                             sbMesh.ParentBone = meshObject.ParentBoneName;
                             

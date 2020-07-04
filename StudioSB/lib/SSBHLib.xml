@@ -1,0 +1,473 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SSBHLib</name>
+    </assembly>
+    <members>
+        <member name="T:SSBHLib.IO.Parsers">
+            <summary>
+            Generated code for parsing SSBH types using a <see cref="T:SSBHLib.IO.SsbhParser"/>.
+            Changes made to this file will be overridden.    
+            </summary>
+        </member>
+        <member name="M:SSBHLib.SsbhFile.PostProcess(SSBHLib.IO.SsbhParser)">
+            <summary>
+            This pretty much exists for MATL's only
+            </summary>
+            <param name="parser"></param>
+        </member>
+        <member name="M:SSBHLib.SsbhFile.PostWrite(SSBHLib.IO.SsbhExporter)">
+            <summary>
+            This pretty much exists for MATL's only
+            </summary>
+            <param name="exporter"></param>
+        </member>
+        <member name="M:SSBHLib.Ssbh.TrySaveSsbhFile(System.String,SSBHLib.SsbhFile)">
+            <summary>
+            Attempts to save the SSBH supported file to given filepath
+            </summary>
+            <param name="filePath"></param>
+            <param name="file"></param>
+        </member>
+        <member name="M:SSBHLib.Ssbh.TryParseSsbhFile(System.String,SSBHLib.SsbhFile@)">
+            <summary>
+            Tries to parse an SSBH file from a filepath
+            </summary>
+            <param name="filePath"></param>
+            <param name="hbssFile"></param>
+            <returns>true if parsing was successful</returns>
+        </member>
+        <member name="M:SSBHLib.Ssbh.TryParseSsbhFile(System.Byte[],SSBHLib.SsbhFile@)">
+            <summary>
+            Tries to parse an SSBH file from a byte array
+            </summary>
+            <param name="fileData"></param>
+            <param name="hbssFile"></param>
+            <returns>true if parsing was successful</returns>
+        </member>
+        <member name="T:SSBHLib.Tools.AnimTrackCustomVector4">
+            <summary>
+            Represents a generic vector 4
+            </summary>
+        </member>
+        <member name="T:SSBHLib.Tools.AnimTrackTexture">
+            <summary>
+            Unknown texture information stored in animation files
+            </summary>
+        </member>
+        <member name="T:SSBHLib.Tools.AnimTrackTransform">
+            <summary>
+            Represents a generic transforms with translation, rotation (as quaternion), and scale.
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.BoundingBoxGenerator.GenerateAabb(System.Collections.Generic.IEnumerable{SSBHLib.Tools.SsbhVertexAttribute},SSBHLib.Tools.SsbhVertexAttribute@,SSBHLib.Tools.SsbhVertexAttribute@)">
+            <summary>
+            Generates a very simple Axis Aligned Bounding Box
+            </summary>
+            <param name="points"></param>
+            <param name="max"></param>
+            <param name="min"></param>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhAnimTrackDecoder">
+            <summary>
+            Decoder for the ANIM track data
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackDecoder.#ctor(SSBHLib.Formats.Animation.Anim)">
+            <summary>
+            Creates decoder for given ANIM file
+            </summary>
+            <param name="animFile"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackDecoder.CheckFlag(System.UInt32,System.UInt32,SSBHLib.Formats.Animation.AnimTrackFlags)">
+            <summary>
+            return true if given flag is set
+            </summary>
+            <param name="flags"></param>
+            <param name="mask"></param>
+            <param name="expectedValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackDecoder.ReadTrack(SSBHLib.Formats.Animation.AnimTrack)">
+            <summary>
+            Reads the data out of the given track.
+            </summary>
+            <param name="track"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackDecoder.ReadCompressed(SSBHLib.IO.SsbhParser,System.UInt32)">
+            <summary>
+            Reads the data from a compressed track
+            </summary>
+            <param name="reader"></param>
+            <param name="flags"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackDecoder.DecompressValues(SSBHLib.IO.SsbhParser,System.UInt32,SSBHLib.Tools.SsbhAnimTrackDecoder.SsbhAnimCompressedHeader,System.Int32)">
+            <summary>
+            Decompresses values in a track
+            </summary>
+            <param name="parser"></param>
+            <param name="dataOffset"></param>
+            <param name="header"></param>
+            <param name="valueCount"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackDecoder.DecompressTransform(SSBHLib.IO.SsbhParser,System.UInt32,SSBHLib.Tools.SsbhAnimTrackDecoder.SsbhAnimCompressedHeader)">
+            <summary>
+            decompresses transform values from a track
+            </summary>
+            <param name="parser"></param>
+            <param name="dataOffset"></param>
+            <param name="header"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackDecoder.ReadDirect(SSBHLib.IO.SsbhParser,System.UInt32)">
+            <summary>
+            Reads direct information from track
+            </summary>
+            <param name="reader"></param>
+            <param name="flags"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackDecoder.Lerp(System.Single,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            A standard linear interpolation function
+            </summary>
+            <param name="av"></param>
+            <param name="bv"></param>
+            <param name="v0"></param>
+            <param name="v1"></param>
+            <param name="t"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhAnimTrackEncoder">
+            <summary>
+            Encoder for ANIM track data
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.SetCompressionLevel(System.Single)">
+            <summary>
+            Sets the margin of error for compression
+            default is 0.000002 smash ultimate seems to be closer to 0.0000012
+            smaller value means smaller filesize but less accuracy
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.AddTrack(System.String,System.String,SSBHLib.Formats.Animation.AnimType,System.Collections.Generic.IList{System.Object})">
+            <summary>
+            Adds a track to be encoded
+            </summary>
+            <param name="NodeName">target material/texture/mesh name</param>
+            <param name="TrackName">Usually "Transform" or "Visibility" matches <see cref="T:SSBHLib.Formats.Animation.AnimType"/></param>
+            <param name="Type"><see cref="T:SSBHLib.Formats.Animation.AnimType"/></param>
+            <param name="Values">Supported types AnimTrackTransform, AnimTrackTexture, AnimTrackCustomVector4, bool, float, int</param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.Save(System.String)">
+            <summary>
+            Generates and saves the new ANIM file
+            </summary>
+            <param name="fname"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.GetGroup(SSBHLib.Formats.Animation.AnimType)">
+            <summary>
+            
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.GetTrackTypeFlag(System.Object)">
+            <summary>
+            Returns the track flag for object type
+            </summary>
+            <param name="o"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.WriteValues(System.IO.BinaryWriter,System.Int32,System.Collections.Generic.IList{System.Object})">
+            <summary>
+            returns true if values were compressed
+            </summary>
+            <param name="w"></param>
+            <param name="flags"></param>
+            <param name="values"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhAnimTrackEncoder.Quantanizer">
+            <summary>
+            Special helper class for quantanizing the track values
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.Quantanizer.GetBitCount(System.Single)">
+            <summary>
+            Returns the number of bits within given margin of error
+            </summary>
+            <param name="epsilon"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.Quantanizer.ComputeError(System.Int32)">
+            <summary>
+            Returns the maximum error for given bit length
+            </summary>
+            <param name="bits"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.Quantanizer.GetQuantanizedValue(System.Single)">
+            <summary>
+            Encodes value with bit compressed version
+            </summary>
+            <param name="v"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.Quantanizer.DecompressedValue(System.Single)">
+            <summary>
+            Gets the encoded then decoded value
+            </summary>
+            <param name="v"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhAnimTrackEncoder.BitWriter">
+            <summary>
+            Special class for writing bits
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.CompressBooleanTrack(System.IO.BinaryWriter,System.Collections.Generic.IList{System.Object})">
+            <summary>
+            Compresses and writes booleans to writer
+            </summary>
+            <param name="w"></param>
+            <param name="values"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.CompressVectorTrack(System.IO.BinaryWriter,System.Collections.Generic.IList{System.Object})">
+            <summary>
+            Compressed vector track and writes it to writer
+            </summary>
+            <param name="w"></param>
+            <param name="values"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.CompressTransformTracks(System.IO.BinaryWriter,System.Collections.Generic.IList{System.Object})">
+            <summary>
+            Compresses <see cref="T:SSBHLib.Tools.AnimTrackTransform"></see> track and writes to writer
+            </summary>
+            <param name="w"></param>
+            <param name="values"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.WriteDirect(System.IO.BinaryWriter,System.Object)">
+            <summary>
+            Writes the object type directly with no compression
+            </summary>
+            <param name="w"></param>
+            <param name="o"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhAnimTrackEncoder.GetNode(SSBHLib.Formats.Animation.AnimType,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="type"></param>
+            <param name="nodeName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhMeshMaker">
+            <summary>
+            Helps generate a MESH file
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhMeshMaker.StartMeshObject(System.String,System.UInt32[],SSBHLib.Tools.SsbhVertexAttribute[],System.String,System.Boolean)">
+            <summary>
+            Begins creating a new mesh object with given attributes
+            </summary>
+            <param name="name">The name of the Mesh Object</param>
+            <param name="indices">The vertex indices as triangles</param>
+            <paramref name="positions"/>
+            <param name="parentBoneName"></param>
+            <param name="generateBounding"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhMeshMaker.SetBoundingSphere(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Sets bounding sphere of current mesh
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhMeshMaker.SetAaBoundingBox(SSBHLib.Tools.SsbhVertexAttribute,SSBHLib.Tools.SsbhVertexAttribute)">
+            <summary>
+            Sets the axis aligned bounding box for the current Mesh
+            </summary>
+            <param name="min"></param>
+            <param name="max"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhMeshMaker.SetOrientedBoundingBox(SSBHLib.Tools.SsbhVertexAttribute,SSBHLib.Tools.SsbhVertexAttribute,System.Single[])">
+            <summary>
+            Sets the oriented bounding box for the current Mesh
+            </summary>
+            <param name="center"></param>
+            <param name="size"></param>
+            <param name="matrix3X3"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhMeshMaker.AddAttributeToMeshObject(SSBHLib.UltimateVertexAttribute,SSBHLib.Tools.SsbhVertexAttribute[])">
+            <summary>
+            Adds new attribute data to the mesh object
+            Note: must call StartMeshObject first
+            </summary>
+            <param name="attribute"></param>
+            <param name="inputValues"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhMeshMaker.AttachRiggingToMeshObject(SSBHLib.Tools.SsbhVertexInfluence[])">
+            <summary>
+            Attaches rigging information to mesh object
+            Note: must call StartMeshObject first
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhMeshMaker.GetMeshFile">
+            <summary>
+            Creates and returns a mesh file
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhRiggingAccessor">
+            <summary>
+            A tool for extracting rigging information out of a MESH file
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhRiggingAccessor.#ctor(System.String)">
+            <summary>
+            Creates a rigging accessor from a filepath
+            </summary>
+            <param name="meshFilePath"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhRiggingAccessor.#ctor(SSBHLib.Formats.Meshes.Mesh)">
+            <summary>
+            Creates a rigging accessor from a mesh file
+            </summary>
+            <param name="meshFile"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhRiggingAccessor.ReadRiggingBuffers">
+            <summary>
+            Reads all the rigging buffers out of the mesh file
+            </summary>
+            <returns>array of tuples containing mesh name, index, and influence array</returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhRiggingAccessor.ReadRiggingBuffer(System.String,System.Int32)">
+            <summary>
+            Reads a vertex influence array for given mesh name and subindex
+            returns null if not found
+            </summary>
+            <param name="meshName"></param>
+            <param name="subIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhRiggingAccessor.FindRiggingGroup(System.String,System.Int32)">
+            <summary>
+            Finds a rigging group for given mesh name and sub index
+            </summary>
+            <param name="meshName"></param>
+            <param name="subIndex"></param>
+            <returns>null if not found</returns>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhRiggingCompiler">
+            <summary>
+            Tools for compiling rigging information into a Mesh Rigging Group
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhRiggingCompiler.CreateRiggingGroup(System.String,System.Int32,SSBHLib.Tools.SsbhVertexInfluence[])">
+            <summary>
+            Creates a mesh rigging group
+            </summary>
+            <param name="meshName"></param>
+            <param name="meshIndex"></param>
+            <param name="influences"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhVertexAttribute">
+            <summary>
+            Represents a generic vector4 attribute
+            Not all values will be used for every type
+            </summary>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhVertexAccessor">
+            <summary>
+            Helper class for reading vertex information out of a MESH file
+            </summary>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhVertexAccessor.#ctor(SSBHLib.Formats.Meshes.Mesh)">
+            <summary>
+            Creates a new vertex accessor for given mesh file
+            </summary>
+            <param name="meshFile"></param>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhVertexAccessor.GetAttribute(System.String,SSBHLib.Formats.Meshes.MeshObject)">
+            <summary>
+            Returns the mesh attribute from the given attribute name or <c>null</c> if not found.
+            </summary>
+            <param name="attributeName">The name of the attribute</param>
+            <param name="meshObject">The mesh to search</param>
+            <returns>The mesh attribute for the given attribute name or <c>null</c> if not found.</returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhVertexAccessor.ReadIndices(SSBHLib.Formats.Meshes.MeshObject)">
+            <summary>
+            Reads all the triangle indices from the given mesh object.
+            </summary>
+            <param name="meshObject">The mesh containing the indices</param>
+            <returns>All the triangle indices from the given mesh object</returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhVertexAccessor.ReadIndices(System.Int32,System.Int32,SSBHLib.Formats.Meshes.MeshObject)">
+            <summary>
+            Reads the triangle indices from the given mesh object starting from <paramref name="startPosition"/>.
+            </summary>
+            <param name="startPosition">The offset in number of elements to start reading from</param>
+            <param name="count">The number of indices to read</param>
+            <param name="meshObject">The mesh containing the indices</param>
+            <returns>All the triangle indices from the given mesh object</returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhVertexAccessor.ReadAttribute(System.String,SSBHLib.Formats.Meshes.MeshObject)">
+            <summary>
+            Reads the vertex attribute information for the given attribute name inside of the mesh object.
+            </summary>
+            <param name="attributeName"></param>
+            <param name="meshObject"></param>
+            <returns>An empty array if <paramref name="attributeName"/> does not exist</returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhVertexAccessor.ReadAttribute(SSBHLib.Formats.Meshes.MeshAttribute,SSBHLib.Formats.Meshes.MeshObject)">
+            <summary>
+            Reads the vertex attribute information for the given attribute name inside of the mesh object.
+            </summary>
+            <param name="attribute">The vertex attribute to read</param>
+            <param name="meshObject">The mesh containing the attribute data</param>
+            <returns>An empty array if <paramref name="attribute"/> does not exist</returns>
+        </member>
+        <member name="M:SSBHLib.Tools.SsbhVertexAccessor.ReadAttribute(System.String,System.Int32,System.Int32,SSBHLib.Formats.Meshes.MeshObject)">
+            <summary>
+            Reads the attribute data from the mesh object with the given name
+            </summary>
+            <param name="attributeName">The name of the vertex attribute</param>
+            <param name="position"></param>
+            <param name="count">The number of elements to read</param>
+            <param name="meshObject">The mesh containing the attribute data</param>
+            <returns>An empty array if <paramref name="attributeName"/> does not exist</returns>
+        </member>
+        <member name="T:SSBHLib.Tools.SsbhVertexInfluence">
+            <summary>
+            Represents a rigging influence for a vertex
+            </summary>
+        </member>
+        <member name="P:SSBHLib.Tools.SsbhVertexInfluence.VertexIndex">
+            <summary>
+            Index of vertex in the MESH vertex array
+            </summary>
+        </member>
+        <member name="P:SSBHLib.Tools.SsbhVertexInfluence.BoneName">
+            <summary>
+            Name of the bone that influences this vertex
+            </summary>
+        </member>
+        <member name="P:SSBHLib.Tools.SsbhVertexInfluence.Weight">
+            <summary>
+            Weight of the bone influence
+            </summary>
+        </member>
+        <member name="M:SSBHLib.EnumHelpers.ToInGameString(SSBHLib.UltimateVertexAttribute)">
+            <summary>
+            Converts the attribute enum to the name used for Smash Ultimate's MESH format.
+            </summary>
+            <param name="attribute">The attribute to convert</param>
+            <returns>The attribute name as used in the MESH format.</returns>
+        </member>
+    </members>
+</doc>
