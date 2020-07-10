@@ -37,7 +37,7 @@ namespace StudioSB.Scenes.Ultimate
                     foreach(var entry in matl.Entries)
                     {
                         UltimateMaterial material = new UltimateMaterial();
-                        material.Name = entry.MaterialName;
+                        material.Name = entry.ShaderLabel;
                         material.Label = entry.MaterialLabel;
 
                         Scene.Materials.Add(material);

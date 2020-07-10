@@ -160,7 +160,7 @@ namespace StudioSB.Scenes.Ultimate
                     UltimateMaterial currentMaterial = null;
                     foreach (UltimateMaterial matentry in Materials)
                     {
-                        if (matentry.Label.Equals(entry.MaterialName))
+                        if (matentry.Label.Equals(entry.MaterialLabel))
                         {
                             currentMaterial = matentry;
                             break;

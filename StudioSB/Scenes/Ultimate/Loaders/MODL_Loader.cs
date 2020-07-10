@@ -23,11 +23,11 @@ namespace StudioSB.Scenes.Ultimate
                 entry.MeshName = mesh.Name;
                 entry.SubIndex = subindex[mesh.Name];
                 if (mesh.Material != null)
-                    entry.MaterialName = mesh.Material.Label;
+                    entry.MaterialLabel = mesh.Material.Label;
                 else
                     SBConsole.WriteLine("Warning: Missing material");
                 subindex[mesh.Name]++;
-                SBConsole.WriteLine($"Creating modl entry: {entry.MeshName} {entry.SubIndex} {entry.MaterialName}");
+                SBConsole.WriteLine($"Creating modl entry: {entry.MeshName} {entry.SubIndex} {entry.MaterialLabel}");
             }
 
             return modl;

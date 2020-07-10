@@ -4,6 +4,31 @@
         <name>SSBHLib</name>
     </assembly>
     <members>
+        <member name="T:SSBHLib.Formats.Materials.MatlAttribute.MatlString">
+            <summary>
+            Stores texture names or text values.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.Formats.Materials.MatlEntry.MaterialLabel">
+            <summary>
+            The unique identifier for this entry.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.Formats.Materials.MatlEntry.ShaderLabel">
+            <summary>
+            Determines what shader is used to render this material.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.Formats.Meshes.MeshAttribute.Name">
+            <summary>
+            The name of the attribute, which may not be the same as the name in <see cref="P:SSBHLib.Formats.Meshes.MeshAttribute.AttributeStrings"/>.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.Formats.ModlEntry.MaterialLabel">
+            <summary>
+            Assigns the material with matching <see cref="P:SSBHLib.Formats.Materials.MatlEntry.MaterialLabel"/> to this entry.
+            </summary>
+        </member>
         <member name="T:SSBHLib.IO.Parsers">
             <summary>
             Generated code for parsing SSBH types using a <see cref="T:SSBHLib.IO.SsbhParser"/>.
@@ -304,7 +329,7 @@
         <member name="M:SSBHLib.Tools.SsbhMeshMaker.AddAttributeToMeshObject(SSBHLib.UltimateVertexAttribute,SSBHLib.Tools.SsbhVertexAttribute[])">
             <summary>
             Adds new attribute data to the mesh object
-            Note: must call StartMeshObject first
+            Note: must call <see cref="M:SSBHLib.Tools.SsbhMeshMaker.StartMeshObject(System.String,System.UInt32[],SSBHLib.Tools.SsbhVertexAttribute[],System.String,System.Boolean)"/> first.
             </summary>
             <param name="attribute"></param>
             <param name="inputValues"></param>
@@ -462,12 +487,140 @@
             Weight of the bone influence
             </summary>
         </member>
-        <member name="M:SSBHLib.EnumHelpers.ToInGameString(SSBHLib.UltimateVertexAttribute)">
+        <member name="M:SSBHLib.EnumHelpers.GetSizeInBytes(SSBHLib.Formats.Meshes.MeshAttribute.AttributeDataType)">
             <summary>
-            Converts the attribute enum to the name used for Smash Ultimate's MESH format.
+            Gets the size in bytes for this data type.
             </summary>
-            <param name="attribute">The attribute to convert</param>
-            <returns>The attribute name as used in the MESH format.</returns>
+            <param name="dataType">The data type for each of the attribute's components</param>
+            <returns>The number of bytes used to store <paramref name="dataType"/></returns>
+        </member>
+        <member name="T:SSBHLib.UltimateVertexAttribute">
+            <summary>
+            Stores the state for the different values of <see cref="T:SSBHLib.Formats.Meshes.MeshAttribute"/> used in Smash Ultimate.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.Position0">
+            <summary>
+            The default configuration for the Position0 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.Normal0">
+            <summary>
+            The default configuration for the Normal0 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.Tangent0">
+            <summary>
+            The default configuration for the Tangent0 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.Map1">
+            <summary>
+            The default configuration for the map1 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.UvSet">
+            <summary>
+            The default configuration for the uvSet attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.UvSet1">
+            <summary>
+            The default configuration for the uvSet1 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.UvSet2">
+            <summary>
+            The default configuration for the uvSet2 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet1">
+            <summary>
+            The default configuration for the colorSet1 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet2">
+            <summary>
+            The default configuration for the colorSet2 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet21">
+            <summary>
+            The default configuration for the colorSet2_1 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet22">
+            <summary>
+            The default configuration for the colorSet22 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet23">
+            <summary>
+            The default configuration for the colorSet23 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet3">
+            <summary>
+            The default configuration for the colorSet3 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet4">
+            <summary>
+            The default configuration for the colorSet4 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet5">
+            <summary>
+            The default configuration for the colorSet5 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet6">
+            <summary>
+            The default configuration for the colorSet6 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ColorSet7">
+            <summary>
+            The default configuration for the colorSet7 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.Bake1">
+            <summary>
+            The default configuration for the bake1 attribute.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.Name">
+            <summary>
+            The name used for the <see cref="T:SSBHLib.Formats.Meshes.MeshAttributeString"/> and shader attributes.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.ComponentCount">
+            <summary>
+            The number of vector components. Color sets have 4 components, for example.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.DataType">
+            <summary>
+            The data type of each attribute component.
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.Index">
+            <summary>
+            TODO: ???
+            </summary>
+        </member>
+        <member name="P:SSBHLib.UltimateVertexAttribute.BufferIndex">
+            <summary>
+            The buffer where the attribute values are stored.
+            </summary>
+        </member>
+        <member name="M:SSBHLib.UltimateVertexAttribute.GetAttributeFromName(System.String)">
+            <summary>
+            Finds a default attribute with in game name <paramref name="name"/>.
+            </summary>
+            <param name="name">The name used for the <see cref="T:SSBHLib.Formats.Meshes.MeshAttributeString"/>.</param>
+            <returns>The default attribute with the given name</returns>
+            <exception cref="T:System.NotImplementedException"><paramref name="name"/> is not the name of a default attribute</exception>
         </member>
     </members>
 </doc>
