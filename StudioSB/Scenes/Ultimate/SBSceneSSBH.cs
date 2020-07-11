@@ -579,50 +579,50 @@ namespace StudioSB.Scenes.Ultimate
 
 
                 if (AttributeMapper.UVEnabled(iomesh, mapper.Map1Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.map1);
+                    mesh.EnableAttribute(UltimateVertexAttribute.Map1);
 
                 if (AttributeMapper.UVEnabled(iomesh, mapper.UvSet1Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.uvSet);
+                    mesh.EnableAttribute(UltimateVertexAttribute.UvSet);
 
                 if (AttributeMapper.UVEnabled(iomesh, mapper.UvSet2Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.uvSet1);
+                    mesh.EnableAttribute(UltimateVertexAttribute.UvSet1);
 
                 if (AttributeMapper.UVEnabled(iomesh, mapper.UvSet3Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.uvSet2);
+                    mesh.EnableAttribute(UltimateVertexAttribute.UvSet2);
 
                 if (AttributeMapper.UVEnabled(iomesh, mapper.Bake1Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.bake1);
+                    mesh.EnableAttribute(UltimateVertexAttribute.Bake1);
 
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet1Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet1);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet1);
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet2Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet2);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet2);
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet21Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet2_1);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet21);
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet22Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet2_2);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet22);
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet23Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet2_3);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet23);
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet3Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet3);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet3);
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet4Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet4);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet4);
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet5Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet5);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet5);
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet6Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet6);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet6);
 
                 if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet7Channel))
-                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet7);
+                    mesh.EnableAttribute(UltimateVertexAttribute.ColorSet7);
 
 
                 // calculate bounding information

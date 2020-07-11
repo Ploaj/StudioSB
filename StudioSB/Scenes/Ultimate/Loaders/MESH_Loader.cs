@@ -263,23 +263,23 @@ namespace StudioSB.Scenes.Ultimate
             {
                 // preprocess
 
-                List<SSBHVertexAttribute> Position0 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> Normal0 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> Tangent0 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> Map1 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> UvSet = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> UvSet1 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> bake1 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet1 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet2 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet21 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet22 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet23 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet3 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet4 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet5 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet6 = new List<SSBHVertexAttribute>();
-                List<SSBHVertexAttribute> colorSet7 = new List<SSBHVertexAttribute>();
+                List<SsbhVertexAttribute> Position0 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> Normal0 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> Tangent0 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> Map1 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> UvSet = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> UvSet1 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> bake1 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet1 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet2 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet21 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet22 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet23 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet3 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet4 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet5 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet6 = new List<SsbhVertexAttribute>();
+                List<SsbhVertexAttribute> colorSet7 = new List<SsbhVertexAttribute>();
 
                 List<SsbhVertexInfluence> Influences = new List<SsbhVertexInfluence>();
 
@@ -368,9 +368,9 @@ namespace StudioSB.Scenes.Ultimate
                 if (mesh.ExportUVSet1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.UvSet, UvSet.ToArray());
                 if (mesh.ExportUVSet2)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet1, UvSet1.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.UvSet1, UvSet1.ToArray());
                 if (mesh.ExportBake1)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.bake1, UvSet1.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.Bake1, UvSet1.ToArray());
                 if (mesh.ExportColorSet1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet1, colorSet1.ToArray());
                 if (mesh.ExportColorSet2)

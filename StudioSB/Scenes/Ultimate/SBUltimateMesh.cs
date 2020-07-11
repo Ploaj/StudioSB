@@ -94,30 +94,44 @@ namespace StudioSB.Scenes.Ultimate
 
         public void EnableAttribute(UltimateVertexAttribute attr)
         {
-            switch (attr)
-            {
-                case UltimateVertexAttribute.Position0: ExportPosition = true; break;
-                case UltimateVertexAttribute.Normal0: ExportNormal = true; break;
-                case UltimateVertexAttribute.Tangent0: ExportTangent = true; break;
-                case UltimateVertexAttribute.uvSet: ExportUVSet1 = true; break;
-                case UltimateVertexAttribute.uvSet1: ExportUVSet2 = true; break;
-                case UltimateVertexAttribute.uvSet2: ExportUVSet3 = true; break;
-                case UltimateVertexAttribute.map1: ExportMap1 = true; break;
-                case UltimateVertexAttribute.bake1: ExportBake1 = true; break;
-                case UltimateVertexAttribute.colorSet1: ExportColorSet1 = true; break;
-                case UltimateVertexAttribute.colorSet2: ExportColorSet2 = true; break;
-                case UltimateVertexAttribute.colorSet2_1: ExportColorSet21 = true; break;
-                case UltimateVertexAttribute.colorSet2_2: ExportColorSet22 = true; break;
-                case UltimateVertexAttribute.colorSet2_3: ExportColorSet23 = true; break;
-                case UltimateVertexAttribute.colorSet3: ExportColorSet3 = true; break;
-                case UltimateVertexAttribute.colorSet4: ExportColorSet4 = true; break;
-                case UltimateVertexAttribute.colorSet5: ExportColorSet5 = true; break;
-                case UltimateVertexAttribute.colorSet6: ExportColorSet6 = true; break;
-                case UltimateVertexAttribute.colorSet7: ExportColorSet7 = true; break;
-                default:
-                    ExtraExportAttributes.Add(attr);
-                    break;
-            }
+            if (attr == UltimateVertexAttribute.Position0)
+                ExportPosition = true;
+            else if (attr == UltimateVertexAttribute.Normal0)
+                ExportNormal = true;
+            else if (attr == UltimateVertexAttribute.Tangent0)
+                ExportTangent = true;
+            else if (attr == UltimateVertexAttribute.UvSet)
+                ExportUVSet1 = true;
+            else if (attr == UltimateVertexAttribute.UvSet1)
+                ExportUVSet2 = true;
+            else if (attr == UltimateVertexAttribute.UvSet2)
+                ExportUVSet3 = true;
+            else if (attr == UltimateVertexAttribute.Map1)
+                ExportMap1 = true;
+            else if (attr == UltimateVertexAttribute.Bake1)
+                ExportBake1 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet1)
+                ExportColorSet1 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet2)
+                ExportColorSet2 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet21)
+                ExportColorSet21 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet22)
+                ExportColorSet22 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet23)
+                ExportColorSet23 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet3)
+                ExportColorSet3 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet4)
+                ExportColorSet4 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet5)
+                ExportColorSet5 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet6)
+                ExportColorSet6 = true;
+            else if (attr == UltimateVertexAttribute.ColorSet7)
+                ExportColorSet7 = true;
+            else
+                ExtraExportAttributes.Add(attr);
         }
 
         public void CalculateBounding()
