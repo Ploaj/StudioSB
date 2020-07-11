@@ -7,14 +7,15 @@ using SSBHLib;
 using SSBHLib.Formats;
 using SFGraphics.GLObjects.Shaders;
 using SFGraphics.Cameras;
-using StudioSB.IO.Models;
 using SFGraphics.GLObjects.BufferObjects;
 using StudioSB.IO.Formats;
 using System.Linq;
 using StudioSB.GUI.Attachments;
-using System.Diagnostics;
 using System.ComponentModel;
 using StudioSB.Scenes.Ultimate.Loaders;
+using IONET.Core.Model;
+using IONET.Core;
+using StudioSB.GUI;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -260,68 +261,111 @@ namespace StudioSB.Scenes.Ultimate
         /// Gets the model information in this scene as an IO Model
         /// </summary>
         /// <returns></returns>
-        public override IOModel GetIOModel()
+        public override IOScene GetIOModel()
         {
+            IOScene scene = new IOScene();
+
             IOModel iomodel = new IOModel();
-            iomodel.Skeleton = (SBSkeleton)Skeleton;
+            scene.Models.Add(iomodel);
+            iomodel.Skeleton = ((SBSkeleton)Skeleton).ToIOSkeleton();
 
-            foreach(var tex in Surfaces)
-            {
-                iomodel.Textures.Add(tex);
-            }
+            // TODO: exporting textures
+            // Surfaces
 
-            foreach(UltimateMaterial mat in Materials)
+            foreach (UltimateMaterial mat in Materials)
             {
                 var m = new IOMaterial();
                 m.Name = mat.Name;
-                m.DiffuseTexture = mat.Texture0.Value;
-                iomodel.Materials.Add(m);
+                m.DiffuseMap = new IOTexture() { Name = mat.Texture0.Value, FilePath = mat.Texture0.Value };
+                scene.Materials.Add(m);
             }
-
+            
             foreach (var mesh in Model.Meshes)
             {
                 var iomesh = new IOMesh();
                 iomesh.Name = mesh.Name;
                 iomodel.Meshes.Add(iomesh);
 
-                iomesh.MaterialIndex = Materials.IndexOf(mesh.Material);
+                IOPolygon poly = new IOPolygon();
+                iomesh.Polygons.Add(poly);
 
-                iomesh.HasPositions = mesh.ExportPosition;
-                iomesh.HasNormals = mesh.ExportNormal;
-                iomesh.HasUV0 = mesh.ExportMap1;
-                iomesh.HasUV1 = mesh.ExportUVSet1;
-                iomesh.HasUV2 = mesh.ExportUVSet2;
-                iomesh.HasUV3 = mesh.ExportUVSet3;
-                iomesh.HasColor = mesh.ExportColorSet1;
-
-                iomesh.HasBoneWeights = true;
-
-                iomesh.Indices.AddRange(mesh.Indices);
+                poly.MaterialName = mesh.Material.Name;
+                
+                poly.Indicies.AddRange(mesh.Indices.Select(e=>(int)e));
 
                 foreach (var vertex in mesh.Vertices)
                 {
                     var iovertex = new IOVertex();
 
-                    iovertex.Position = vertex.Position0;
-                    iovertex.Normal = vertex.Normal0;
-                    iovertex.Tangent = vertex.Tangent0;
-                    iovertex.UV0 = vertex.Map1;
-                    iovertex.UV1 = vertex.UvSet;
-                    iovertex.UV2 = vertex.UvSet1;
-                    iovertex.Color = vertex.ColorSet1;
-                    iovertex.BoneIndices = new Vector4(vertex.BoneIndices.X, vertex.BoneIndices.Y, vertex.BoneIndices.Z, vertex.BoneIndices.W);
-                    iovertex.BoneWeights = vertex.BoneWeights;
+                    // export basic attributes
+                    iovertex.Position = new System.Numerics.Vector3(vertex.Position0.X, vertex.Position0.Y, vertex.Position0.Z);
+                    iovertex.Normal = new System.Numerics.Vector3(vertex.Normal0.X, vertex.Normal0.Y, vertex.Normal0.Z);
+                    iovertex.Tangent = new System.Numerics.Vector3(vertex.Tangent0.X, vertex.Tangent0.Y, vertex.Tangent0.Z);
 
-                    // single bind fix
+                    // export uv channels
+                    if (mesh.ExportMap1)
+                        iovertex.SetUV(vertex.Map1.X, vertex.Map1.Y, 0);
+                    if (mesh.ExportUVSet1)
+                        iovertex.SetUV(vertex.UvSet.X, vertex.UvSet.Y, 1);
+                    if (mesh.ExportUVSet2)
+                        iovertex.SetUV(vertex.UvSet1.X, vertex.UvSet1.Y, 2);
+                    if (mesh.ExportUVSet3)
+                        iovertex.SetUV(vertex.UvSet2.X, vertex.UvSet2.Y, 3);
+                    if (mesh.ExportBake1)
+                        iovertex.SetUV(vertex.Bake1.X, vertex.Bake1.Y, 4);
+
+                    // export color sets
+                    if (mesh.ExportColorSet1)
+                        iovertex.SetColor(vertex.ColorSet1.X, vertex.ColorSet1.Y, vertex.ColorSet1.Z, vertex.ColorSet1.W, 0);
+                    if (mesh.ExportColorSet2)
+                        iovertex.SetColor(vertex.ColorSet2.X, vertex.ColorSet2.Y, vertex.ColorSet2.Z, vertex.ColorSet2.W, 1);
+                    if (mesh.ExportColorSet21)
+                        iovertex.SetColor(vertex.ColorSet21.X, vertex.ColorSet21.Y, vertex.ColorSet21.Z, vertex.ColorSet21.W, 2);
+                    if (mesh.ExportColorSet22)
+                        iovertex.SetColor(vertex.ColorSet22.X, vertex.ColorSet22.Y, vertex.ColorSet22.Z, vertex.ColorSet22.W, 3);
+                    if (mesh.ExportColorSet23)
+                        iovertex.SetColor(vertex.ColorSet23.X, vertex.ColorSet23.Y, vertex.ColorSet23.Z, vertex.ColorSet23.W, 4);
+                    if (mesh.ExportColorSet3)
+                        iovertex.SetColor(vertex.ColorSet3.X, vertex.ColorSet3.Y, vertex.ColorSet3.Z, vertex.ColorSet3.W, 5);
+                    if (mesh.ExportColorSet4)
+                        iovertex.SetColor(vertex.ColorSet4.X, vertex.ColorSet4.Y, vertex.ColorSet4.Z, vertex.ColorSet4.W, 6);
+                    if (mesh.ExportColorSet5)
+                        iovertex.SetColor(vertex.ColorSet5.X, vertex.ColorSet5.Y, vertex.ColorSet5.Z, vertex.ColorSet5.W, 7);
+                    if (mesh.ExportColorSet6)
+                        iovertex.SetColor(vertex.ColorSet6.X, vertex.ColorSet6.Y, vertex.ColorSet6.Z, vertex.ColorSet6.W, 8);
+                    if (mesh.ExportColorSet7)
+                        iovertex.SetColor(vertex.ColorSet7.X, vertex.ColorSet7.Y, vertex.ColorSet7.Z, vertex.ColorSet7.W, 9);
+
+                    // export bone weights
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if(vertex.BoneWeights[i] > 0)
+                        {
+                            iovertex.Envelope.Weights.Add(new IOBoneWeight()
+                            {
+                                BoneName = Skeleton.Bones[vertex.BoneIndices[i]].Name,
+                                Weight = vertex.BoneWeights[i]
+                            });
+                        }
+                    }
+                    
+                    // normalize parent binding
                     if(mesh.ParentBone != "" && Skeleton != null)
                     {
                         var parentBone = Skeleton[mesh.ParentBone];
                         if (parentBone != null)
                         {
-                            iovertex.Position = Vector3.TransformPosition(vertex.Position0, parentBone.WorldTransform);
-                            iovertex.Normal = Vector3.TransformNormal(vertex.Normal0, parentBone.WorldTransform);
-                            iovertex.BoneIndices = new Vector4(Skeleton.IndexOfBone(parentBone), 0, 0, 0);
-                            iovertex.BoneWeights = new Vector4(1, 0, 0, 0);
+                            var tpos = Vector3.TransformPosition(vertex.Position0, parentBone.WorldTransform);
+                            var tn = Vector3.TransformNormal(vertex.Normal0, parentBone.WorldTransform);
+
+                            iovertex.Position = new System.Numerics.Vector3(tpos.X, tpos.Y, tpos.Z);
+                            iovertex.Normal = new System.Numerics.Vector3(tn.X, tn.Y, tn.Z);
+
+                            iovertex.Envelope.Weights.Add(new IOBoneWeight()
+                            {
+                                BoneName = parentBone.Name,
+                                Weight = 1
+                            });
                         }
                     }
 
@@ -329,16 +373,138 @@ namespace StudioSB.Scenes.Ultimate
                 }
             }
 
-            return iomodel;
+            return scene;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class AttributeMapper
+        {
+            [Category("0 UV Channels"), DisplayName("Map1"), Description("")]
+            public int Map1Channel { get; set; } = 0;
+
+            [Category("0 UV Channels"), DisplayName("UvSet1"), Description("")]
+            public int UvSet1Channel { get; set; } = 1;
+
+            [Category("0 UV Channels"), DisplayName("UvSet2"), Description("")]
+            public int UvSet2Channel { get; set; } = 2;
+
+            [Category("0 UV Channels"), DisplayName("UvSet3"), Description("")]
+            public int UvSet3Channel { get; set; } = 3;
+
+            [Category("0 UV Channels"), DisplayName("Bake1"), Description("")]
+            public int Bake1Channel { get; set; } = -1;
+
+
+            [Category("1 Color Channels"), DisplayName("ColorSet1"), Description("")]
+            public int ColorSet1Channel { get; set; } = 0;
+
+            [Category("1 Color Channels"), DisplayName("ColorSet2"), Description("")]
+            public int ColorSet2Channel { get; set; } = -1;
+
+            [Category("1 Color Channels"), DisplayName("ColorSet21"), Description("")]
+            public int ColorSet21Channel { get; set; } = -1;
+
+            [Category("1 Color Channels"), DisplayName("ColorSet22"), Description("")]
+            public int ColorSet22Channel { get; set; } = -1;
+
+            [Category("1 Color Channels"), DisplayName("ColorSet23"), Description("")]
+            public int ColorSet23Channel { get; set; } = -1;
+
+            [Category("1 Color Channels"), DisplayName("ColorSet3"), Description("")]
+            public int ColorSet3Channel { get; set; } = -1;
+
+            [Category("1 Color Channels"), DisplayName("ColorSet4"), Description("")]
+            public int ColorSet4Channel { get; set; } = -1;
+
+            [Category("1 Color Channels"), DisplayName("ColorSet5"), Description("")]
+            public int ColorSet5Channel { get; set; } = -1;
+
+            [Category("1 Color Channels"), DisplayName("ColorSet6"), Description("")]
+            public int ColorSet6Channel { get; set; } = -1;
+
+            [Category("1 Color Channels"), DisplayName("ColorSet7"), Description("")]
+            public int ColorSet7Channel { get; set; } = -1;
+
+            /// <summary>
+            /// Checks if this uv channel attribtue should be enabled
+            /// </summary>
+            /// <param name="mesh"></param>
+            /// <param name="channel"></param>
+            /// <returns></returns>
+            public static bool UVEnabled(IOMesh mesh, int channel)
+            {
+                return channel != -1 && mesh.HasUVSet(channel);
+            }
+
+            /// <summary>
+            /// Checks if this color channel attribtue should be enabled
+            /// </summary>
+            /// <param name="mesh"></param>
+            /// <param name="channel"></param>
+            /// <returns></returns>
+            public static bool ColorEnabled(IOMesh mesh, int channel)
+            {
+                return channel != -1 && mesh.HasColorSet(channel);
+            }
+
+            /// <summary>
+            /// Returns uv for given channel
+            /// </summary>
+            /// <param name="iov"></param>
+            /// <param name="channel"></param>
+            /// <returns></returns>
+            public static Vector2 RemapUV(IOVertex iov, int channel)
+            {
+                if (channel != -1 && channel < iov.UVs.Count)
+                    return NumVecToTk(iov.UVs[channel]);
+                else
+                    return Vector2.Zero;
+            }
+
+            /// <summary>
+            /// Returns color for given channel
+            /// </summary>
+            /// <param name="iov"></param>
+            /// <param name="channel"></param>
+            /// <returns></returns>
+            public static Vector4 RemapColor(IOVertex iov, int channel)
+            {
+                if (channel != -1 && channel < iov.Colors.Count)
+                    return NumVecToTk(iov.Colors[channel]);
+                else
+                    return Vector4.One;
+            }
         }
 
         /// <summary>
         /// Imports information into this scene from an IO Model
         /// </summary>
-        public override void FromIOModel(IOModel iomodel)
+        public override void FromIOModel(IOScene ioscene)
         {
-            // copy skeleton
-            Skeleton = iomodel.Skeleton;
+            // check if any models are in scene
+            if (ioscene.Models.Count == 0)
+                return;
+
+            // get use mapper settings
+            AttributeMapper mapper = new AttributeMapper();
+
+            using (var d = new SBCustomDialog(mapper))
+            {
+                if(d.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                {
+                    // if canceled use default options
+                    mapper = new AttributeMapper();
+                }
+            }
+
+            // select first model
+            var iomodel = ioscene.Models[0];
+
+            // load skeleton
+            Skeleton = SBSkeleton.FromIOSkeleton(iomodel.Skeleton);
+            
 
             // make temp material
             UltimateMaterial material;
@@ -354,6 +520,7 @@ namespace StudioSB.Scenes.Ultimate
             }
             else
                 material = (UltimateMaterial)Materials[0];
+
             
             // convert meshes
             SBUltimateModel model = Model == null ? new SBUltimateModel() : (SBUltimateModel)Model;
@@ -367,53 +534,133 @@ namespace StudioSB.Scenes.Ultimate
 
                 model.Meshes.Add(mesh);
 
-                mesh.Indices = iomesh.Indices;
+                mesh.Indices = new List<uint>();
+                foreach(var p in iomesh.Polygons)
+                {
+                    if (p.PrimitiveType != IOPrimitive.TRIANGLE)
+                        continue;
 
+                    mesh.Indices.AddRange(p.Indicies.Select(e=>(uint)e));
+                }
+                
+                // generate tangents and bitangents
+                // this can optionally be done during the importing post process, but we need to make sure...
                 iomesh.GenerateTangentsAndBitangents();
 
                 //optimization single bind
                 bool isSingleBound = true;
-                int bone = iomesh.Vertices.Count > 0 ? (int)iomesh.Vertices[0].BoneIndices.X : -1;
+                string bonename = iomesh.Vertices.Count > 0 ? iomesh.Vertices[0].Envelope.Weights[0].BoneName : "";
                 foreach (var vertex in iomesh.Vertices)
                 {
-                    if (vertex.BoneWeights.X != 1 || vertex.BoneIndices.X != bone)
+                    if (vertex.Envelope.Weights.Count == 0 || vertex.Envelope.Weights[0].BoneName != bonename)
                     {
                         isSingleBound = false;
                         break;
                     }
                 }
                 SBBone parentBone = null;
-                if(isSingleBound)
-                    parentBone = iomodel.Skeleton.Bones[bone];
-
-                bool Has2ndUVChannel = false;
+                if (isSingleBound)
+                    parentBone = Skeleton[bonename];
 
                 // because the vertex cannot be changed after creation, and we don't know if we need to single bind,
                 // we have to go through the vertices again after determining if this mesh is single bound
                 foreach (var vertex in iomesh.Vertices)
                 {
-                    if (vertex.UV1 != Vector2.Zero)
-                        Has2ndUVChannel = true;
-                    mesh.Vertices.Add(IOToUltimateVertex(vertex, isSingleBound, parentBone == null ? Matrix4.Identity : parentBone.InvWorldTransform));
+                    mesh.Vertices.Add(IOToUltimateVertex(vertex, (SBSkeleton)Skeleton, isSingleBound, parentBone == null ? Matrix4.Identity : parentBone.InvWorldTransform, mapper));
                 }
 
                 if (isSingleBound)
                     mesh.ParentBone = parentBone.Name;
+                
 
-                //TODO: make more customizable through import settings
                 mesh.EnableAttribute(UltimateVertexAttribute.Position0);
                 mesh.EnableAttribute(UltimateVertexAttribute.Normal0);
                 mesh.EnableAttribute(UltimateVertexAttribute.Tangent0);
-                mesh.EnableAttribute(UltimateVertexAttribute.map1);
-                if(Has2ndUVChannel)
+
+
+                if (AttributeMapper.UVEnabled(iomesh, mapper.Map1Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.map1);
+
+                if (AttributeMapper.UVEnabled(iomesh, mapper.UvSet1Channel))
                     mesh.EnableAttribute(UltimateVertexAttribute.uvSet);
-                mesh.EnableAttribute(UltimateVertexAttribute.colorSet1);
+
+                if (AttributeMapper.UVEnabled(iomesh, mapper.UvSet2Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.uvSet1);
+
+                if (AttributeMapper.UVEnabled(iomesh, mapper.UvSet3Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.uvSet2);
+
+                if (AttributeMapper.UVEnabled(iomesh, mapper.Bake1Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.bake1);
+
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet1Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet1);
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet2Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet2);
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet21Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet2_1);
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet22Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet2_2);
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet23Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet2_3);
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet3Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet3);
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet4Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet4);
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet5Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet5);
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet6Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet6);
+
+                if (AttributeMapper.ColorEnabled(iomesh, mapper.ColorSet7Channel))
+                    mesh.EnableAttribute(UltimateVertexAttribute.colorSet7);
+
 
                 // calculate bounding information
                 mesh.CalculateBounding();
+
             }
 
             Model = model;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <returns></returns>
+        private static Vector2 NumVecToTk(System.Numerics.Vector2 vec)
+        {
+            return new Vector2(vec.X, vec.Y);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <returns></returns>
+        private static Vector3 NumVecToTk(System.Numerics.Vector3 vec)
+        {
+            return new Vector3(vec.X, vec.Y, vec.Z);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vec"></param>
+        /// <returns></returns>
+        private static Vector4 NumVecToTk(System.Numerics.Vector4 vec)
+        {
+            return new Vector4(vec.X, vec.Y, vec.Z, vec.W);
         }
 
         /// <summary>
@@ -423,33 +670,60 @@ namespace StudioSB.Scenes.Ultimate
         /// <param name="singleBound"></param>
         /// <param name="parentBoneInverse"></param>
         /// <returns></returns>
-        private static UltimateVertex IOToUltimateVertex(IOVertex iov, bool singleBound, Matrix4 parentBoneInverse)
+        private static UltimateVertex IOToUltimateVertex(IOVertex iov, SBSkeleton skeleton, bool singleBound, Matrix4 parentBoneInverse, AttributeMapper mapper)
         {
+            // convert and map uvs
+            var map = AttributeMapper.RemapUV(iov, mapper.Map1Channel);
+            var uv1 = AttributeMapper.RemapUV(iov, mapper.UvSet1Channel);
+            var uv2 = AttributeMapper.RemapUV(iov, mapper.UvSet2Channel);
+            var uv3 = AttributeMapper.RemapUV(iov, mapper.UvSet3Channel);
+            var bake = AttributeMapper.RemapUV(iov, mapper.Bake1Channel);
+
+            // convert and map colors
+            var color1 = AttributeMapper.RemapColor(iov, mapper.ColorSet1Channel);
+            var color2 = AttributeMapper.RemapColor(iov, mapper.ColorSet2Channel);
+            var color21 = AttributeMapper.RemapColor(iov, mapper.ColorSet21Channel);
+            var color22 = AttributeMapper.RemapColor(iov, mapper.ColorSet22Channel);
+            var color23 = AttributeMapper.RemapColor(iov, mapper.ColorSet23Channel);
+            var color3 = AttributeMapper.RemapColor(iov, mapper.ColorSet3Channel);
+            var color4 = AttributeMapper.RemapColor(iov, mapper.ColorSet4Channel);
+            var color5 = AttributeMapper.RemapColor(iov, mapper.ColorSet5Channel);
+            var color6 = AttributeMapper.RemapColor(iov, mapper.ColorSet6Channel);
+            var color7 = AttributeMapper.RemapColor(iov, mapper.ColorSet7Channel);
+
+            // convert weights
+            var boneIndices = new IVec4();
+            var boneWeights = Vector4.Zero;
+            if (!singleBound)
+                for (int i = 0; i < iov.Envelope.Weights.Count; i++)
+                {
+                    boneIndices[i] = skeleton.IndexOfBone(skeleton[iov.Envelope.Weights[i].BoneName]);
+                    boneWeights[i] = iov.Envelope.Weights[i].Weight;
+                }
+
+            // create and return vertex
             return new UltimateVertex(
-                singleBound ? Vector3.TransformPosition(iov.Position, parentBoneInverse) : iov.Position,
-                singleBound ? Vector3.TransformNormal(iov.Normal, parentBoneInverse) : iov.Normal, 
-                iov.Tangent, 
-                iov.Bitangent, 
-                iov.UV0, 
-                iov.UV1,
-                iov.UV2,
-                iov.UV3,
-                singleBound ? new IVec4() : new IVec4() { X = (int)iov.BoneIndices.X,
-                    Y = (int)iov.BoneIndices.Y,
-                    Z = (int)iov.BoneIndices.Z,
-                    W = (int)iov.BoneIndices.W },
-                 singleBound ? Vector4.Zero : iov.BoneWeights, 
-                 Vector2.Zero, 
-                 iov.Color, 
-                 Vector4.One, 
-                 Vector4.One, 
-                 Vector4.One, 
-                 Vector4.One, 
-                 Vector4.One, 
-                 Vector4.One, 
-                 Vector4.One, 
-                 Vector4.One,
-                 Vector4.One);
+                 singleBound ? Vector3.TransformPosition(NumVecToTk(iov.Position), parentBoneInverse) : NumVecToTk(iov.Position),
+                 singleBound ? Vector3.TransformNormal(NumVecToTk(iov.Normal), parentBoneInverse) : NumVecToTk(iov.Normal),
+                 singleBound ? Vector3.TransformNormal(NumVecToTk(iov.Tangent), parentBoneInverse) : NumVecToTk(iov.Tangent),
+                 singleBound ? Vector3.TransformNormal(NumVecToTk(iov.Binormal), parentBoneInverse) : NumVecToTk(iov.Binormal),
+                 map,
+                 uv1,
+                 uv2,
+                 uv3,
+                 boneIndices,
+                 boneWeights,
+                 bake,
+                 color1,
+                 color2,
+                 color21,
+                 color22,
+                 color23,
+                 color3,
+                 color4,
+                 color5,
+                 color6,
+                 color7);
         }
 
         #endregion

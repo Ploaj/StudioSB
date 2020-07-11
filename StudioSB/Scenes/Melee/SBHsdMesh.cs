@@ -7,7 +7,7 @@ using SFGenericModel;
 using OpenTK.Graphics.OpenGL;
 using OpenTK;
 using SFGraphics.GLObjects.Shaders;
-using StudioSB.IO.Models;
+using IONET.Core.Model;
 
 namespace StudioSB.Scenes.Melee
 {
@@ -124,8 +124,9 @@ namespace StudioSB.Scenes.Melee
 
             // reorder to triangle strips
             List<GX_Vertex> triStrip = new List<GX_Vertex>();
-            foreach (var i in mesh.Indices)
-                triStrip.Add(verts[(int)i]);
+            foreach(var p in mesh.Polygons)
+                foreach (var i in p.Indicies)
+                    triStrip.Add(verts[(int)i]);
             
             // compress and generate display lists
             DOBJ.Pobj = compressor.CreatePOBJsFromTriangleList(triStrip, attrGroup, weightList);
@@ -156,18 +157,32 @@ namespace StudioSB.Scenes.Melee
             List<GX_Vertex> gxverts = new List<GX_Vertex>();
             foreach(var iovert in ioverts)
             {
-                var tuple = new Tuple<Vector4, Vector4>(iovert.BoneIndices, iovert.BoneWeights);
+                // load bone weights
+                Vector4 boneIndices = Vector4.Zero;
+                Vector4 boneWeights = Vector4.Zero;
+
+                int bi = 0;
+                foreach(var bw in iovert.Envelope.Weights)
+                {
+                    boneIndices[bi] = skeleton.IndexOfBone(skeleton[bw.BoneName]);
+                    boneWeights[bi] = bw.Weight;
+                    bi++;
+                }
+
+                // get bone weight mapping
+                var tuple = new Tuple<Vector4, Vector4>(boneIndices, boneWeights);
+
                 if (!weightToWeightListIndex.ContainsKey(tuple))
                 {
                     HSD_Envelope weight = new HSD_Envelope();
                     for (int i = 0; i < 4; i++)
                     {
-                        if (iovert.BoneWeights[i] != 0)
+                        if (boneWeights[i] != 0)
                         {
-                            var jobj = ((SBHsdBone)skeleton.Bones[(int)iovert.BoneIndices[i]]).GetJOBJ();
+                            var jobj = ((SBHsdBone)skeleton.Bones[(int)boneIndices[i]]).GetJOBJ();
                             if (jobj == null)
                                 throw new Exception("Error getting JOBJ for rigging");
-                            weight.Add(jobj, iovert.BoneWeights[i]);
+                            weight.Add(jobj, boneWeights[i]);
                         }
                     }
                     weightToWeightListIndex.Add(tuple, weightList.Count);
@@ -179,18 +194,25 @@ namespace StudioSB.Scenes.Melee
                 if (index * 3 > ushort.MaxValue)
                     SBConsole.WriteLine("Warning!: To many weights for one polygon object, try splitting the polygons to more DOBJs");
 
+                // load attributes
                 GX_Vertex gxvert = new GX_Vertex();
                 gxvert.PNMTXIDX = (ushort)(index * 3);
 
-                var p = Vector3.TransformPosition(iovert.Position, transform);
-                var n = Vector3.TransformNormal(iovert.Normal, transform);
+                var p = Vector3.TransformPosition(new Vector3(iovert.Position.X, iovert.Position.Y, iovert.Position.Z), transform);
+                var n = Vector3.TransformNormal(new Vector3(iovert.Normal.X, iovert.Normal.Y, iovert.Normal.Z), transform);
 
                 gxvert.POS = new GXVector3(p.X, p.Y, p.Z);
                 gxvert.NRM = new GXVector3(n.X, n.Y, n.Z);
-                gxvert.TEX0 = new GXVector2(iovert.UV0.X, iovert.UV0.Y);
-                gxvert.CLR0 = new GXColor4(iovert.Color.X, iovert.Color.Y, iovert.Color.Z, iovert.Color.W);
+
+                if(iovert.UVs.Count > 0)
+                    gxvert.TEX0 = new GXVector2(iovert.UVs[0].X, iovert.UVs[0].Y);
+
+                if (iovert.Colors.Count > 0)
+                    gxvert.CLR0 = new GXColor4(iovert.Colors[0].X, iovert.Colors[0].Y, iovert.Colors[0].Z, iovert.Colors[0].W);
+
                 gxverts.Add(gxvert);
             }
+
             return gxverts;
         }
 

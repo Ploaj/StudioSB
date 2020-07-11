@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL;
 using StudioSB.Rendering.Shapes;
 using StudioSB.Rendering;
 using SFGraphics.Cameras;
+using IONET.Core.Skeleton;
 
 namespace StudioSB.Scenes
 {
@@ -200,6 +201,79 @@ namespace StudioSB.Scenes
             }
             return transforms.ToArray();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="skeleton"></param>
+        /// <returns></returns>
+        public static SBSkeleton FromIOSkeleton(IOSkeleton ioskel)
+        {
+            SBSkeleton skel = new SBSkeleton();
+
+            Dictionary<IOBone, SBBone> iotosb = new Dictionary<IOBone, SBBone>();
+            
+            foreach(var iobone in ioskel.BreathFirstOrder())
+            {
+                SBConsole.WriteLine(iobone.Name + " " + iobone.Scale + " " + iobone.Rotation + " " + iobone.Translation);
+                SBBone bone = new SBBone()
+                {
+                    Name = iobone.Name,
+                    SX = iobone.ScaleX,
+                    SY = iobone.ScaleY,
+                    SZ = iobone.ScaleZ,
+                    RX = iobone.RotationEuler.X,
+                    RY = iobone.RotationEuler.Y,
+                    RZ = iobone.RotationEuler.Z,
+                    X = iobone.TranslationX,
+                    Y = iobone.TranslationY,
+                    Z = iobone.TranslationZ,
+                };
+
+                SBConsole.WriteLine(bone.Name + " " + bone.Translation.ToString() + " " + bone.Scale.ToString() + " " + bone.RotationQuaternion.ToString());
+
+                iotosb.Add(iobone, bone);
+
+                if (iobone.Parent == null)
+                    skel.AddRoot(bone);
+                else
+                    bone.Parent = iotosb[iobone.Parent];
+            }
+
+            return skel;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IOSkeleton ToIOSkeleton()
+        {
+            IOSkeleton ioskel = new IOSkeleton();
+
+            Dictionary<SBBone, IOBone> sbtoio = new Dictionary<SBBone, IOBone>();
+
+            foreach (var b in GetBones())
+            {
+                IOBone bone = new IOBone()
+                {
+                    Name = b.Name,
+                    Scale = new System.Numerics.Vector3(b.SX, b.SY, b.SZ),
+                    RotationEuler = new System.Numerics.Vector3(b.RX, b.RY, b.RZ),
+                    Translation = new System.Numerics.Vector3(b.X, b.Y, b.Z),
+                };
+
+                sbtoio.Add(b, bone);
+
+                if (b.Parent == null)
+                    ioskel.RootBones.Add(bone);
+                else
+                    bone.Parent = sbtoio[b.Parent];
+            }
+
+            return ioskel;
+        }
+
         #endregion
     }
 

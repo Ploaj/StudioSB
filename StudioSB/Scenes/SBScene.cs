@@ -1,7 +1,7 @@
-﻿using SFGraphics.Cameras;
+﻿using IONET.Core;
+using SFGraphics.Cameras;
 using StudioSB.GUI;
 using StudioSB.GUI.Attachments;
-using StudioSB.IO.Models;
 using System;
 using System.Collections.Generic;
 
@@ -67,16 +67,16 @@ namespace StudioSB.Scenes
         /// Gets an IO model containing the scene information
         /// </summary>
         /// <returns></returns>
-        public virtual IOModel GetIOModel()
+        public virtual IOScene GetIOModel()
         {
-            return new IOModel();
+            return new IOScene();
         }
 
         /// <summary>
         /// Imports an IO model into the scene
         /// </summary>
         /// <param name="iomodel"></param>
-        public virtual void FromIOModel(IOModel iomodel)
+        public virtual void FromIOModel(IOScene iomodel)
         {
 
         }

@@ -204,7 +204,7 @@ namespace StudioSB.Scenes
                 AnimatedTransform = value;
             }
         }
-        private Matrix4 _transform;
+        private Matrix4 _transform = Matrix4.Identity;
 
         public Matrix4 AnimatedTransform { get; set; }
 

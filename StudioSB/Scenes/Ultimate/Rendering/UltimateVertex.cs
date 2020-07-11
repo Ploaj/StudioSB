@@ -10,6 +10,33 @@ namespace StudioSB.Scenes.Ultimate
         public int Y { get; set; }
         public int Z { get; set; }
         public int W { get; set; }
+
+        public int this[int i]
+        {
+            get
+            {
+                switch (i) {
+                    case 0: return X;
+                    case 1: return Y;
+                    case 2: return Z;
+                    case 3: return W;
+                    default:
+                        throw new System.IndexOutOfRangeException();
+                }
+            }
+            set
+            {
+                switch (i)
+                {
+                    case 0: X = value; break;
+                    case 1: Y = value; break;
+                    case 2: Z = value; break;
+                    case 3: W = value; break;
+                    default:
+                        throw new System.IndexOutOfRangeException();
+                }
+            }
+        }
     }
 
     public struct UltimateVertex

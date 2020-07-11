@@ -33,12 +33,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="netstandard" />
-    <Reference Include="Fbx, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="IONET, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Fbx.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>lib\IONET.dll</HintPath>
     </Reference>
+    <Reference Include="netstandard" />
     <Reference Include="HSDRaw">
       <HintPath>lib\HSDRaw.dll</HintPath>
     </Reference>
@@ -87,6 +86,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -173,18 +176,14 @@
     <Compile Include="GUI\SBViewportPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="IO\Formats\DAE_Writer.cs" />
     <Compile Include="IO\Formats\IO_8MOT.cs" />
     <Compile Include="IO\Formats\IO_BVH.cs" />
     <Compile Include="IO\Formats\IO_CSV.cs" />
-    <Compile Include="IO\Formats\IO_DAE.cs" />
     <Compile Include="IO\Formats\IO_DDS.cs" />
-    <Compile Include="IO\Formats\IO_FBX.cs" />
     <Compile Include="IO\Formats\IO_HSDAnim.cs" />
     <Compile Include="IO\Formats\IO_MayaAnim.cs" />
     <Compile Include="IO\Formats\IO_NUANMB.cs" />
     <Compile Include="IO\Formats\IO_NUTEXB.cs" />
-    <Compile Include="IO\Formats\IO_OBJ.cs" />
     <Compile Include="IO\Formats\IO_PLY.cs" />
     <Compile Include="IO\Formats\IO_SBAnimation.cs" />
     <Compile Include="IO\Formats\IO_SEANIM.cs" />
@@ -193,13 +192,8 @@
     <Compile Include="IO\Formats\IO_SSF.cs" />
     <Compile Include="IO\Formats\SSF.cs" />
     <Compile Include="IO\IExportableAnimation.cs" />
-    <Compile Include="IO\IExportableModelType.cs" />
     <Compile Include="IO\IExportableSkeleton.cs" />
-    <Compile Include="IO\IImportableModelType.cs" />
     <Compile Include="IO\IImportableSkeleton.cs" />
-    <Compile Include="IO\Models\IOMaterial.cs" />
-    <Compile Include="IO\Models\IOMesh.cs" />
-    <Compile Include="IO\Models\IOModel.cs" />
     <Compile Include="Rendering\Bounding\AABoundingBox.cs" />
     <Compile Include="Rendering\Bounding\BoundingSphere.cs" />
     <Compile Include="Rendering\Bounding\OrientedBoundingBox.cs" />
@@ -587,10 +581,10 @@
     <Content Include="DefaultTextures\UVPattern.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="lib\Fbx.dll">
+    <Content Include="lib\HSDRaw.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="lib\HSDRaw.dll">
+    <Content Include="lib\IONET.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="lib\OpenTK.dll">

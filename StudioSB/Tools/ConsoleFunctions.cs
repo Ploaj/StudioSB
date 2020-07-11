@@ -1,5 +1,4 @@
 ﻿using StudioSB.IO;
-using StudioSB.IO.Models;
 using StudioSB.Scenes;
 using StudioSB.Scenes.Animation;
 using System.IO;
@@ -68,12 +67,12 @@ namespace StudioSB.Tools
                 {
                     foreach (var v in Directory.GetFiles(animPath))
                     {
-                        ConvertAnim(v, Path.ChangeExtension(v, output), mod.Skeleton, exporter);
+                        ConvertAnim(v, Path.ChangeExtension(v, output), SBSkeleton.FromIOSkeleton(mod.Models[0].Skeleton), exporter);
                     }
                 }
                 else
                 {
-                    ConvertAnim(animPath, Path.ChangeExtension(animPath, output), mod.Skeleton, exporter);
+                    ConvertAnim(animPath, Path.ChangeExtension(animPath, output), SBSkeleton.FromIOSkeleton(mod.Models[0].Skeleton), exporter);
                 }
 
             }

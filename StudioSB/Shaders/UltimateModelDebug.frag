@@ -6,6 +6,7 @@ in vec3 bitangent;
 in vec2 map1;
 in vec2 uvSet;
 in vec2 uvSet1;
+//in vec2 uvSet2;
 in vec4 colorSet1;
 // in vec4 colorSet2;
 // in vec4 colorSet21;
@@ -216,7 +217,19 @@ void main()
 		case 22:
 			fragColor = vec4(bake1, 1, 1);
 			break;
-        case 23:
+		case 23:
+			fragColor = vec4(map1, 1, 1);
+			break;
+		case 24:
+			fragColor = vec4(uvSet, 1, 1);
+			break;
+		case 25:
+			fragColor = vec4(uvSet1, 1, 1);
+			break;
+		case 26:
+			//fragColor = vec4(uvSet1, 1, 1);
+			break;
+        case 27:
             fragColor = uvPatternColor;
             break;
 		default:

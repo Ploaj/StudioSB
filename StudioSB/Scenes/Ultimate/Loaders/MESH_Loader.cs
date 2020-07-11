@@ -278,6 +278,7 @@ namespace StudioSB.Scenes.Ultimate
                 List<SSBHVertexAttribute> Map1 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> UvSet = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> UvSet1 = new List<SSBHVertexAttribute>();
+                List<SSBHVertexAttribute> bake1 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> colorSet1 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> colorSet2 = new List<SSBHVertexAttribute>();
                 List<SSBHVertexAttribute> colorSet21 = new List<SSBHVertexAttribute>();
@@ -319,6 +320,7 @@ namespace StudioSB.Scenes.Ultimate
                     Map1.Add(vectorToAttribute(vertex.Map1));
                     UvSet.Add(vectorToAttribute(vertex.UvSet));
                     UvSet1.Add(vectorToAttribute(vertex.UvSet1));
+                    bake1.Add(vectorToAttribute(vertex.Bake1));
                     colorSet1.Add(vectorToAttribute(vertex.ColorSet1 * 128));
                     colorSet2.Add(vectorToAttribute(vertex.ColorSet2 * 128));
                     colorSet21.Add(vectorToAttribute(vertex.ColorSet21 * 128));
@@ -376,6 +378,8 @@ namespace StudioSB.Scenes.Ultimate
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet, UvSet.ToArray());
                 if (mesh.ExportUVSet2)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.uvSet1, UvSet1.ToArray());
+                if (mesh.ExportBake1)
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.bake1, UvSet1.ToArray());
                 if (mesh.ExportColorSet1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.colorSet1, colorSet1.ToArray());
                 if (mesh.ExportColorSet2)

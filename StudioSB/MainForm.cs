@@ -57,9 +57,6 @@ namespace StudioSB
     where typeof(SBScene).IsAssignableFrom(type)
     select type).ToArray();
 
-        private static List<IImportableModelType> ModelImporters = new List<IImportableModelType>();
-        private static List<IExportableModelType> ModelExporters = new List<IExportableModelType>();
-
         private static List<IImportableAnimation> AnimationImporters = new List<IImportableAnimation>();
         private static List<IExportableAnimation> AnimationExporters = new List<IExportableAnimation>();
 
@@ -354,6 +351,12 @@ namespace StudioSB
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="FilePath"></param>
+        /// <param name="skeleton"></param>
+        /// <returns></returns>
         public static SBAnimation LoadAnimation(string FilePath, SBSkeleton skeleton)
         {
             foreach (var openableAnimation in AnimationImporters)
@@ -367,6 +370,11 @@ namespace StudioSB
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="FilePath"></param>
+        /// <returns></returns>
         public static SBScene LoadScene(string FilePath)
         {
             Dictionary<string, Type> extensionToType = new Dictionary<string, Type>();
@@ -453,35 +461,20 @@ namespace StudioSB
                 if (attr is SceneFileInformation info)
                 {
                     SceneExtension = info.Extension;
-                    Filter += $"*{info.Extension};";
+                    Filter += $"Scene|*{info.Extension}|";
                 }
             }
-
-            //Create filter
-            Dictionary<string, IExportableModelType> extensionToExporter = new Dictionary<string, IExportableModelType>();
-            foreach (IExportableModelType exporter in ModelExporters)
-            {
-                string Extension = exporter.Extension;
-                Filter += $"*{Extension};";
-                extensionToExporter.Add(Extension, exporter);
-            }
-
-
+            
             string FileName;
-            if (Tools.FileTools.TrySaveFile(out FileName, "Supported Files|" + Filter))
+            if (Tools.FileTools.TrySaveFile(out FileName, Filter + IONET.IOManager.GetModelExportFileFilter()))
             {
-                foreach (var extension in extensionToExporter.Keys)
+                if (FileName.EndsWith(SceneExtension))
                 {
-                    if (FileName.EndsWith(SceneExtension))
-                    {
-                        viewportPanel.LoadedScene.ExportSceneToFile(FileName);
-                        break;
-                    }else
-                    if (FileName.EndsWith(extension))
-                    {
-                        extensionToExporter[extension].ExportIOModel(FileName, viewportPanel.LoadedScene.GetIOModel());
-                        break;
-                    }
+                    viewportPanel.LoadedScene.ExportSceneToFile(FileName);
+                }
+                else
+                {
+                    IONET.IOManager.ExportScene(viewportPanel.LoadedScene.GetIOModel(), FileName);
                 }
             }
         }
@@ -570,7 +563,7 @@ namespace StudioSB
                 {
                     if (FileName.ToLower().EndsWith(extension))
                     {
-                        SBSkeleton skeleton = viewportPanel.LoadedScene.GetIOModel().Skeleton;
+                        SBSkeleton skeleton = viewportPanel.LoadedScene.Skeleton as SBSkeleton;
                         extensionToExporter[extension].ExportSBSkeleton(FileName, skeleton);
                     }
                 }
@@ -613,6 +606,11 @@ namespace StudioSB
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void ImportSkeletonToScene(object sender, EventArgs args)
         {
             if (viewportPanel.LoadedScene == null)
@@ -639,7 +637,7 @@ namespace StudioSB
                 {
                     if (FileName.ToLower().EndsWith(extension))
                     {
-                        SBSkeleton skeleton = viewportPanel.LoadedScene.GetIOModel().Skeleton;
+                        SBSkeleton skeleton = viewportPanel.LoadedScene.Skeleton as SBSkeleton;
                         extensionToImporter[extension].ImportSBSkeleton(FileName, skeleton);
                     }
                 }
@@ -654,38 +652,12 @@ namespace StudioSB
         public void ImportToScene(object sender, EventArgs args)
         {
             string FileName;
-            string Filter = "";
 
-            //Create filter
-            Dictionary<string, IImportableModelType> extensionToExporter = new Dictionary<string, IImportableModelType>();
-            foreach (IImportableModelType exporter in ModelImporters)
-            {
-                string Extension = exporter.Extension;
-                Filter += $"*{Extension};";
-                extensionToExporter.Add(Extension, exporter);
-            }
-
-            if (Tools.FileTools.TryOpenFile(out FileName, "Supported Files|" + Filter))
+            if (Tools.FileTools.TryOpenFile(out FileName, IONET.IOManager.GetModelImportFileFilter()))
             {
                 var scene = LoadScene(FileName, viewportPanel.LoadedScene);
                 viewportPanel.SetScene(scene);
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        private static IImportableModelType GetModelTypeFromPath(string filePath)
-        {
-            Dictionary<string, IImportableModelType> extensionToExporter = new Dictionary<string, IImportableModelType>();
-            foreach (IImportableModelType exporter in ModelImporters)
-            {
-                if (exporter.Extension == System.IO.Path.GetExtension(filePath).ToLower())
-                    return exporter;
-            }
-            return null;
         }
 
         /// <summary>
@@ -718,6 +690,10 @@ namespace StudioSB
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public static string[] SupportedAnimExportTypes()
         {
             string[] s = new string[AnimationExporters.Count];
@@ -735,19 +711,15 @@ namespace StudioSB
         /// <returns></returns>
         public static SBScene LoadScene(string filePath, SBScene loadedScene)
         {
-            IImportableModelType modelType = GetModelTypeFromPath(filePath);
-
-            if (modelType == null)
-                return null;
-
             DialogResult Result = DialogResult.OK;
-            if (modelType.Settings != null)
-                using (var dialog = new SBCustomDialog(modelType.Settings))
-                    Result = dialog.ShowDialog();
+
+            var settings = new IONET.ImportSettings();
+            using (SBCustomDialog d = new SBCustomDialog(settings))
+                Result = d.ShowDialog();
 
             if (Result == DialogResult.OK)
             {
-                var ioModel = modelType.ImportIOModel(filePath);
+                var ioModel = IONET.IOManager.LoadScene(filePath, settings);
 
                 SBScene scene;
                 if (loadedScene == null)
@@ -764,7 +736,7 @@ namespace StudioSB
                             MATL_Loader.Open(SBSceneSSBH.NewImportSettings.NUMATLB, scene);
 
                         if (SBSceneSSBH.NewImportSettings.NUSKTFile != null && SBSceneSSBH.NewImportSettings.NUSKTFile != "")
-                            ioModel.Skeleton = SKEL_Loader.Open(SBSceneSSBH.NewImportSettings.NUSKTFile, scene);
+                            ioModel.Models[0].Skeleton = SKEL_Loader.Open(SBSceneSSBH.NewImportSettings.NUSKTFile, scene).ToIOSkeleton();
                     }
                     else
                     {
@@ -783,7 +755,9 @@ namespace StudioSB
                     {
                         if (SBSceneSSBH.ImportSettings.UseExistingSkeleton)
                         {
-                            ioModel.ConvertToSkeleton((SBSkeleton)scene.Skeleton);
+                            ioModel.Models[0].Skeleton = ((SBSkeleton)scene.Skeleton).ToIOSkeleton();
+                            //ioModel.ConvertToSkeleton((SBSkeleton)scene.Skeleton);
+                            // ionet uses bone names so no need to convert bone mapping indices
                         }
                     }
                     else
@@ -801,7 +775,10 @@ namespace StudioSB
                 return null;
             }
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
         private void InitializeImportTypes()
         {
             var assemblyTypes = new List<Type>();
@@ -809,26 +786,6 @@ namespace StudioSB
             {
                 assemblyTypes.AddRange(assembly.GetTypes());
             }
-
-            // initialize model importers/exporters
-            var exportableModelTypes = from type in assemblyTypes
-                where typeof(IExportableModelType).IsAssignableFrom(type) select type;
-
-            foreach (var type in exportableModelTypes)
-            {
-                if (type != typeof(IExportableModelType))
-                    ModelExporters.Add((IExportableModelType)Activator.CreateInstance(type));
-            }
-
-            var importableModelTypes = from type in assemblyTypes
-                where typeof(IImportableModelType).IsAssignableFrom(type) select type;
-
-            foreach (var type in importableModelTypes)
-            {
-                if (type != typeof(IImportableModelType))
-                    ModelImporters.Add((IImportableModelType)Activator.CreateInstance(type));
-            }
-
 
             // initialize animation importers/exporters
             var exportableAnimationTypes = from type in assemblyTypes

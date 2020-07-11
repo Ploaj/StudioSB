@@ -1,12 +1,10 @@
 ﻿using System.IO;
 using System.Text;
-
-using StudioSB.IO.Models;
 using System.Windows.Forms;
 
 namespace StudioSB.IO.Formats
 {
-    class IO_CSV : IExportableModelType
+    /*class IO_CSV : IExportableModelType
     {
         public string Name => "CSV";
         public string Extension => ".csv";
@@ -132,5 +130,5 @@ namespace StudioSB.IO.Formats
             }
             File.WriteAllText(FileName, csv.ToString());
         }
-    }
+    }*/
 }

@@ -1,11 +1,10 @@
 ﻿using System.Text;
-using StudioSB.IO.Models;
 using System;
 using System.IO;
 
 namespace StudioSB.IO.Formats
 {
-    public class IO_PLY : IExportableModelType
+    /*public class IO_PLY : IExportableModelType
     {
         public string Name => "PLY";
         public string Extension => ".ply";
@@ -83,5 +82,5 @@ namespace StudioSB.IO.Formats
                 }
             }
         }
-    }
+    }*/
 }

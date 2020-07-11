@@ -42,6 +42,9 @@ namespace StudioSB.Scenes.Ultimate
         public bool ExportMap1 { get; set; } = false;
 
         [Category("Export Options")]
+        public bool ExportBake1 { get; set; } = false;
+
+        [Category("Export Options")]
         public bool ExportColorSet1 { get; set; } = false;
 
         [Category("Export Options")]
@@ -87,6 +90,7 @@ namespace StudioSB.Scenes.Ultimate
                 case UltimateVertexAttribute.uvSet1: ExportUVSet2 = true; break;
                 case UltimateVertexAttribute.uvSet2: ExportUVSet3 = true; break;
                 case UltimateVertexAttribute.map1: ExportMap1 = true; break;
+                case UltimateVertexAttribute.bake1: ExportBake1 = true; break;
                 case UltimateVertexAttribute.colorSet1: ExportColorSet1 = true; break;
                 case UltimateVertexAttribute.colorSet2: ExportColorSet2 = true; break;
                 case UltimateVertexAttribute.colorSet2_1: ExportColorSet21 = true; break;

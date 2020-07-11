@@ -42,6 +42,10 @@ namespace StudioSB
         Tangents,
         Bitangents,
         BakeUV,
+        Map1,
+        UvSet1,
+        UvSet2,
+        UvSet3,
         UVPattern
     }
 

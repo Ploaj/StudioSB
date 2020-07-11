@@ -9,13 +9,14 @@ using StudioSB.Rendering;
 using OpenTK.Graphics.OpenGL;
 using SFGraphics.GLObjects.BufferObjects;
 using SFGraphics.GLObjects.Textures;
-using StudioSB.IO.Models;
 using StudioSB.GUI.Attachments;
 using StudioSB.GUI;
 using StudioSB.Tools;
 using HSDRaw.GX;
 using System.Drawing;
 using System.Linq;
+using IONET.Core;
+using IONET.Core.Model;
 
 namespace StudioSB.Scenes.Melee
 {
@@ -447,23 +448,37 @@ namespace StudioSB.Scenes.Melee
             }
         }
 
-        public override void FromIOModel(IOModel iomodel)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        private static void InvertSingleBinds(IOModel model)
         {
-            //System.Windows.Forms.MessageBox.Show("Importing Model to DAT not supported");
-            
-            // use the existing skeleton always
-            iomodel.ConvertToSkeleton((SBSkeleton)Skeleton);
+            foreach (var m in model.Meshes)
+                foreach (var v in m.Vertices)
+                    if (v.Envelope.Weights.Count > 0 && v.Envelope.Weights[0].Weight == 1)
+                    {
+                        System.Numerics.Matrix4x4.Invert(model.Skeleton.GetBoneByName(v.Envelope.Weights[0].BoneName).WorldTransform, out System.Numerics.Matrix4x4 inv);
+                        v.Transform(inv);
+                    }
+        }
 
-            // single bound vertices are stored in inverse transform positions
-            iomodel.InvertSingleBinds();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="iomodel"></param>
+        public override void FromIOModel(IOScene iomodel)
+        {
+            var model = iomodel.Models[0];
+
+            InvertSingleBinds(model);
 
             // dobjs to import to
             var dobjs = GetMeshObjects();
-            
+
+            // clear pobjs
             foreach (SBHsdMesh m in GetMeshObjects())
-            {
                 m.DOBJ.Pobj = null;
-            }
 
             var attributeGroup = MakeRiggedAttributes();
             var singleAttributeGroup = MakeSingleAttributes();
@@ -473,12 +488,12 @@ namespace StudioSB.Scenes.Melee
             POBJ_Generator compressor = new POBJ_Generator();
 
             // import the iomeshes into their respective dobjs
-            foreach (var iomesh in iomodel.Meshes)
+            foreach (var iomesh in model.Meshes)
             {
                 int dobjId = -1;
                 int.TryParse(iomesh.Name.Replace("DOBJ_", ""), out dobjId);
 
-                SBConsole.WriteLine(iomesh.Name + " imported:" + (dobjId!=-1));
+                SBConsole.WriteLine(iomesh.Name + " imported:" + (dobjId != -1));
 
                 if (dobjId != -1)
                 {
@@ -491,7 +506,7 @@ namespace StudioSB.Scenes.Melee
             compressor.SaveChanges();
 
             // refresh everything
-            RefreshRendering();
+            RefreshRendering(); 
         }
 
         private GXAttribName[] MakeRiggedAttributes()
@@ -515,26 +530,36 @@ namespace StudioSB.Scenes.Melee
             };
         }
 
-        public override IOModel GetIOModel()
+        public override IOScene GetIOModel()
         {
-            var iomodel = new IOModel();
+            IOScene scene = new IOScene();
 
-            iomodel.Skeleton = (SBSkeleton)Skeleton;
-            
+            IOModel iomodel = new IOModel();
+            scene.Models.Add(iomodel);
+
+            iomodel.Skeleton = ((SBSkeleton)Skeleton).ToIOSkeleton();
+
+            // bone indices
             List<SBHsdBone> bones = new List<SBHsdBone>();
 
             foreach (SBHsdBone bone in Skeleton.Bones)
                 bones.Add(bone);
+            
 
+            // gather textures
             Dictionary<HSDStruct, string> tobjToName = new Dictionary<HSDStruct, string>();
 
-            foreach(var tex in tobjToSurface)
+            List<SBSurface> textures = new List<SBSurface>();
+
+            foreach (var tex in tobjToSurface)
             {
-                tex.Value.Name = $"TOBJ_{iomodel.Textures.Count}";
+                tex.Value.Name = $"TOBJ_{textures.Count}";
                 tobjToName.Add(tex.Key, tex.Value.Name);
-                iomodel.Textures.Add(tex.Value);
+                textures.Add(tex.Value);
             }
 
+
+            // process mesh
             foreach (SBHsdMesh me in GetMeshObjects())
             {
                 var dobj = me.DOBJ;
@@ -552,16 +577,12 @@ namespace StudioSB.Scenes.Melee
                             }
                     }
                 }
-                
+
                 var iomesh = new IOMesh();
                 iomesh.Name = me.Name;
                 iomodel.Meshes.Add(iomesh);
-
-                iomesh.HasPositions = true;
-                iomesh.HasColor = true;
-                iomesh.HasNormals = true;
-                iomesh.HasBoneWeights = true;
-                iomesh.HasUV0 = true;
+                IOPolygon poly = new IOPolygon();
+                iomesh.Polygons.Add(poly);
 
                 if (dobj.Pobj != null)
                     foreach (var pobj in dobj.Pobj.List)
@@ -585,41 +606,66 @@ namespace StudioSB.Scenes.Melee
                     }
                 
 
-                iomesh.Optimize();
-
                 // flip faces
-                var temp = iomesh.Indices.ToArray();
-                iomesh.Indices.Clear();
-                for (int i = 0; i < temp.Length; i += 3)
+                for (int i = 0; i < iomesh.Vertices.Count; i += 3)
                 {
-                    if (i + 2 < temp.Length)
+                    if (i + 2 < iomesh.Vertices.Count)
                     {
-                        iomesh.Indices.Add(temp[i + 2]);
-                        iomesh.Indices.Add(temp[i + 1]);
-                        iomesh.Indices.Add(temp[i]);
+                        poly.Indicies.Add(i + 2);
+                        poly.Indicies.Add(i + 1);
+                        poly.Indicies.Add(i);
                     }
                     else
                         break;
                 }
 
-                iomesh.MaterialIndex = iomodel.Materials.Count;
+                poly.MaterialName = iomesh.Name + "_material";
 
-                IOMaterialPhong mat = new IOMaterialPhong();
+
+                // create material
+                IOMaterial mat = new IOMaterial();
+
                 mat.Name = iomesh.Name + "_material";
-                if(dobj.Mobj.Material != null)
+                if (dobj.Mobj.Material != null)
                 {
-                    mat.DiffuseColor = dobj.Mobj.Material.DiffuseColor;
-                    mat.SpecularColor = dobj.Mobj.Material.SpecularColor;
-                    mat.AmbientColor = dobj.Mobj.Material.AmbientColor;
+                    mat.DiffuseColor = new System.Numerics.Vector4(
+                        dobj.Mobj.Material.DiffuseColor.R / 255f,
+                        dobj.Mobj.Material.DiffuseColor.G / 255f,
+                        dobj.Mobj.Material.DiffuseColor.B / 255f,
+                        dobj.Mobj.Material.DiffuseColor.A / 255f);
+                    mat.SpecularColor = new System.Numerics.Vector4(
+                        dobj.Mobj.Material.SpecularColor.R / 255f,
+                        dobj.Mobj.Material.SpecularColor.G / 255f,
+                        dobj.Mobj.Material.SpecularColor.B / 255f,
+                        dobj.Mobj.Material.SpecularColor.A / 255f);
+                    mat.AmbientColor = new System.Numerics.Vector4(
+                        dobj.Mobj.Material.AmbientColor.R / 255f,
+                        dobj.Mobj.Material.AmbientColor.G / 255f,
+                        dobj.Mobj.Material.AmbientColor.B / 255f,
+                        dobj.Mobj.Material.AmbientColor.A / 255f);
+                    mat.Alpha = dobj.Mobj.Material.Alpha;
+                    mat.Shininess = dobj.Mobj.Material.Shininess;
                 }
-                if(dobj.Mobj.Textures != null)
-                    mat.DiffuseTexture = tobjToName[dobj.Mobj.Textures._s];
-                iomodel.Materials.Add(mat);
+
+                if (dobj.Mobj.Textures != null)
+                    mat.DiffuseMap = new IOTexture()
+                    {
+                        Name = tobjToName[dobj.Mobj.Textures._s],
+                        FilePath = tobjToName[dobj.Mobj.Textures._s]
+                    };
+                scene.Materials.Add(mat);
             }
 
-            return iomodel;
+            return scene;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="vertices"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
         private List<IOVertex> ConvertGXDLtoTriangleList(GXPrimitiveType type, List<SBHsdVertex> vertices, SBHsdBone parent)
         {
             var list = new List<IOVertex>();
@@ -628,27 +674,39 @@ namespace StudioSB.Scenes.Melee
             {
                 var vertex = new IOVertex()
                 {
-                    Position = GXtoGL.GLVector3(v.POS),
-                    Normal = GXtoGL.GLVector3(v.NRM),
-                    UV0 = GXtoGL.GLVector2(v.UV0),
-                    BoneIndices = v.Bone,
-                    BoneWeights = v.Weight,
+                    Position = new System.Numerics.Vector3(v.POS.X, v.POS.Y, v.POS.Z),
+                    Normal = new System.Numerics.Vector3(v.NRM.X, v.NRM.Y, v.NRM.Z),
                 };
+                vertex.SetUV(v.UV0.X, v.UV0.Y, 0);
+
+                for(int i = 0; i < 4; i++)
+                {
+                    if(v.Weight[i] > 0)
+                    {
+                        vertex.Envelope.Weights.Add(new IOBoneWeight()
+                        {
+                            BoneName = "JOBJ_" + (int)v.Bone[i],
+                            Weight = v.Weight[i]
+                        });
+                    }
+                }
+
                 if(parent != null)
                 {
-                    vertex.Position = Vector3.TransformPosition(vertex.Position, parent.WorldTransform);
-                    vertex.Normal = Vector3.TransformNormal(vertex.Normal, parent.WorldTransform);
+                    vertex.Transform(TktoNumeric(parent.WorldTransform));
 
-                    if (vertex.BoneWeights.X == 0)
+                    if (vertex.Envelope.Weights.Count == 0)
                     {
-                        vertex.BoneWeights.X = 1;
-                        vertex.BoneIndices.X = Skeleton.IndexOfBone(parent);
+                        vertex.Envelope.Weights.Add(new IOBoneWeight()
+                        {
+                            BoneName = parent.Name,
+                            Weight = 1
+                        });
                     }
                 }
                 if(v.Weight.X == 1)
                 {
-                    vertex.Position = Vector3.TransformPosition(vertex.Position, Skeleton.Bones[(int)v.Bone.X].WorldTransform);
-                    vertex.Normal = Vector3.TransformNormal(vertex.Normal, Skeleton.Bones[(int)v.Bone.X].WorldTransform);
+                    vertex.Transform(TktoNumeric(Skeleton.Bones[(int)v.Bone.X].WorldTransform));
                 }
                 list.Add(vertex);
             }
@@ -660,6 +718,19 @@ namespace StudioSB.Scenes.Melee
                 TriangleConvert.QuadToList(list, out list);
 
             return list;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public System.Numerics.Matrix4x4 TktoNumeric(Matrix4 m)
+        {
+            return new System.Numerics.Matrix4x4(m.M11, m.M21, m.M31, m.M41,
+                m.M12, m.M22, m.M32, m.M42,
+                m.M13, m.M23, m.M33, m.M43,
+                m.M14, m.M24, m.M34, m.M44);
         }
 
         #endregion
