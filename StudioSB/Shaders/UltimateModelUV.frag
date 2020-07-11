@@ -1,6 +1,6 @@
 #version 330
 
-in vec3 N;
+in vec3 vertexNormal;
 in vec3 tangent;
 in vec3 bitangent;
 in vec2 UV0;

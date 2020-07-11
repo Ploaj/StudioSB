@@ -9,10 +9,10 @@ namespace StudioSB.Scenes.Ultimate
     {
         public static SBSkeleton Open(string FileName, SBScene Scene)
         {
-            ISSBH_File File;
-            if (SSBH.TryParseSSBHFile(FileName, out File))
+            SsbhFile File;
+            if (Ssbh.TryParseSsbhFile(FileName, out File))
             {
-                if (File is SKEL skel)
+                if (File is Skel skel)
                 {
                     var Skeleton = new SBSkeleton();
                     Scene.Skeleton = Skeleton;
@@ -24,12 +24,12 @@ namespace StudioSB.Scenes.Ultimate
                         SBBone bone = new SBBone();
                         bone.Name = b.Name;
                         bone.Type = b.Type;
-                        bone.Transform = Skel_to_TKMatrix(skel.Transform[b.ID]);
-                        idToBone.Add(b.ID, bone);
-                        if (b.ParentID == -1)
+                        bone.Transform = Skel_to_TKMatrix(skel.Transform[b.Id]);
+                        idToBone.Add(b.Id, bone);
+                        if (b.ParentId == -1)
                             Skeleton.AddRoot(bone);
                         else
-                            needParent.Add(bone, b.ParentID);
+                            needParent.Add(bone, b.ParentId);
                     }
                     foreach(var v in needParent)
                     {
@@ -46,16 +46,16 @@ namespace StudioSB.Scenes.Ultimate
         {
             var Skeleton = Scene.Skeleton;
 
-            var skelFile = new SKEL();
+            var skelFile = new Skel();
 
             skelFile.MajorVersion = 1;
             skelFile.MinorVersion = 0;
 
-            List<SKEL_BoneEntry> BoneEntries = new List<SKEL_BoneEntry>();
-            List<SKEL_Matrix> Transforms = new List<SKEL_Matrix>();
-            List<SKEL_Matrix> InvTransforms = new List<SKEL_Matrix>();
-            List<SKEL_Matrix> WorldTransforms = new List<SKEL_Matrix>();
-            List<SKEL_Matrix> InvWorldTransforms = new List<SKEL_Matrix>();
+            List<SkelBoneEntry> BoneEntries = new List<SkelBoneEntry>();
+            List<SkelMatrix> Transforms = new List<SkelMatrix>();
+            List<SkelMatrix> InvTransforms = new List<SkelMatrix>();
+            List<SkelMatrix> WorldTransforms = new List<SkelMatrix>();
+            List<SkelMatrix> InvWorldTransforms = new List<SkelMatrix>();
 
             short index = 0;
             Dictionary<SBBone, short> BoneToIndex = new Dictionary<SBBone, short>();
@@ -64,14 +64,14 @@ namespace StudioSB.Scenes.Ultimate
             foreach (var bone in OrderedBones)
             {
                 BoneToIndex.Add(bone, index);
-                var boneentry = new SKEL_BoneEntry();
+                var boneentry = new SkelBoneEntry();
                 boneentry.Name = bone.Name;
                 boneentry.Type = bone.Type;
-                boneentry.ID = index++;
+                boneentry.Id = index++;
                 boneentry.Type = 1;
-                boneentry.ParentID = -1;
+                boneentry.ParentId = -1;
                 if (bone.Parent != null)// && BoneToIndex.ContainsKey(bone.Parent))
-                    boneentry.ParentID = (short)OrderedBones.IndexOf(bone.Parent);
+                    boneentry.ParentId = (short)OrderedBones.IndexOf(bone.Parent);
                 BoneEntries.Add(boneentry);
 
                 Transforms.Add(TKMatrix_to_Skel(bone.Transform));
@@ -86,7 +86,7 @@ namespace StudioSB.Scenes.Ultimate
             skelFile.WorldTransform = WorldTransforms.ToArray();
             skelFile.InvWorldTransform = InvWorldTransforms.ToArray();
 
-            SSBH.TrySaveSSBHFile(FileName, skelFile);
+            Ssbh.TrySaveSsbhFile(FileName, skelFile);
         }
 
         private static string[] FighterBoneSet = {
@@ -164,7 +164,7 @@ namespace StudioSB.Scenes.Ultimate
             return finalList;
         }
 
-        private static Matrix4 Skel_to_TKMatrix(SKEL_Matrix sm)
+        private static Matrix4 Skel_to_TKMatrix(SkelMatrix sm)
         {
             return new Matrix4(sm.M11, sm.M12, sm.M13, sm.M14,
                 sm.M21, sm.M22, sm.M23, sm.M24,
@@ -172,9 +172,9 @@ namespace StudioSB.Scenes.Ultimate
                 sm.M41, sm.M42, sm.M43, sm.M44);
         }
 
-        private static SKEL_Matrix TKMatrix_to_Skel(Matrix4 sm)
+        private static SkelMatrix TKMatrix_to_Skel(Matrix4 sm)
         {
-            var skelmat = new SKEL_Matrix();
+            var skelmat = new SkelMatrix();
             skelmat.M11 = sm.M11;
             skelmat.M12 = sm.M12;
             skelmat.M13 = sm.M13;

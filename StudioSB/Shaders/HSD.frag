@@ -1,4 +1,5 @@
 ﻿#version 330
+
 in vec3 vertPosition;
 in vec3 normal;
 in vec3 bitangent;
@@ -7,7 +8,7 @@ in vec4 color;
 in vec2 tex0;
 in vec3 specularPass;
 
-noperspective in vec3 edgeDistance;
+// noperspective in vec3 edgeDistance;
 
 uniform int hasDiffuseMaterial;
 uniform int hasDF;
@@ -170,12 +171,12 @@ void main()
 	// vertex color
 	//fragColor.rgb *= color.rgb;
 	
-    if (renderWireframe == 1)
-    {
-        vec3 edgeColor = vec3(1);
-        float intensity = WireframeIntensity(edgeDistance);
-        fragColor.rgb = mix(fragColor.rgb, edgeColor, intensity);
-    }
+    // if (renderWireframe == 1)
+    // {
+    //     vec3 edgeColor = vec3(1);
+    //     float intensity = WireframeIntensity(edgeDistance);
+    //     fragColor.rgb = mix(fragColor.rgb, edgeColor, intensity);
+    // }
 
 	// Set alpha
     if (renderAlpha == 1)

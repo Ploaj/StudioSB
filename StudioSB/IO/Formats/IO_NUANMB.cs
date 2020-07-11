@@ -34,25 +34,25 @@ namespace StudioSB.IO.Formats
         {
             SBAnimation anim = new SBAnimation();
 
-            ISSBH_File File;
-            if (SSBH.TryParseSSBHFile(FileName, out File))
+            SsbhFile File;
+            if (Ssbh.TryParseSsbhFile(FileName, out File))
             {
-                if (File is ANIM animation)
+                if (File is Anim animation)
                 {
                     anim.Name = animation.Name;
                     anim.FrameCount = animation.FrameCount;
 
                     foreach (var group in animation.Animations)
                     {
-                        if (group.Type == ANIM_TYPE.Visibilty)
+                        if (group.Type == AnimType.Visibility)
                         {
                             ReadVisibilityAnimations(animation, group, anim);
                         }
-                        if (group.Type == ANIM_TYPE.Transform)
+                        if (group.Type == AnimType.Transform)
                         {
                             ReadTransformAnimations(animation, group, anim);
                         }
-                        if (group.Type == ANIM_TYPE.Material)
+                        if (group.Type == AnimType.Material)
                         {
                             ReadMaterialAnimations(animation, group, anim);
                         }
@@ -63,9 +63,9 @@ namespace StudioSB.IO.Formats
             return anim;
         }
 
-        private void ReadTransformAnimations(ANIM animFile, AnimGroup animGroup, SBAnimation animation)
+        private void ReadTransformAnimations(Anim animFile, AnimGroup animGroup, SBAnimation animation)
         {
-            var decoder = new SSBHAnimTrackDecoder(animFile);
+            var decoder = new SsbhAnimTrackDecoder(animFile);
 
             foreach (AnimNode animNode in animGroup.Nodes)
             {
@@ -117,14 +117,14 @@ namespace StudioSB.IO.Formats
 
         private static Matrix4 GetMatrix(AnimTrackTransform Transform)
         {
-            return Matrix4.CreateScale(Transform.SX, Transform.SY, Transform.SZ) *
-                Matrix4.CreateFromQuaternion(new Quaternion(Transform.RX, Transform.RY, Transform.RZ, Transform.RW)) *
+            return Matrix4.CreateScale(Transform.Sx, Transform.Sy, Transform.Sz) *
+                Matrix4.CreateFromQuaternion(new Quaternion(Transform.Rx, Transform.Ry, Transform.Rz, Transform.Rw)) *
                 Matrix4.CreateTranslation(Transform.X, Transform.Y, Transform.Z);
         }
 
-        private void ReadMaterialAnimations(ANIM animFile, AnimGroup animGroup, SBAnimation animation)
+        private void ReadMaterialAnimations(Anim animFile, AnimGroup animGroup, SBAnimation animation)
         {
-            var decoder = new SSBHAnimTrackDecoder(animFile);
+            var decoder = new SsbhAnimTrackDecoder(animFile);
 
             foreach (AnimNode animNode in animGroup.Nodes)
             {
@@ -152,9 +152,9 @@ namespace StudioSB.IO.Formats
             }
         }
 
-        private void ReadVisibilityAnimations(ANIM animFile, AnimGroup animGroup, SBAnimation animation)
+        private void ReadVisibilityAnimations(Anim animFile, AnimGroup animGroup, SBAnimation animation)
         {
-            var decoder = new SSBHAnimTrackDecoder(animFile);
+            var decoder = new SsbhAnimTrackDecoder(animFile);
             foreach (AnimNode animNode in animGroup.Nodes)
             {
                 SBVisibilityAnimation visAnim = new SBVisibilityAnimation()
@@ -179,7 +179,7 @@ namespace StudioSB.IO.Formats
 
         public void ExportSBAnimation(string FileName, SBAnimation animation, SBSkeleton skeleton)
         {
-            SSBHAnimTrackEncoder encoder = new SSBHAnimTrackEncoder(animation.FrameCount);
+            SsbhAnimTrackEncoder encoder = new SsbhAnimTrackEncoder(animation.FrameCount);
 
             encoder.CompressVector4 = ExportSettings.CompressVector4;
             encoder.SetCompressionLevel(ExportSettings.CompressionLevel);
@@ -198,7 +198,7 @@ namespace StudioSB.IO.Formats
                     transforms.Add(MatrixToTransform(node.GetTransformAt(i, skeleton)));
                 }
 
-                encoder.AddTrack(node.Name, "Transform", ANIM_TYPE.Transform, transforms);
+                encoder.AddTrack(node.Name, "Transform", AnimType.Transform, transforms);
             }
 
 
@@ -220,7 +220,7 @@ namespace StudioSB.IO.Formats
                     visibilities.Clear();
                     visibilities.Add(first);
                 }
-                encoder.AddTrack(node.MeshName, "Visibility", ANIM_TYPE.Visibilty, visibilities);
+                encoder.AddTrack(node.MeshName, "Visibility", AnimType.Visibility, visibilities);
             }
 
             var matNodes = animation.MaterialNodes.OrderBy(e => e.MaterialName, StringComparer.Ordinal);
@@ -242,7 +242,7 @@ namespace StudioSB.IO.Formats
                     list.Clear();
                     list.Add(new AnimTrackCustomVector4(first.X, first.Y, first.Z, first.W));
                 }
-                encoder.AddTrack(mat.MaterialName, mat.AttributeName, ANIM_TYPE.Material, list);
+                encoder.AddTrack(mat.MaterialName, mat.AttributeName, AnimType.Material, list);
             }
 
             try
@@ -250,7 +250,7 @@ namespace StudioSB.IO.Formats
                 encoder.Save(FileName);
             } catch(Exception)
             {
-                System.Windows.Forms.MessageBox.Show("Error creating ANIM file: try using a larger compression level");
+                System.Windows.Forms.MessageBox.Show("Error creating Anim file: try using a larger compression level");
             }
         }
 
@@ -264,13 +264,13 @@ namespace StudioSB.IO.Formats
                 X = temp.X,
                 Y = temp.Y,
                 Z = temp.Z,
-                RX = temp.RotationQuaternion.X,
-                RY = temp.RotationQuaternion.Y,
-                RZ = temp.RotationQuaternion.Z,
-                RW = temp.RotationQuaternion.W,
-                SX = temp.SX,
-                SY = temp.SY,
-                SZ = temp.SZ
+                Rx = temp.RotationQuaternion.X,
+                Ry = temp.RotationQuaternion.Y,
+                Rz = temp.RotationQuaternion.Z,
+                Rw = temp.RotationQuaternion.W,
+                Sx = temp.SX,
+                Sy = temp.SY,
+                Sz = temp.SZ
             };
 
             return t;

@@ -7,12 +7,12 @@ in vec4 Clr0;
 in vec4 Bone;
 in vec4 Weight;
 
-/*out vec3 geomPosition;
+out vec3 geomPosition;
 out vec3 geomNormal;
 out vec2 geomTex0;
 out vec4 geomColor;
 out vec3 geomBitangent;
-out vec3 geomTangent;*/
+out vec3 geomTangent;
 
 out vec3 vertPosition;
 out vec3 normal;
