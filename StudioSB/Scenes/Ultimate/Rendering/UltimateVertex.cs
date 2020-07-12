@@ -133,7 +133,7 @@ namespace StudioSB.Scenes.Ultimate
             ColorSet4 = colorSet4;
             ColorSet5 = colorSet5;
             ColorSet6 = colorSet6;
-            ColorSet7 = colorSet5;
+            ColorSet7 = colorSet7;
         }
     }
 }

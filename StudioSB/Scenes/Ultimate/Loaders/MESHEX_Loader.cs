@@ -28,6 +28,11 @@ namespace StudioSB.Scenes.Ultimate.Loaders
             public Vector3 Unknown = Vector3.UnitY;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bounding"></param>
+        /// <param name="Name"></param>
         public void AddMeshData(BoundingSphere bounding, string Name)
         {
             var data = MeshData.FindIndex(e=>e.Name.Equals(Name));
@@ -39,11 +44,27 @@ namespace StudioSB.Scenes.Ultimate.Loaders
                 {
                     BoundingSphere = bounding,
                     Name = Name,
-                    TrueName = Name.IndexOf("_VIS") != -1 ? Name.Substring(0, Name.IndexOf("_VIS")) : Name
+                    TrueName = GetTrueName(Name)
                 });
             }
 
             Entries.Add(new EntryEx() { MeshExIndex = data });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private static string GetTrueName(string name)
+        {
+            if (name.EndsWith("_VIS"))
+                name = name.Substring(0, name.IndexOf("_VIS"));
+
+            if (name.EndsWith("Shape"))
+                name = name.Substring(0, name.IndexOf("Shape"));
+
+            return name;
         }
 
         /// <summary>

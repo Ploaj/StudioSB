@@ -9,9 +9,9 @@ in vec2 uvSet1;
 //in vec2 uvSet2;
 in vec4 colorSet1;
 in vec4 colorSet2;
-in vec4 colorSet21;
-in vec4 colorSet22;
-in vec4 colorSet23;
+//in vec4 colorSet21;
+//in vec4 colorSet22;
+//in vec4 colorSet23;
 in vec4 colorSet3;
 in vec4 colorSet4;
 in vec4 colorSet5;
@@ -182,13 +182,13 @@ void main()
 			fragColor = colorSet2;
 			break;
 		case 11:
-			fragColor = colorSet21;
+			//fragColor = colorSet21;
 			break;
 		case 12:
-			fragColor = colorSet22;
+			//fragColor = colorSet22;
 			break;
 		case 13:
-			fragColor = colorSet23;
+			//fragColor = colorSet23;
 			break;
 		case 14:
 			fragColor = colorSet3;
@@ -200,10 +200,10 @@ void main()
 			fragColor = colorSet5;
 			break;
 		case 17:
-			fragColor = colorSet6;
+			//fragColor = colorSet6;
 			break;
 		case 18:
-			fragColor = colorSet7;
+			//fragColor = colorSet7;
 			break;
 		case 19:
 			fragColor = vec4(fragmentNormal * 0.5 + 0.5, 1);
