@@ -370,7 +370,7 @@ namespace StudioSB.Scenes.Ultimate
                 if (mesh.ExportUVSet2)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.UvSet1, UvSet1.ToArray());
                 if (mesh.ExportBake1)
-                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.Bake1, UvSet1.ToArray());
+                    maker.AddAttributeToMeshObject(UltimateVertexAttribute.Bake1, bake1.ToArray());
                 if (mesh.ExportColorSet1)
                     maker.AddAttributeToMeshObject(UltimateVertexAttribute.ColorSet1, colorSet1.ToArray());
                 if (mesh.ExportColorSet2)
