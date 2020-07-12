@@ -549,7 +549,7 @@ namespace StudioSB.Scenes.Ultimate
 
                 //optimization single bind
                 bool isSingleBound = true;
-                string bonename = iomesh.Vertices.Count > 0 ? iomesh.Vertices[0].Envelope.Weights[0].BoneName : "";
+                string bonename = iomesh.Vertices.Count > 0 && iomesh.Vertices[0].Envelope.Weights.Count > 0 ? iomesh.Vertices[0].Envelope.Weights[0].BoneName : "";
                 foreach (var vertex in iomesh.Vertices)
                 {
                     if (vertex.Envelope.Weights.Count == 0 || vertex.Envelope.Weights[0].BoneName != bonename)
