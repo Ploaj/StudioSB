@@ -474,7 +474,8 @@ namespace StudioSB
                 }
                 else
                 {
-                    IONET.IOManager.ExportScene(viewportPanel.LoadedScene.GetIOModel(), FileName);
+                    var ioScene = viewportPanel.LoadedScene.GetIOModel();
+                    IONET.IOManager.ExportScene(ioScene, FileName);
                 }
             }
         }

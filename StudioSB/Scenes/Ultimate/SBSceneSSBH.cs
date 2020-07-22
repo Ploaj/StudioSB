@@ -274,24 +274,33 @@ namespace StudioSB.Scenes.Ultimate
 
             foreach (UltimateMaterial mat in Materials)
             {
+                //if(scene.Materials.Find(e=>e.Name == mat.Label))
                 var m = new IOMaterial();
-                m.Name = mat.Name;
+                m.Name = mat.Label;
                 m.DiffuseMap = new IOTexture() { Name = mat.Texture0.Value, FilePath = mat.Texture0.Value };
                 scene.Materials.Add(m);
             }
-            
+
+            Dictionary<string, IOMesh> nameToMesh = new Dictionary<string, IOMesh>();
+
             foreach (var mesh in Model.Meshes)
             {
-                var iomesh = new IOMesh();
-                iomesh.Name = mesh.Name;
-                iomodel.Meshes.Add(iomesh);
+                if (!nameToMesh.ContainsKey(mesh.Name))
+                {
+                    IOMesh m = new IOMesh();
+                    m.Name = mesh.Name;
+                    iomodel.Meshes.Add(m);
+                    nameToMesh.Add(mesh.Name, m);
+                }
+
+                IOMesh iomesh = nameToMesh[mesh.Name];
 
                 IOPolygon poly = new IOPolygon();
                 iomesh.Polygons.Add(poly);
 
-                poly.MaterialName = mesh.Material.Name;
+                poly.MaterialName = mesh.Material.Label;
                 
-                poly.Indicies.AddRange(mesh.Indices.Select(e=>(int)e));
+                poly.Indicies.AddRange(mesh.Indices.Select(e=>(int)e + iomesh.Vertices.Count));
 
                 foreach (var vertex in mesh.Vertices)
                 {
@@ -697,6 +706,8 @@ namespace StudioSB.Scenes.Ultimate
             if (!singleBound)
                 for (int i = 0; i < iov.Envelope.Weights.Count; i++)
                 {
+                    if (i >= 4)
+                        break;
                     boneIndices[i] = skeleton.IndexOfBone(skeleton[iov.Envelope.Weights[i].BoneName]);
                     boneWeights[i] = iov.Envelope.Weights[i].Weight;
                 }
