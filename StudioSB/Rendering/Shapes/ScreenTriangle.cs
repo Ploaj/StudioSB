@@ -29,7 +29,6 @@ namespace StudioSB.Rendering.Shapes
             shader.UseProgram();
             if (renderTexture != null)
                 shader.SetTexture("image", renderTexture, 0);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)TextureMagFilter.Nearest);
             
             // The colors need to be converted back to sRGB gamma.
             shader.SetBoolToInt("isSrgb", IsSrgb);

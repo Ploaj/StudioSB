@@ -53,8 +53,8 @@ namespace StudioSB.Rendering
             LoadBitmap("defaultBlack", defaultBlack, "DefaultTextures/default_black.png");
 
             LoadBitmap("renderFront", renderFont, "DefaultTextures/render_font.png");
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)TextureMagFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (float)TextureMinFilter.Nearest);
+            renderFont.MagFilter = TextureMagFilter.Nearest;
+            renderFont.MinFilter = TextureMinFilter.Nearest;
 
             LoadBitmap("iblBrdf", iblLut, "DefaultTextures/ibl_brdf_lut.png");
 

@@ -81,7 +81,7 @@ new Vector3(    -1.0f,  1.0f, -1.0f),
             shader.SetMatrix4x4("projection", ref projection);
 
             shader.SetTexture("skybox", cubemap, 0);
-            GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (float)TextureMagFilter.Nearest);
+            cubemap.MagFilter = TextureMagFilter.Nearest;
             
             UnitSkyBox.Draw(shader);
         }
