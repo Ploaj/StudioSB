@@ -733,11 +733,11 @@ namespace StudioSB
 
                     if (Result == DialogResult.OK)
                     {
-                        if (SBSceneSSBH.NewImportSettings.NUMATLB != null && SBSceneSSBH.NewImportSettings.NUMATLB != "")
-                            MATL_Loader.Open(SBSceneSSBH.NewImportSettings.NUMATLB, scene);
+                        if (SBSceneSSBH.NewImportSettings.NumatbFile != null && SBSceneSSBH.NewImportSettings.NumatbFile != "")
+                            MATL_Loader.Open(SBSceneSSBH.NewImportSettings.NumatbFile, scene);
 
-                        if (SBSceneSSBH.NewImportSettings.NUSKTFile != null && SBSceneSSBH.NewImportSettings.NUSKTFile != "")
-                            ioModel.Models[0].Skeleton = SKEL_Loader.Open(SBSceneSSBH.NewImportSettings.NUSKTFile, scene).ToIOSkeleton();
+                        if (SBSceneSSBH.NewImportSettings.NusktbFile != null && SBSceneSSBH.NewImportSettings.NusktbFile != "")
+                            ioModel.Models[0].Skeleton = SKEL_Loader.Open(SBSceneSSBH.NewImportSettings.NusktbFile, scene).ToIOSkeleton();
                     }
                     else
                     {

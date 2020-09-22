@@ -16,6 +16,7 @@ using StudioSB.Scenes.Ultimate.Loaders;
 using IONET.Core.Model;
 using IONET.Core;
 using StudioSB.GUI;
+using System.Drawing.Design;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -38,6 +39,11 @@ namespace StudioSB.Scenes.Ultimate
 
         [DisplayName("Use \"Model\" as FileName")]
         public bool UseModelName { get; set; } = true;
+
+        [Editor(typeof(FilteredFileNameEditor), typeof(UITypeEditor)),
+        DisplayName("NUSKTB FilePath (Recommended)"),
+        Description("Path to a reference .nusktb for exporting bones in the correct order")]
+        public string ReferenceNusktbFile { get; set; } = "";
     }
 
     public enum UltimateMaterialTransitionMode
@@ -236,7 +242,7 @@ namespace StudioSB.Scenes.Ultimate
             if (ExportSettings.ExportSkeleton)
             {
                 SBConsole.WriteLine($"Creating SKEL.. {name}.nusktb");
-                SKEL_Loader.Save(name + ".nusktb", this);
+                SKEL_Loader.Save(name + ".nusktb", this, ExportSettings.ReferenceNusktbFile);
                 SBConsole.WriteLine("Done");
             }
 
@@ -250,6 +256,8 @@ namespace StudioSB.Scenes.Ultimate
                 }
                 SBConsole.WriteLine("Done");
             }
+
+
 
             //SBConsole.WriteLine("Creating MATL...");
 

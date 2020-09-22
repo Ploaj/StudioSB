@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
+using SELib;
 using SSBHLib;
 using SSBHLib.Formats;
 
@@ -9,8 +12,7 @@ namespace StudioSB.Scenes.Ultimate
     {
         public static SBSkeleton Open(string FileName, SBScene Scene)
         {
-            SsbhFile File;
-            if (Ssbh.TryParseSsbhFile(FileName, out File))
+            if (Ssbh.TryParseSsbhFile(FileName, out SsbhFile File))
             {
                 if (File is Skel skel)
                 {
@@ -31,7 +33,7 @@ namespace StudioSB.Scenes.Ultimate
                         else
                             needParent.Add(bone, b.ParentId);
                     }
-                    foreach(var v in needParent)
+                    foreach (var v in needParent)
                     {
                         v.Key.Parent = idToBone[v.Value];
                     }
@@ -42,9 +44,9 @@ namespace StudioSB.Scenes.Ultimate
             return null;
         }
 
-        public static void Save(string FileName, SBScene Scene)
+        public static void Save(string fileName, SBScene scene, string sourceSkelPath)
         {
-            var Skeleton = Scene.Skeleton;
+            var Skeleton = scene.Skeleton;
 
             var skelFile = new Skel();
 
@@ -57,20 +59,27 @@ namespace StudioSB.Scenes.Ultimate
             List<SkelMatrix> WorldTransforms = new List<SkelMatrix>();
             List<SkelMatrix> InvWorldTransforms = new List<SkelMatrix>();
 
-            short index = 0;
-            foreach (var bone in Skeleton.Bones)
+            // Attempt to match bone order to an existing SKEL if possible.
+            var sortedBones = Skeleton.Bones;
+            if (!string.IsNullOrEmpty(sourceSkelPath))
             {
-                var boneentry = new SkelBoneEntry
+                sortedBones = GetBoneOrderBasedOnReference(Skeleton.Bones, sourceSkelPath);
+            }
+
+            short index = 0;
+            foreach (var bone in sortedBones)
+            {
+                var boneEntry = new SkelBoneEntry
                 {
                     Name = bone.Name,
                     Type = bone.Type,
                     Id = index++
                 };
-                boneentry.Type = 1;
-                boneentry.ParentId = -1;
+                boneEntry.Type = 1;
+                boneEntry.ParentId = -1;
                 if (bone.Parent != null)
-                    boneentry.ParentId = (short)System.Array.IndexOf(Skeleton.Bones, bone.Parent);
-                BoneEntries.Add(boneentry);
+                    boneEntry.ParentId = (short)Array.IndexOf(sortedBones, bone.Parent);
+                BoneEntries.Add(boneEntry);
 
                 Transforms.Add(TKMatrixToSkel(bone.Transform));
                 InvTransforms.Add(TKMatrixToSkel(bone.Transform.Inverted()));
@@ -84,7 +93,38 @@ namespace StudioSB.Scenes.Ultimate
             skelFile.WorldTransform = WorldTransforms.ToArray();
             skelFile.InvWorldTransform = InvWorldTransforms.ToArray();
 
-            Ssbh.TrySaveSsbhFile(FileName, skelFile);
+            Ssbh.TrySaveSsbhFile(fileName, skelFile);
+        }
+
+        private static SBBone[] GetBoneOrderBasedOnReference(SBBone[] targetBones, string sourceSkelPath)
+        {
+            // TODO: This is quite inefficient.
+            if (Ssbh.TryParseSsbhFile(sourceSkelPath, out SsbhFile sourceSkelFile))
+            {
+                if (sourceSkelFile is Skel sourceSkel)
+                {
+                    // Match the existing bone order when possible.
+                    // Ignore any bones in the source SKEL not found in targetBones.
+                    var sortedResult = new List<SBBone>();
+                    foreach (var sourceBone in sourceSkel.BoneEntries)
+                    {
+                        var targetBone = targetBones.FirstOrDefault(b => b.Name == sourceBone.Name);
+                        if (targetBone != null)
+                            sortedResult.Add(targetBone);
+                    }
+
+                    // Bones not found in the source SKEL should be placed at the end.
+                    foreach (var targetBone in targetBones)
+                    {
+                        if (sourceSkel.BoneEntries.FirstOrDefault(b => b.Name == targetBone.Name) == null)
+                            sortedResult.Add(targetBone);
+                    }
+
+                    return sortedResult.ToArray();
+                }
+            }
+
+            return targetBones;
         }
 
         private static Matrix4 SkelToTKMatrix(SkelMatrix sm)
