@@ -307,7 +307,8 @@ namespace StudioSB.Scenes.Ultimate
 
                     Position0.Add(vectorToAttribute(vertex.Position0));
                     Normal0.Add(vectorToAttribute(vertex.Normal0));
-                    Tangent0.Add(vectorToAttribute(tangentVectors[VertexIndex]));
+                    // Flip tangent W.
+                    Tangent0.Add(vectorToAttribute(new Vector4(tangentVectors[VertexIndex].Xyz, tangentVectors[VertexIndex].W * -1f)));
                     Map1.Add(vectorToAttribute(vertex.Map1));
                     UvSet.Add(vectorToAttribute(vertex.UvSet));
                     UvSet1.Add(vectorToAttribute(vertex.UvSet1));
