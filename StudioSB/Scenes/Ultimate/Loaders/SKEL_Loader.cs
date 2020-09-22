@@ -24,7 +24,7 @@ namespace StudioSB.Scenes.Ultimate
                         SBBone bone = new SBBone();
                         bone.Name = b.Name;
                         bone.Type = b.Type;
-                        bone.Transform = Skel_to_TKMatrix(skel.Transform[b.Id]);
+                        bone.Transform = SkelToTKMatrix(skel.Transform[b.Id]);
                         idToBone.Add(b.Id, bone);
                         if (b.ParentId == -1)
                             Skeleton.AddRoot(bone);
@@ -58,26 +58,24 @@ namespace StudioSB.Scenes.Ultimate
             List<SkelMatrix> InvWorldTransforms = new List<SkelMatrix>();
 
             short index = 0;
-            Dictionary<SBBone, short> BoneToIndex = new Dictionary<SBBone, short>();
-            var OrderedBones = SortBones(Skeleton.Bones);
-
-            foreach (var bone in OrderedBones)
+            foreach (var bone in Skeleton.Bones)
             {
-                BoneToIndex.Add(bone, index);
-                var boneentry = new SkelBoneEntry();
-                boneentry.Name = bone.Name;
-                boneentry.Type = bone.Type;
-                boneentry.Id = index++;
+                var boneentry = new SkelBoneEntry
+                {
+                    Name = bone.Name,
+                    Type = bone.Type,
+                    Id = index++
+                };
                 boneentry.Type = 1;
                 boneentry.ParentId = -1;
-                if (bone.Parent != null)// && BoneToIndex.ContainsKey(bone.Parent))
-                    boneentry.ParentId = (short)OrderedBones.IndexOf(bone.Parent);
+                if (bone.Parent != null)
+                    boneentry.ParentId = (short)System.Array.IndexOf(Skeleton.Bones, bone.Parent);
                 BoneEntries.Add(boneentry);
 
-                Transforms.Add(TKMatrix_to_Skel(bone.Transform));
-                InvTransforms.Add(TKMatrix_to_Skel(bone.Transform.Inverted()));
-                WorldTransforms.Add(TKMatrix_to_Skel(bone.WorldTransform));
-                InvWorldTransforms.Add(TKMatrix_to_Skel(bone.InvWorldTransform));
+                Transforms.Add(TKMatrixToSkel(bone.Transform));
+                InvTransforms.Add(TKMatrixToSkel(bone.Transform.Inverted()));
+                WorldTransforms.Add(TKMatrixToSkel(bone.WorldTransform));
+                InvWorldTransforms.Add(TKMatrixToSkel(bone.InvWorldTransform));
             }
 
             skelFile.BoneEntries = BoneEntries.ToArray();
@@ -89,82 +87,7 @@ namespace StudioSB.Scenes.Ultimate
             Ssbh.TrySaveSsbhFile(FileName, skelFile);
         }
 
-        private static string[] FighterBoneSet = {
-            "Trans",
-            "Rot",
-            "Hip",
-            "Waist",
-            "Bust",
-            "Neck",
-            "Head",
-            "ClavicleC",
-            "ClavicleL",
-            "ShoulderL",
-            "ArmL",
-            "HandL",
-            "HaveL",
-            "ClavicleR",
-            "ShoulderR",
-            "ArmR",
-            "HandR",
-            "HaveR",
-            "LegC",
-            "LegL",
-            "KneeL",
-            "FootL",
-            "ToeL",
-            "LegR",
-            "KneeR",
-            "FootR",
-            "ToeR",
-            "Throw",
-        };
-
-        private static List<SBBone> SortBones(IEnumerable<SBBone> boneList)
-        {
-            var basic = new List<SBBone>();
-            var swing = new List<SBBone>();
-            var extra = new List<SBBone>();
-            var helper = new List<SBBone>();
-
-            // first collect basic strings
-            var copy = new List<SBBone>(boneList);
-
-            foreach(var s in FighterBoneSet)
-            {
-                foreach(var b in copy)
-                {
-                    if(b.Name.Equals(s))
-                    {
-                        basic.Add(b);
-                        break;
-                    }
-                }
-            }
-            foreach(var b in basic)
-                copy.Remove(b);
-
-            // every other bone
-            foreach(SBBone b in copy)
-            {
-                if (b.Name.StartsWith("S_"))
-                    swing.Add(b);
-                else if (b.Name.StartsWith("H_"))
-                    helper.Add(b);
-                else
-                    extra.Add(b);
-            }
-
-            var finalList = new List<SBBone>();
-            finalList.AddRange(basic);
-            finalList.AddRange(swing);
-            finalList.AddRange(extra);
-            finalList.AddRange(helper);
-
-            return finalList;
-        }
-
-        private static Matrix4 Skel_to_TKMatrix(SkelMatrix sm)
+        private static Matrix4 SkelToTKMatrix(SkelMatrix sm)
         {
             return new Matrix4(sm.M11, sm.M12, sm.M13, sm.M14,
                 sm.M21, sm.M22, sm.M23, sm.M24,
@@ -172,7 +95,7 @@ namespace StudioSB.Scenes.Ultimate
                 sm.M41, sm.M42, sm.M43, sm.M44);
         }
 
-        private static SkelMatrix TKMatrix_to_Skel(Matrix4 sm)
+        private static SkelMatrix TKMatrixToSkel(Matrix4 sm)
         {
             var skelmat = new SkelMatrix();
             skelmat.M11 = sm.M11;
