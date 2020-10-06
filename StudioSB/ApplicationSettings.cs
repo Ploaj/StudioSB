@@ -85,19 +85,19 @@ namespace StudioSB
         public static Color ForegroundColor { get; internal set; } = Color.Ivory;
 
         [SettingsGroup(SettingsGroupType.Application)]
-        public static Color MiddleColor { get; internal set; } = Color.FromArgb(0xFF, 0x5C, 0x70, 0x70);
+        public static Color MiddleColor { get; internal set; } = Color.FromArgb(0xFF, 0x23, 0x23, 0x23);
 
         [SettingsGroup(SettingsGroupType.Application)]
-        public static Color BackgroundColor { get; internal set; } = Color.FromArgb(0xFF, 0x3C, 0x50, 0x50);
-        
-        [SettingsGroup(SettingsGroupType.Application)]
-        public static Color PoppedInColor { get; internal set; } = Color.FromArgb(0xFF, 0x20, 0x30, 0x30);
+        public static Color BackgroundColor { get; internal set; } = Color.FromArgb(0xFF, 0x23, 0x23, 0x23);
 
         [SettingsGroup(SettingsGroupType.Application)]
-        public static Color PoppedOutColor { get; internal set; } = Color.FromArgb(0xFF, 0x50, 0x60, 0x60);
+        public static Color PoppedInColor { get; internal set; } = Color.FromArgb(0xFF, 0x23, 0x23, 0x23);
 
         [SettingsGroup(SettingsGroupType.Application)]
-        public static Color ButtonColor { get; internal set; } = Color.FromArgb(0xFF, 0x50, 0x60, 0x60);
+        public static Color PoppedOutColor { get; internal set; } = Color.FromArgb(0xFF, 0x23, 0x23, 0x23);
+
+        [SettingsGroup(SettingsGroupType.Application)]
+        public static Color ButtonColor { get; internal set; } = Color.FromArgb(0xFF, 0x66, 0x66, 0x66);
 
         [SettingsGroup(SettingsGroupType.Application)]
         public static Color ErrorColor { get; internal set; } = Color.DarkRed;
@@ -126,12 +126,12 @@ namespace StudioSB
 
         [SettingsGroup(SettingsGroupType.Viewport, "The size of the grid", "Grid Spacing")]
         public static int GridSize { get; set; } = 5;
-        
+
         [SettingsGroup(SettingsGroupType.Viewport, "Top Background Color in Viewport", "Back Gradient")]
-        public static Color BGColor1 { get; set; } = Color.DarkSlateGray;
+        public static Color BGColor1 { get; set; } = Color.FromArgb(0xFF, 0x3C, 0x3C, 0x3C);
 
         [SettingsGroup(SettingsGroupType.Viewport, "Bottom Background Color in Viewport", "Back Gradient")]
-        public static Color BGColor2 { get; set; } = Color.DarkGray;
+        public static Color BGColor2 { get; set; } = Color.FromArgb(0xFF, 0x3C, 0x3C, 0x3C);
 
         [SettingsGroup(SettingsGroupType.Viewport, "Color of the viewport grid's lines", "Grid Color")]
         public static Color GridLineColor { get; set; } = Color.Ivory;
