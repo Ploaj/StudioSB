@@ -10,6 +10,31 @@ This application is a work-in-progress, so expect incomplete features and bugs.
 
 [Request a Feature / Report bug](https://github.com/Ploaj/StudioSB/issues)
 
+# Application Theme
+The old dark teal theme can be set by changing the following values in `ApplicationSettings.cfg` in a text editor.
+```javascript
+ForegroundColor=#FFFFFFF0
+MiddleColor=#FF5C7070
+BackgroundColor=#FF3C5050
+PoppedInColor=#FF203030
+PoppedOutColor=#FF506060
+ButtonColor=#FF506060
+BGColor1=#FF2F4F4F
+BGColor2=#FFA9A9A9
+```
+
+The current dark theme values.
+```javascript
+ForegroundColor=#FFFFFFF0
+MiddleColor=#FF232323
+BackgroundColor=#FF232323
+PoppedInColor=#FF232323
+PoppedOutColor=#FF232323
+ButtonColor=#FF666666
+BGColor1=#FF3C3C3C
+BGColor2=#FF3C3C3C
+```
+
 ## Building (Windows)
 * Compile in Visual Studio 2017 on Windows
 * Requires .NET Framework 4.7.2
