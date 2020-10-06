@@ -11,6 +11,8 @@ This application is a work-in-progress, so expect incomplete features and bugs.
 [Request a Feature / Report bug](https://github.com/Ploaj/StudioSB/issues)
 
 # Application Theme
+## Dark Teal (Original)
+<a href="url"><img src="https://github.com/Ploaj/StudioSB/blob/master/dark_teal.png" align="top" height="auto" width="auto" ></a>  
 The old dark teal theme can be set by changing the following values in `ApplicationSettings.cfg` in a text editor.
 ```javascript
 ForegroundColor=#FFFFFFF0
@@ -23,7 +25,9 @@ BGColor1=#FF2F4F4F
 BGColor2=#FFA9A9A9
 ```
 
-The current dark theme values.
+## Dark
+<a href="url"><img src="https://github.com/Ploaj/StudioSB/blob/master/dark.png" align="top" height="auto" width="auto" ></a>  
+The current dark theme values that are set by default. Deleting the existing `ApplicationSettings.cfg` will use these values.
 ```javascript
 ForegroundColor=#FFFFFFF0
 MiddleColor=#FF232323
