@@ -123,7 +123,7 @@ namespace StudioSB.Scenes
                     }
                     else
                     {
-                        var format = new TextureFormatUncompressed((PixelInternalFormat)PixelFormat, PixelFormat, PixelType);
+                        var format = new TextureFormatUncompressed((PixelInternalFormat)InternalFormat, PixelFormat, PixelType);
                         
                         cube.LoadImageData(Width, format,
                             Arrays[0].Mipmaps[0], Arrays[1].Mipmaps[0], Arrays[2].Mipmaps[0],
@@ -158,7 +158,7 @@ namespace StudioSB.Scenes
                     else
                     {
                         // TODO: Uncompressed mipmaps
-                        var format = new TextureFormatUncompressed(PixelInternalFormat.Rgba, PixelFormat, PixelType);
+                        var format = new TextureFormatUncompressed((PixelInternalFormat)InternalFormat, PixelFormat, PixelType);
                         sfTex.LoadImageData(Width, Height, Arrays[0].Mipmaps, format);
                     }
                     renderTexture = sfTex;

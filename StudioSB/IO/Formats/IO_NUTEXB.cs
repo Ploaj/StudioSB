@@ -165,7 +165,7 @@ namespace StudioSB.IO.Formats
                 case NUTEX_FORMAT.R32G32B32A32_FLOAT:
                     return PixelType.Float;
                 default:
-                    return PixelType.Byte;
+                    return PixelType.UnsignedByte;
             }
         }
         /// <summary>
