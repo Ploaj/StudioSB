@@ -109,10 +109,14 @@ namespace StudioSB.Scenes.Ultimate
 
         #region Textures
 
+        // gross
+        // TODO: rework texture loading system
+        public Dictionary<string, MatlAttribute.MatlSampler> TextureToSampler = new Dictionary<string, MatlAttribute.MatlSampler>();
+
         [DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> Texture0 { get; } = new SBMatAttrib<string>("colMap", "", description: "Color Map");
         public bool hasColMap { get => Texture0.Used; }
-        
+
         [DefaultTextureName("defaultWhite")]
         public SBMatAttrib<string> Texture1 { get; } = new SBMatAttrib<string>("col2Map", "", description: "Color Map 2");
         public bool hasCol2Map { get => Texture1.Used; }
@@ -246,12 +250,17 @@ namespace StudioSB.Scenes.Ultimate
                 if (p.PropertyType == typeof(SBMatAttrib<string>))
                 {
                     var texName = ((SBMatAttrib<string>)MatAttribs[p.Name]).Name;
+
                     if (shader.GetUniformLocation(texName) == -1)
                         continue;
+
                     var value = ((SBMatAttrib<string>)MatAttribs[p.Name]).AnimatedValue.ToLower();
+
                     SBSurface surface = ssbhScene.GetSurfaceFromName(value);
+
                     var surfaceInfo = nameToDefaultTexture[p.Name];
-                    BindSurface(shader, ssbhScene, surface, surfaceInfo, texName, TextureUnit++);
+
+                    BindSurface(shader, ssbhScene, surface, surfaceInfo, texName, p.Name, TextureUnit++);
                 }
                 if (shader.GetUniformLocation(p.Name) != -1 || shader.GetAttribLocation(p.Name) != -1)
                 {
@@ -355,12 +364,47 @@ namespace StudioSB.Scenes.Ultimate
         /// <param name="surfaceInfo"></param>
         /// <param name="attributeName"></param>
         /// <param name="TextureUnit"></param>
-        private void BindSurface(Shader shader, SBSceneSSBH ssbhScene, SBSurface surface, DefaultTextureName surfaceInfo, string attributeName, int TextureUnit)
+        private void BindSurface(Shader shader, SBSceneSSBH ssbhScene, SBSurface surface, DefaultTextureName surfaceInfo, string attributeName, string paramName, int textureUnit)
         {
+            GL.ActiveTexture(TextureUnit.Texture0 + textureUnit);
+            
             if (surface != null)
-                shader.SetTexture(attributeName, surface.GetRenderTexture(), TextureUnit);
+            {
+                if (TextureToSampler.ContainsKey(paramName))
+                {
+                    var sampler = TextureToSampler[paramName];
+
+                    surface.MagFilter = GetMagFilter(sampler.MagFilter);
+                    surface.MinFilter = GetMinFilter(sampler.MinFilter);
+                }
+
+                surface.GetRenderTexture().Bind();
+            }
             else
-                shader.SetTexture(attributeName, DefaultTextures.Instance.GetTextureByName(surfaceInfo.DefaultTexture), TextureUnit);
+                DefaultTextures.Instance.GetTextureByName(surfaceInfo.DefaultTexture).Bind();
+
+            GL.Uniform1(shader.GetUniformLocation(attributeName), textureUnit);
+
+        }
+
+        private TextureMinFilter GetMinFilter(int value)
+        {
+            switch(value)
+            {
+                case 0: return TextureMinFilter.Nearest;
+                default:
+                    return TextureMinFilter.Linear;
+            }
+        }
+
+        private TextureMagFilter GetMagFilter(int value)
+        {
+            switch (value)
+            {
+                case 0: return TextureMagFilter.Nearest;
+                default:
+                    return TextureMagFilter.Linear;
+            }
         }
 
         /// <summary>

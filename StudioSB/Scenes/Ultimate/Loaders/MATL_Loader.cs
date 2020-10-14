@@ -66,7 +66,28 @@ namespace StudioSB.Scenes.Ultimate
                                 case MatlEnums.ParamId.BlendState0:
                                     material.BlendState = (MatlAttribute.MatlBlendState)attr.DataObject;
                                     break;
-                                default:
+                                    case MatlEnums.ParamId.Sampler0:
+                                    case MatlEnums.ParamId.Sampler1:
+                                    case MatlEnums.ParamId.Sampler2:
+                                    case MatlEnums.ParamId.Sampler3:
+                                    case MatlEnums.ParamId.Sampler4:
+                                    case MatlEnums.ParamId.Sampler5:
+                                    case MatlEnums.ParamId.Sampler6:
+                                    case MatlEnums.ParamId.Sampler7:
+                                    case MatlEnums.ParamId.Sampler8:
+                                    case MatlEnums.ParamId.Sampler9:
+                                    case MatlEnums.ParamId.Sampler10:
+                                    case MatlEnums.ParamId.Sampler11:
+                                    case MatlEnums.ParamId.Sampler12:
+                                    case MatlEnums.ParamId.Sampler13:
+                                    case MatlEnums.ParamId.Sampler14:
+                                    case MatlEnums.ParamId.Sampler15:
+                                    case MatlEnums.ParamId.Sampler16:
+                                    case MatlEnums.ParamId.Sampler17:
+                                        // TODO: rework texture loading system
+                                        material.TextureToSampler.Add(attr.ParamId.ToString().Replace("Sampler", "Texture"), (MatlAttribute.MatlSampler)attr.DataObject);
+                                        break;
+                                    default:
                                     //SBConsole.WriteLine("Extra Param: " + attr.ParamID.ToString() + " = " + attr.DataObject.ToString());
                                     material.extraParams.Add(attr.ParamId, attr.DataObject);
                                     break;

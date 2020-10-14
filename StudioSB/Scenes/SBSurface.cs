@@ -40,6 +40,41 @@ namespace StudioSB.Scenes
         [ReadOnly(true), Category("Format")]
         public InternalFormat InternalFormat { get; set; }
 
+        [Category("Format"), Browsable(false)]
+        public TextureMinFilter MinFilter
+        {
+            get
+            {
+                if (renderTexture == null)
+                    return TextureMinFilter.Nearest;
+
+                return renderTexture.MinFilter;
+            }
+            set
+            {
+                if (renderTexture != null)
+                    renderTexture.MinFilter = value;
+            }
+        }
+
+        [Category("Format"), Browsable(false)]
+        public TextureMagFilter MagFilter
+        {
+            get
+            {
+                if (renderTexture == null)
+                    return TextureMagFilter.Nearest;
+
+                return renderTexture.MagFilter;
+            }
+            set
+            {
+                if (renderTexture != null)
+                    renderTexture.MagFilter = value;
+            }
+        } 
+
+
         [ReadOnly(true), Category("Format")]
         public int ArrayCount { get; set; } = 1;
 
@@ -112,8 +147,8 @@ namespace StudioSB.Scenes
                 {
                     var cube = new TextureCubeMap()
                     {
-                        MinFilter = TextureMinFilter.Linear,
-                        MagFilter = TextureMagFilter.Linear
+                        MinFilter = MinFilter,
+                        MagFilter = MagFilter
                     };
                     if (TextureFormatTools.IsCompressed(InternalFormat))
                     {
@@ -138,6 +173,8 @@ namespace StudioSB.Scenes
                         // Set defaults until all the sampler parameters are added.
                         TextureWrapS = TextureWrapMode.Repeat,
                         TextureWrapT = TextureWrapMode.Repeat,
+                        MinFilter = MinFilter,
+                        MagFilter = MagFilter
                     };
 
                     if (TextureFormatTools.IsCompressed(InternalFormat))
