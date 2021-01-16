@@ -179,7 +179,10 @@ namespace StudioSB.IO.Formats
 
         public void ExportSBAnimation(string FileName, SBAnimation animation, SBSkeleton skeleton)
         {
-            SsbhAnimTrackEncoder encoder = new SsbhAnimTrackEncoder(animation.FrameCount);
+            // The final frame index is one less than the number of frames.
+            // Empty animations have a final frame index of 1, so clamp to 1.
+            int finalFrameIndex = Math.Max((int)animation.FrameCount - 1, 1);
+            SsbhAnimTrackEncoder encoder = new SsbhAnimTrackEncoder(finalFrameIndex);
 
             encoder.CompressVector4 = ExportSettings.CompressVector4;
             encoder.SetCompressionLevel(ExportSettings.CompressionLevel);
