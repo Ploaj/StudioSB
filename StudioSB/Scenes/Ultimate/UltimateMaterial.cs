@@ -172,7 +172,7 @@ namespace StudioSB.Scenes.Ultimate
         public SBMatAttrib<string> Texture16 { get; } = new SBMatAttrib<string>("inkNorMap", "", description: "Ink Normal Map");
         public bool hasInkNorMap { get => Texture16.Used; }
 
-        public bool HasBlending { get { return (BlendState.BlendFactor1 != 0 || BlendState.BlendFactor2 != 0); } }
+        public bool HasBlending { get { return (BlendState.SourceColor != 0 || BlendState.DestinationColor != 0); } }
 
         public bool emissionOverride
         {
@@ -290,7 +290,7 @@ namespace StudioSB.Scenes.Ultimate
         /// </summary>
         private void BindBlendState()
         {
-            if (BlendState.Unk7 == 1 || BlendState.Unk8 == 1)
+            if (BlendState.EnableAlphaSampleToCoverage == 1)
                 GL.Enable(EnableCap.SampleAlphaToCoverage);
             else
                 GL.Disable(EnableCap.SampleAlphaToCoverage);
@@ -298,17 +298,17 @@ namespace StudioSB.Scenes.Ultimate
             BlendingFactor src = BlendingFactor.One;
             BlendingFactor dst = BlendingFactor.OneMinusSrcAlpha;
 
-            if (BlendState.BlendFactor1 == 1)
+            if (BlendState.SourceColor == MatlBlendFactor.One)
                 src = BlendingFactor.One;
-            else if (BlendState.BlendFactor1 == 6)
+            else if (BlendState.SourceColor == MatlBlendFactor.SourceAlpha)
                 src = BlendingFactor.SrcAlpha;
 
-            if (BlendState.BlendFactor2 == 1)
+            if (BlendState.DestinationColor == MatlBlendFactor.One)
                 dst = BlendingFactor.One;
-            else if (BlendState.BlendFactor2 == 6)
+            else if (BlendState.DestinationColor == MatlBlendFactor.OneMinusSourceAlpha)
                 dst = BlendingFactor.OneMinusSrcAlpha;
 
-            if (BlendState.BlendFactor1 != 0 || BlendState.BlendFactor2 != 0)
+            if (BlendState.SourceColor != 0 || BlendState.DestinationColor != 0)
             {
                 GL.Enable(EnableCap.Blend);
                 GL.BlendFunc(src, dst);
@@ -330,20 +330,20 @@ namespace StudioSB.Scenes.Ultimate
             {
                 switch (RasterizerState.FillMode)
                 {
-                    case 0:
+                    case MatlFillMode.Line:
                         pm = PolygonMode.Line;
                         break;
-                    case 1:
+                    case MatlFillMode.Solid:
                         pm = PolygonMode.Fill;
                         break;
                 }
                 switch (RasterizerState.CullMode)
                 {
-                    case 1:
+                    case MatlCullMode.Front:
                         mf = MaterialFace.Front;
                         cullMode = CullFaceMode.Front;
                         break;
-                    case 2:
+                    case MatlCullMode.None:
                         GL.Disable(EnableCap.CullFace);
                         mf = MaterialFace.FrontAndBack;
                         cullMode = CullFaceMode.FrontAndBack;
@@ -374,8 +374,8 @@ namespace StudioSB.Scenes.Ultimate
                 {
                     var sampler = TextureToSampler[paramName];
 
-                    surface.MagFilter = GetMagFilter(sampler.MagFilter);
-                    surface.MinFilter = GetMinFilter(sampler.MinFilter);
+                    surface.MagFilter = GetMagFilter((int)sampler.MagFilter);
+                    surface.MinFilter = GetMinFilter((int)sampler.MinFilter);
                 }
 
                 surface.GetRenderTexture().Bind();

@@ -6,6 +6,7 @@ using OpenTK;
 using SSBHLib.Tools;
 using StudioSB.Rendering.Bounding;
 using StudioSB.Scenes.Ultimate.Loaders;
+using StudioSB.Tools;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -30,7 +31,7 @@ namespace StudioSB.Scenes.Ultimate
 
                     SBUltimateModel model = new SBUltimateModel();
                     model.Name = mesh.ModelName;
-                    model.BoundingSphere = new Vector4(mesh.BoundingSphereX, mesh.BoundingSphereY, mesh.BoundingSphereZ, mesh.BoundingSphereRadius);
+                    model.BoundingSphere = new Vector4(mesh.BoundingSphereCenter.X, mesh.BoundingSphereCenter.Y, mesh.BoundingSphereCenter.Z, mesh.BoundingSphereRadius);
                     
                     ((SBSceneSSBH)Scene).Model = model;
 
@@ -44,14 +45,13 @@ namespace StudioSB.Scenes.Ultimate
                             sbMesh.Name = meshObject.Name;
                             sbMesh.ParentBone = meshObject.ParentBoneName;
                             
-                            sbMesh.BoundingSphere = new BoundingSphere(meshObject.BoundingSphereX, meshObject.BoundingSphereY, meshObject.BoundingSphereZ, meshObject.BoundingSphereRadius);
-                            sbMesh.AABoundingBox = new AABoundingBox(new Vector3(meshObject.MinBoundingBoxX, meshObject.MinBoundingBoxY, meshObject.MinBoundingBoxZ),
-                                 new Vector3(meshObject.MaxBoundingBoxX, meshObject.MaxBoundingBoxY, meshObject.MaxBoundingBoxZ));
-                            sbMesh.OrientedBoundingBox = new OrientedBoundingBox(new Vector3(meshObject.ObbCenterX, meshObject.ObbCenterY, meshObject.ObbCenterZ),
-                                new Vector3(meshObject.ObbSizeX, meshObject.ObbSizeY, meshObject.ObbSizeZ),
-                                new Matrix3(meshObject.M11, meshObject.M12, meshObject.M13,
-                                meshObject.M21, meshObject.M22, meshObject.M23,
-                                meshObject.M31, meshObject.M32, meshObject.M33));
+                            sbMesh.BoundingSphere = new BoundingSphere(meshObject.BoundingSphereCenter.X, meshObject.BoundingSphereCenter.Y, meshObject.BoundingSphereCenter.Z, meshObject.BoundingSphereRadius);
+                            sbMesh.AABoundingBox = new AABoundingBox(new Vector3(meshObject.BoundingBoxMin.X, meshObject.BoundingBoxMin.Y, meshObject.BoundingBoxMin.Z),
+                                 new Vector3(meshObject.BoundingBoxMax.X, meshObject.BoundingBoxMax.Y, meshObject.BoundingBoxMax.Z));
+                            sbMesh.OrientedBoundingBox = new OrientedBoundingBox(
+                                meshObject.OrientedBoundingBoxCenter.ToOpenTK(),
+                                meshObject.OrientedBoundingBoxSize.ToOpenTK(),
+                                meshObject.OrientedBoundingBoxTransform.ToOpenTK());
                             
                             sbMesh.Indices = new List<uint>(accessor.ReadIndices(0, meshObject.IndexCount, meshObject));
                             sbMesh.Vertices = CreateVertices(mesh, Scene.Skeleton, meshObject, accessor, sbMesh.Indices.ToArray());
@@ -92,7 +92,7 @@ namespace StudioSB.Scenes.Ultimate
             SFGraphics.Utils.TriangleListUtils.CalculateTangentsBitangents(positionVectors, normalVectors, map1Vectors, (int[])(object)vertexIndices, out Vector3[] tangentVectors, out Vector3[] bitangentVectors);
 
             var riggingAccessor = new SsbhRiggingAccessor(mesh);
-            var influences = riggingAccessor.ReadRiggingBuffer(meshObject.Name, (int)meshObject.SubMeshIndex);
+            var influences = riggingAccessor.ReadRiggingBuffer(meshObject.Name, (int)meshObject.SubIndex);
             var indexByBoneName = new Dictionary<string, int>();
 
             if (Skeleton != null)
@@ -403,34 +403,16 @@ namespace StudioSB.Scenes.Ultimate
             model.BoundingSphere = new BoundingSphere(allVertices).XyzRadius;
             model.AABoundingBox = new AABoundingBox(allVertices);
             model.OrientedBoundingBox = new OrientedBoundingBox(allVertices);
-            
-            meshFile.BoundingSphereX = model.BoundingSphere.X;
-            meshFile.BoundingSphereY = model.BoundingSphere.Y;
-            meshFile.BoundingSphereZ = model.BoundingSphere.Z;
+
+            meshFile.BoundingSphereCenter = model.BoundingSphere.Xyz.ToSsbh();
             meshFile.BoundingSphereRadius = model.BoundingSphere.W;
 
-            meshFile.MaxBoundingBoxX = model.AABoundingBox.Max.X;
-            meshFile.MaxBoundingBoxY = model.AABoundingBox.Max.Y;
-            meshFile.MaxBoundingBoxZ = model.AABoundingBox.Max.Z;
+            meshFile.BoundingBoxMax = model.AABoundingBox.Max.ToSsbh();
+            meshFile.BoundingBoxMin = model.AABoundingBox.Min.ToSsbh();
 
-            meshFile.MinBoundingBoxX = model.AABoundingBox.Min.X;
-            meshFile.MinBoundingBoxY = model.AABoundingBox.Min.Y;
-            meshFile.MinBoundingBoxZ = model.AABoundingBox.Min.Z;
-
-            meshFile.ObbCenterX = model.OrientedBoundingBox.Position.X;
-            meshFile.ObbCenterY = model.OrientedBoundingBox.Position.Y;
-            meshFile.ObbCenterZ = model.OrientedBoundingBox.Position.Z;
-
-            meshFile.ObbSizeX = model.OrientedBoundingBox.Size.X;
-            meshFile.ObbSizeY = model.OrientedBoundingBox.Size.Y;
-            meshFile.ObbSizeZ = model.OrientedBoundingBox.Size.Z;
-
-            {
-                var tr = model.OrientedBoundingBox.Transform;
-                meshFile.M11 = tr.M11; meshFile.M12 = tr.M12; meshFile.M13 = tr.M13;
-                meshFile.M21 = tr.M21; meshFile.M22 = tr.M22; meshFile.M23 = tr.M23;
-                meshFile.M31 = tr.M31; meshFile.M32 = tr.M32; meshFile.M33 = tr.M33;
-            }
+            meshFile.OrientedBoundingBoxCenter = new SSBHLib.Formats.Vector3(model.OrientedBoundingBox.Position.X, model.OrientedBoundingBox.Position.Y, model.OrientedBoundingBox.Position.Z);
+            meshFile.OrientedBoundingBoxSize = new SSBHLib.Formats.Vector3(model.OrientedBoundingBox.Size.X, model.OrientedBoundingBox.Size.Y, model.OrientedBoundingBox.Size.Z);
+            meshFile.OrientedBoundingBoxTransform = model.OrientedBoundingBox.Transform.ToSsbh();
 
             meshEX = new MESHEX_Loader();
             meshEX.AllBoundingSphere = new BoundingSphere(allVertices);

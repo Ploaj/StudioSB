@@ -5,6 +5,7 @@ using OpenTK;
 using SELib;
 using SSBHLib;
 using SSBHLib.Formats;
+using StudioSB.Tools;
 
 namespace StudioSB.Scenes.Ultimate
 {
@@ -26,7 +27,7 @@ namespace StudioSB.Scenes.Ultimate
                         SBBone bone = new SBBone();
                         bone.Name = b.Name;
                         bone.Type = b.Type;
-                        bone.Transform = SkelToTKMatrix(skel.Transform[b.Id]);
+                        bone.Transform = skel.Transform[b.Id].ToOpenTK();
                         idToBone.Add(b.Id, bone);
                         if (b.ParentId == -1)
                             Skeleton.AddRoot(bone);
@@ -54,10 +55,10 @@ namespace StudioSB.Scenes.Ultimate
             skelFile.MinorVersion = 0;
 
             List<SkelBoneEntry> BoneEntries = new List<SkelBoneEntry>();
-            List<SkelMatrix> Transforms = new List<SkelMatrix>();
-            List<SkelMatrix> InvTransforms = new List<SkelMatrix>();
-            List<SkelMatrix> WorldTransforms = new List<SkelMatrix>();
-            List<SkelMatrix> InvWorldTransforms = new List<SkelMatrix>();
+            List<Matrix4x4> Transforms = new List<Matrix4x4>();
+            List<Matrix4x4> InvTransforms = new List<Matrix4x4>();
+            List<Matrix4x4> WorldTransforms = new List<Matrix4x4>();
+            List<Matrix4x4> InvWorldTransforms = new List<Matrix4x4>();
 
             // Attempt to match bone order to an existing SKEL if possible.
             var sortedBones = Skeleton.Bones;
@@ -81,10 +82,10 @@ namespace StudioSB.Scenes.Ultimate
                     boneEntry.ParentId = (short)Array.IndexOf(sortedBones, bone.Parent);
                 BoneEntries.Add(boneEntry);
 
-                Transforms.Add(TKMatrixToSkel(bone.Transform));
-                InvTransforms.Add(TKMatrixToSkel(bone.Transform.Inverted()));
-                WorldTransforms.Add(TKMatrixToSkel(bone.WorldTransform));
-                InvWorldTransforms.Add(TKMatrixToSkel(bone.InvWorldTransform));
+                Transforms.Add(bone.Transform.ToSsbh());
+                InvTransforms.Add(bone.Transform.Inverted().ToSsbh());
+                WorldTransforms.Add(bone.WorldTransform.ToSsbh());
+                InvWorldTransforms.Add(bone.InvWorldTransform.ToSsbh());
             }
 
             skelFile.BoneEntries = BoneEntries.ToArray();
@@ -125,36 +126,6 @@ namespace StudioSB.Scenes.Ultimate
             }
 
             return targetBones;
-        }
-
-        private static Matrix4 SkelToTKMatrix(SkelMatrix sm)
-        {
-            return new Matrix4(sm.M11, sm.M12, sm.M13, sm.M14,
-                sm.M21, sm.M22, sm.M23, sm.M24,
-                sm.M31, sm.M32, sm.M33, sm.M34,
-                sm.M41, sm.M42, sm.M43, sm.M44);
-        }
-
-        private static SkelMatrix TKMatrixToSkel(Matrix4 sm)
-        {
-            var skelmat = new SkelMatrix();
-            skelmat.M11 = sm.M11;
-            skelmat.M12 = sm.M12;
-            skelmat.M13 = sm.M13;
-            skelmat.M14 = sm.M14;
-            skelmat.M21 = sm.M21;
-            skelmat.M22 = sm.M22;
-            skelmat.M23 = sm.M23;
-            skelmat.M24 = sm.M24;
-            skelmat.M31 = sm.M31;
-            skelmat.M32 = sm.M32;
-            skelmat.M33 = sm.M33;
-            skelmat.M34 = sm.M34;
-            skelmat.M41 = sm.M41;
-            skelmat.M42 = sm.M42;
-            skelmat.M43 = sm.M43;
-            skelmat.M44 = sm.M44;
-            return skelmat;
         }
     }
 }

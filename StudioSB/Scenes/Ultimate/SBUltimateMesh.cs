@@ -86,7 +86,7 @@ namespace StudioSB.Scenes.Ultimate
             {
                 foreach (var atstring in attr.AttributeStrings)
                 {
-                    UltimateVertexAttribute at = UltimateVertexAttribute.GetAttributeFromName(atstring.Name);
+                    UltimateVertexAttribute at = UltimateVertexAttribute.GetAttributeFromName(atstring.Text);
                     EnableAttribute(at);
                 }
             }

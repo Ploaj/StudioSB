@@ -225,7 +225,7 @@ namespace StudioSB.Scenes.Ultimate
                 modl.ModelFileName = simpleName;
                 modl.SkeletonFileName = $"{simpleName}.nusktb";
                 modl.MeshString = $"{simpleName}.numshb";
-                modl.UnknownFileName = null;
+                modl.Unk1 = 0;
                 modl.MaterialFileNames = new ModlMaterialName[] { new ModlMaterialName() { MaterialFileName = $"{simpleName}.numatb" } };
                 SBConsole.WriteLine("Done");
                 Ssbh.TrySaveSsbhFile(FileName, modl);
@@ -372,8 +372,8 @@ namespace StudioSB.Scenes.Ultimate
                         var parentBone = Skeleton[mesh.ParentBone];
                         if (parentBone != null)
                         {
-                            var tpos = Vector3.TransformPosition(vertex.Position0, parentBone.WorldTransform);
-                            var tn = Vector3.TransformNormal(vertex.Normal0, parentBone.WorldTransform);
+                            var tpos = OpenTK.Vector3.TransformPosition(vertex.Position0, parentBone.WorldTransform);
+                            var tn = OpenTK.Vector3.TransformNormal(vertex.Normal0, parentBone.WorldTransform);
 
                             iovertex.Position = new System.Numerics.Vector3(tpos.X, tpos.Y, tpos.Z);
                             iovertex.Normal = new System.Numerics.Vector3(tn.X, tn.Y, tn.Z);
@@ -486,12 +486,12 @@ namespace StudioSB.Scenes.Ultimate
             /// <param name="iov"></param>
             /// <param name="channel"></param>
             /// <returns></returns>
-            public static Vector4 RemapColor(IOVertex iov, int channel)
+            public static OpenTK.Vector4 RemapColor(IOVertex iov, int channel)
             {
                 if (channel != -1 && channel < iov.Colors.Count)
                     return NumVecToTk(iov.Colors[channel]);
                 else
-                    return Vector4.One;
+                    return OpenTK.Vector4.One;
             }
         }
 
@@ -665,9 +665,9 @@ namespace StudioSB.Scenes.Ultimate
         /// </summary>
         /// <param name="vec"></param>
         /// <returns></returns>
-        private static Vector3 NumVecToTk(System.Numerics.Vector3 vec)
+        private static OpenTK.Vector3 NumVecToTk(System.Numerics.Vector3 vec)
         {
-            return new Vector3(vec.X, vec.Y, vec.Z);
+            return new OpenTK.Vector3(vec.X, vec.Y, vec.Z);
         }
 
         /// <summary>
@@ -675,9 +675,9 @@ namespace StudioSB.Scenes.Ultimate
         /// </summary>
         /// <param name="vec"></param>
         /// <returns></returns>
-        private static Vector4 NumVecToTk(System.Numerics.Vector4 vec)
+        private static OpenTK.Vector4 NumVecToTk(System.Numerics.Vector4 vec)
         {
-            return new Vector4(vec.X, vec.Y, vec.Z, vec.W);
+            return new OpenTK.Vector4(vec.X, vec.Y, vec.Z, vec.W);
         }
 
         /// <summary>
@@ -710,7 +710,7 @@ namespace StudioSB.Scenes.Ultimate
 
             // convert weights
             var boneIndices = new IVec4();
-            var boneWeights = Vector4.Zero;
+            var boneWeights = OpenTK.Vector4.Zero;
             if (!singleBound)
                 for (int i = 0; i < iov.Envelope.Weights.Count; i++)
                 {
@@ -722,10 +722,10 @@ namespace StudioSB.Scenes.Ultimate
 
             // create and return vertex
             return new UltimateVertex(
-                 singleBound ? Vector3.TransformPosition(NumVecToTk(iov.Position), parentBoneInverse) : NumVecToTk(iov.Position),
-                 singleBound ? Vector3.TransformNormal(NumVecToTk(iov.Normal), parentBoneInverse) : NumVecToTk(iov.Normal),
-                 singleBound ? Vector3.TransformNormal(NumVecToTk(iov.Tangent), parentBoneInverse) : NumVecToTk(iov.Tangent),
-                 singleBound ? Vector3.TransformNormal(NumVecToTk(iov.Binormal), parentBoneInverse) : NumVecToTk(iov.Binormal),
+                 singleBound ? OpenTK.Vector3.TransformPosition(NumVecToTk(iov.Position), parentBoneInverse) : NumVecToTk(iov.Position),
+                 singleBound ? OpenTK.Vector3.TransformNormal(NumVecToTk(iov.Normal), parentBoneInverse) : NumVecToTk(iov.Normal),
+                 singleBound ? OpenTK.Vector3.TransformNormal(NumVecToTk(iov.Tangent), parentBoneInverse) : NumVecToTk(iov.Tangent),
+                 singleBound ? OpenTK.Vector3.TransformNormal(NumVecToTk(iov.Binormal), parentBoneInverse) : NumVecToTk(iov.Binormal),
                  map,
                  uv1,
                  uv2,
@@ -805,7 +805,7 @@ namespace StudioSB.Scenes.Ultimate
                     foreach(var index in mesh.Indices)
                     {
                         var vertex = mesh.Vertices[(int)index];
-                        var color = new Vector3(0.5f) + vertex.Normal0 / 2;
+                        var color = new OpenTK.Vector3(0.5f) + vertex.Normal0 / 2;
                         GL.Color3(color);
                         GL.Vertex3(vertex.Position0);
                     }
@@ -900,8 +900,8 @@ namespace StudioSB.Scenes.Ultimate
                 Matrix4 transform = Matrix4.Identity;
                 if (Skeleton != null && c.ParentBone != "" && Skeleton.ContainsBone(c.ParentBone))
                     transform = Skeleton[c.ParentBone].AnimatedWorldTransform;
-                var v = Vector3.TransformPosition(c.BoundingSphere.Position, transform);
-                v = Vector3.TransformPosition(c.BoundingSphere.Position, camera.MvpMatrix);
+                var v = OpenTK.Vector3.TransformPosition(c.BoundingSphere.Position, transform);
+                v = OpenTK.Vector3.TransformPosition(c.BoundingSphere.Position, camera.MvpMatrix);
                 return v.Z + c.BoundingSphere.Radius;
             }).ToList();
 
@@ -991,11 +991,11 @@ namespace StudioSB.Scenes.Ultimate
             shader.SetVector3("chrLightDir", GetLightDirectionFromQuaternion(-0.453154f, -0.365998f, -0.211309f, 0.784886f));
         }
 
-        private static Vector3 GetLightDirectionFromQuaternion(float x, float y, float z, float w)
+        private static OpenTK.Vector3 GetLightDirectionFromQuaternion(float x, float y, float z, float w)
         {
             var quaternion = new Quaternion(x, y, z, w);
             var matrix = Matrix4.CreateFromQuaternion(quaternion);
-            var lightDirection = Vector4.Transform(new Vector4(0, 0, 1, 0), matrix);
+            var lightDirection = OpenTK.Vector4.Transform(new OpenTK.Vector4(0, 0, 1, 0), matrix);
             return lightDirection.Normalized().Xyz;
         }
 
