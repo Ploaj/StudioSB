@@ -15,8 +15,8 @@ namespace StudioSB.IO.Formats
     {
         public class NUExportSettings
         {
-            //[DisplayName("Compress Vector"), Description("can make filesize smaller, but less accurate")]
-            public bool CompressVector4 = false;
+            [DisplayName("Compress Vectors"), Description("Useful for material anims. No effect on most anims.")]
+            public bool CompressVector4 { get; set; } = true;
 
             [DisplayName("CompressionLevel"), Description("the large the value the smaller the filesize")]
             public float CompressionLevel { get; set; } = 0.000002f;
