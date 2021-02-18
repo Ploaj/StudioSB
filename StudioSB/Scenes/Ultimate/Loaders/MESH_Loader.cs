@@ -65,24 +65,24 @@ namespace StudioSB.Scenes.Ultimate
         private static List<UltimateVertex> CreateVertices(Mesh mesh, ISBSkeleton Skeleton, MeshObject meshObject, SsbhVertexAccessor vertexAccessor, uint[] vertexIndices)
         {
             // Read attribute values.
-            var positions = vertexAccessor.ReadAttribute("Position0", 0, meshObject.VertexCount, meshObject);
-            var normals = vertexAccessor.ReadAttribute("Normal0", 0, meshObject.VertexCount, meshObject);
-            var tangents = vertexAccessor.ReadAttribute("Tangent0", 0, meshObject.VertexCount, meshObject);
-            var map1Values = vertexAccessor.ReadAttribute("map1", 0, meshObject.VertexCount, meshObject);
-            var uvSetValues = vertexAccessor.ReadAttribute("uvSet", 0, meshObject.VertexCount, meshObject);
-            var uvSet1Values = vertexAccessor.ReadAttribute("uvSet1", 0, meshObject.VertexCount, meshObject);
-            var uvSet2Values = vertexAccessor.ReadAttribute("uvSet2", 0, meshObject.VertexCount, meshObject);
-            var bake1Values = vertexAccessor.ReadAttribute("bake1", 0, meshObject.VertexCount, meshObject);
-            var colorSet1Values = vertexAccessor.ReadAttribute("colorSet1", 0, meshObject.VertexCount, meshObject);
-            var colorSet2Values = vertexAccessor.ReadAttribute("colorSet2", 0, meshObject.VertexCount, meshObject);
-            var colorSet21Values = vertexAccessor.ReadAttribute("colorSet21", 0, meshObject.VertexCount, meshObject);
-            var colorSet22Values = vertexAccessor.ReadAttribute("colorSet22", 0, meshObject.VertexCount, meshObject);
-            var colorSet23Values = vertexAccessor.ReadAttribute("colorSet23", 0, meshObject.VertexCount, meshObject);
-            var colorSet3Values = vertexAccessor.ReadAttribute("colorSet3", 0, meshObject.VertexCount, meshObject);
-            var colorSet4Values = vertexAccessor.ReadAttribute("colorSet4", 0, meshObject.VertexCount, meshObject);
-            var colorSet5Values = vertexAccessor.ReadAttribute("colorSet5", 0, meshObject.VertexCount, meshObject);
-            var colorSet6Values = vertexAccessor.ReadAttribute("colorSet6", 0, meshObject.VertexCount, meshObject);
-            var colorSet7Values = vertexAccessor.ReadAttribute("colorSet7", 0, meshObject.VertexCount, meshObject);
+            var positions = vertexAccessor.ReadAttribute("Position0", meshObject.VertexCount, meshObject);
+            var normals = vertexAccessor.ReadAttribute("Normal0", meshObject.VertexCount, meshObject);
+            var tangents = vertexAccessor.ReadAttribute("Tangent0", meshObject.VertexCount, meshObject);
+            var map1Values = vertexAccessor.ReadAttribute("map1", meshObject.VertexCount, meshObject);
+            var uvSetValues = vertexAccessor.ReadAttribute("uvSet", meshObject.VertexCount, meshObject);
+            var uvSet1Values = vertexAccessor.ReadAttribute("uvSet1", meshObject.VertexCount, meshObject);
+            var uvSet2Values = vertexAccessor.ReadAttribute("uvSet2", meshObject.VertexCount, meshObject);
+            var bake1Values = vertexAccessor.ReadAttribute("bake1", meshObject.VertexCount, meshObject);
+            var colorSet1Values = vertexAccessor.ReadAttribute("colorSet1", meshObject.VertexCount, meshObject);
+            var colorSet2Values = vertexAccessor.ReadAttribute("colorSet2", meshObject.VertexCount, meshObject);
+            var colorSet21Values = vertexAccessor.ReadAttribute("colorSet21", meshObject.VertexCount, meshObject);
+            var colorSet22Values = vertexAccessor.ReadAttribute("colorSet22", meshObject.VertexCount, meshObject);
+            var colorSet23Values = vertexAccessor.ReadAttribute("colorSet23", meshObject.VertexCount, meshObject);
+            var colorSet3Values = vertexAccessor.ReadAttribute("colorSet3", meshObject.VertexCount, meshObject);
+            var colorSet4Values = vertexAccessor.ReadAttribute("colorSet4", meshObject.VertexCount, meshObject);
+            var colorSet5Values = vertexAccessor.ReadAttribute("colorSet5", meshObject.VertexCount, meshObject);
+            var colorSet6Values = vertexAccessor.ReadAttribute("colorSet6", meshObject.VertexCount, meshObject);
+            var colorSet7Values = vertexAccessor.ReadAttribute("colorSet7", meshObject.VertexCount, meshObject);
 
             // Generate bitangents.
             // TODO: Use vec4 tangents instead.
