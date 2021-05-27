@@ -717,6 +717,10 @@ namespace StudioSB.Scenes.Ultimate
                     if (i >= 4)
                         break;
                     boneIndices[i] = skeleton.IndexOfBone(skeleton[iov.Envelope.Weights[i].BoneName]);
+                    if (boneIndices[i] == -1)
+                    {
+                        throw new System.Exception("A vertex is rigged to bone '" + iov.Envelope.Weights[i].BoneName + "', which doesn't exist in this armature! (Don't select 'Use Existing Skeleton' on import if the skeletons are different)");
+                    }
                     boneWeights[i] = iov.Envelope.Weights[i].Weight;
                 }
 
