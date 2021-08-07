@@ -416,12 +416,13 @@ namespace StudioSB.Scenes.Ultimate
 
             meshEX = new MESHEX_Loader();
             meshEX.AllBoundingSphere = new BoundingSphere(allVertices);
-
+            /*
             foreach(var m in model.Meshes)
             {
                 meshEX.AddMeshData(m.BoundingSphere, m.Name);
             }
-
+            */
+            meshEX.AddAllMeshData(model.Meshes);
             return meshFile;
         }
         

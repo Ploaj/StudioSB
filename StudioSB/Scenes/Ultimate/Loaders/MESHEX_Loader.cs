@@ -47,8 +47,54 @@ namespace StudioSB.Scenes.Ultimate.Loaders
                     TrueName = GetTrueName(Name)
                 });
             }
-
+    
             Entries.Add(new EntryEx() { MeshExIndex = data });
+        }
+
+        /// <summary>
+        /// For each mesh in meshes, we will consolidate the meshes of the same name into one single meshex entry
+        /// with a new bouunding sphere calculated to cover all the same-named meshes
+        /// </summary>
+        public void AddAllMeshData(List<SBUltimateMesh> Meshes)
+        {
+            Dictionary<string, List<SBUltimateMesh>> mesh_name_dict = new Dictionary<string, List<SBUltimateMesh>>();
+            foreach (var mesh in Meshes)
+            {
+                List<SBUltimateMesh> mesh_list = new List<SBUltimateMesh>();
+                if (mesh_name_dict.TryGetValue(mesh.Name, out mesh_list))
+                {
+                    mesh_list.Add(mesh);
+                }
+                else
+                {
+                    List<SBUltimateMesh> new_mesh_list = new List<SBUltimateMesh>();
+                    new_mesh_list.Add(mesh);
+                    mesh_name_dict.Add(mesh.Name, new_mesh_list);
+                }
+            }
+
+            int mesh_ex_index = 0;
+            foreach (var unique_mesh_name in mesh_name_dict.Keys)
+            {
+                List<SBUltimateMesh> mesh_list = mesh_name_dict[unique_mesh_name];
+                List<Vector3> grouped_vertices = new List<Vector3>();
+                foreach (var mesh in mesh_list)
+                {
+                    foreach (var vertex in mesh.Vertices)
+                    {
+                        grouped_vertices.Add(vertex.Position0);
+                    }
+                }
+                BoundingSphere group_sphere = new BoundingSphere(grouped_vertices);
+                MeshData.Add(new MeshEX()
+                {
+                    BoundingSphere = group_sphere,
+                    Name = unique_mesh_name,
+                    TrueName = GetTrueName(unique_mesh_name)
+                });
+                Entries.Add(new EntryEx() { MeshExIndex = mesh_ex_index });
+                mesh_ex_index++;
+            }
         }
 
         /// <summary>
