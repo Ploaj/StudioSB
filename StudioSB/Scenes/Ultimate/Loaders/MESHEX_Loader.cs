@@ -104,9 +104,10 @@ namespace StudioSB.Scenes.Ultimate.Loaders
         /// <returns></returns>
         private static string GetTrueName(string name)
         {
-            if (name.EndsWith("_VIS"))
-                name = name.Substring(0, name.IndexOf("_VIS"));
-
+            if (name.Contains("_VIS_"))
+                name = name.Substring(0, name.IndexOf("_VIS_"));
+            if (name.Contains("_O_"))
+                name = name.Substring(0, name.IndexOf("_O_"));
             if (name.EndsWith("Shape"))
                 name = name.Substring(0, name.IndexOf("Shape"));
 
