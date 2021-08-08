@@ -52,8 +52,8 @@ namespace StudioSB.Scenes.Ultimate.Loaders
         }
 
         /// <summary>
-        /// For each mesh in meshes, we will consolidate the meshes of the same name into one single meshex entry
-        /// with a new bouunding sphere calculated to cover all the same-named meshes
+        /// For each mesh in meshes, we will add an entry to 'Entries'. However, all meshes of the same name will get consolidated into
+        /// one single 'MeshData' entry that contains a new bounding sphere that encapsulates all the same-named meshes
         /// </summary>
         public void AddAllMeshData(List<SBUltimateMesh> Meshes)
         {
@@ -73,7 +73,6 @@ namespace StudioSB.Scenes.Ultimate.Loaders
                 }
             }
 
-            int mesh_ex_index = 0;
             foreach (var unique_mesh_name in mesh_name_dict.Keys)
             {
                 List<SBUltimateMesh> mesh_list = mesh_name_dict[unique_mesh_name];
@@ -91,9 +90,13 @@ namespace StudioSB.Scenes.Ultimate.Loaders
                     BoundingSphere = group_sphere,
                     Name = unique_mesh_name,
                     TrueName = GetTrueName(unique_mesh_name)
-                });
-                Entries.Add(new EntryEx() { MeshExIndex = mesh_ex_index });
-                mesh_ex_index++;
+                });   
+            }
+
+            foreach (var mesh in Meshes)
+            {
+                var data_index = MeshData.FindIndex(e => e.Name.Equals(mesh.Name));
+                Entries.Add(new EntryEx() { MeshExIndex = data_index });
             }
         }
 
