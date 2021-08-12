@@ -720,7 +720,15 @@ namespace StudioSB
 
             if (Result == DialogResult.OK)
             {
-                var ioModel = IONET.IOManager.LoadScene(filePath, settings);
+                IONET.Core.IOScene ioModel;
+                try
+                {
+                    ioModel = IONET.IOManager.LoadScene(filePath, settings);
+                }
+                catch (NullReferenceException e)
+                {
+                    throw new NullReferenceException("Did you make sure to export an Armature along with the Mesh(es)?\nOriginal Message: " + e.Message , e);
+                }
 
                 SBScene scene;
                 if (loadedScene == null)
