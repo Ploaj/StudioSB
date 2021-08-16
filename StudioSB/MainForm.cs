@@ -725,9 +725,13 @@ namespace StudioSB
                 {
                     ioModel = IONET.IOManager.LoadScene(filePath, settings);
                 }
+                catch (ArgumentNullException e)
+                {
+                    throw new ArgumentNullException("This error is usually caused by missing textures. Go to blender, change shading mode to 'Material Preview', and if ur model looks pink, its missing textures.\n Original Error Msg: \n" + e.Message, e);
+                }
                 catch (NullReferenceException e)
                 {
-                    throw new NullReferenceException("Did you make sure to export an Armature along with the Mesh(es)?\nOriginal Message: " + e.Message , e);
+                    throw new NullReferenceException("This error is usually caused by a not exporting an Armature along with the Meshes. \nOriginal Message: \n" + e.Message , e);
                 }
 
                 SBScene scene;
