@@ -720,7 +720,19 @@ namespace StudioSB
 
             if (Result == DialogResult.OK)
             {
-                var ioModel = IONET.IOManager.LoadScene(filePath, settings);
+                IONET.Core.IOScene ioModel;
+                try
+                {
+                    ioModel = IONET.IOManager.LoadScene(filePath, settings);
+                }
+                catch (ArgumentNullException e)
+                {
+                    throw new ArgumentNullException("This error is usually caused by missing textures. Make sure you can correctly preview your model with textures before exporting.\nOriginal Error Msg: \n" + e.Message, e);
+                }
+                catch (NullReferenceException e)
+                {
+                    throw new NullReferenceException("This error is usually caused by a not exporting the Skeleton along with the Meshes. \nOriginal Message: \n" + e.Message , e);
+                }
 
                 SBScene scene;
                 if (loadedScene == null)
