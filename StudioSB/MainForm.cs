@@ -727,11 +727,11 @@ namespace StudioSB
                 }
                 catch (ArgumentNullException e)
                 {
-                    throw new ArgumentNullException("This error is usually caused by missing textures. Go to blender, change shading mode to 'Material Preview', and if ur model looks pink, its missing textures.\n Original Error Msg: \n" + e.Message, e);
+                    throw new ArgumentNullException("This error is usually caused by missing textures. Make sure you can correctly preview your model with textures before exporting.\nOriginal Error Msg: \n" + e.Message, e);
                 }
                 catch (NullReferenceException e)
                 {
-                    throw new NullReferenceException("This error is usually caused by a not exporting an Armature along with the Meshes. \nOriginal Message: \n" + e.Message , e);
+                    throw new NullReferenceException("This error is usually caused by a not exporting the Skeleton along with the Meshes. \nOriginal Message: \n" + e.Message , e);
                 }
 
                 SBScene scene;
