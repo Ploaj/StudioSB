@@ -577,7 +577,14 @@ namespace StudioSB.Scenes.Ultimate
                 }
                 SBBone parentBone = null;
                 if (isSingleBound)
+                {
                     parentBone = Skeleton[bonename];
+                    if (parentBone is null)
+                    {
+                        throw new System.Exception($"A vertex in mesh {mesh.Name} was weighted to bone {bonename}, but that bone doesn't exist in this skelton!\n" +
+                                                   $"If you are importing a new model over an existing skeleton, make sure you only rig to the bones that also exist in this existing skeleton.");
+                    }
+                }
 
                 // because the vertex cannot be changed after creation, and we don't know if we need to single bind,
                 // we have to go through the vertices again after determining if this mesh is single bound
