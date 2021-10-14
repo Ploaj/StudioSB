@@ -17,7 +17,7 @@ namespace StudioSB.IO.Formats
         public string Extension => ".sbanim";
 
         public object Settings => null;
-        
+
         public void ExportSBAnimation(string FileName, SBAnimation animation, SBSkeleton skeleton)
         {
             using (StreamWriter w = new StreamWriter(new FileStream(FileName, FileMode.Create)))
@@ -39,7 +39,7 @@ namespace StudioSB.IO.Formats
                     }
                     w.WriteLine("}");
                 }
-                
+
                 foreach (var matNode in animation.MaterialNodes)
                 {
                     w.WriteLine($"material {matNode.MaterialName} {matNode.AttributeName}");
@@ -72,6 +72,8 @@ namespace StudioSB.IO.Formats
 
                     switch (args[0])
                     {
+                        case "comment":
+                          break;
                         case "FrameCount":
                             anim.FrameCount = int.Parse(args[1]);
                             break;
