@@ -30,8 +30,8 @@ namespace StudioSB.IO.Formats
                 reader.ReadChars(4); // TNX magic
 
                 string texName = ReadTexName(reader);
-                surface.Name = texName;
-
+                //surface.Name = texName; Seems more convenient to use the filename rather than the internal texture name
+                surface.Name = Path.GetFileNameWithoutExtension(FilePath);
                 surface.Width = reader.ReadInt32();
                 surface.Height = reader.ReadInt32();
                 surface.Depth = reader.ReadInt32();
