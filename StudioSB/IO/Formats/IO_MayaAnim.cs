@@ -59,7 +59,8 @@ namespace StudioSB.IO.Formats
             translate,
             rotate,
             scale,
-            visibility
+            visibility,
+            MaxHandle
         }
 
         private enum TrackType
@@ -195,6 +196,11 @@ namespace StudioSB.IO.Formats
                             }
                             currentData = new AnimData();
                             currentData.controlType = (ControlType)Enum.Parse(typeof(ControlType), args[1].Split('.')[0]);
+                            if (currentData.controlType == ControlType.MaxHandle)
+                            {
+                                currentData = null;
+                                break;
+                            }    
                             currentData.type = (TrackType)Enum.Parse(typeof(TrackType), args[2]);
                             currentNode.atts.Add(currentData);
                             break;
