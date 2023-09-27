@@ -1,77 +1,116 @@
-﻿using System;
+﻿using StudioSB.Tools;
 using System.Collections.Generic;
-using StudioSB.Tools;
+using System.ComponentModel;
 
 namespace StudioSB.Scenes.LVD
 {
-    public class LVDEnemyGenerator : LVDEntry
+    public class LVDEnemyGenerator : LVDBase
     {
-        public List<LVDShape> Spawns { get; set; } = new List<LVDShape>();
-        public List<LVDShape> Zones { get; set; } = new List<LVDShape>();
-        public int Unknown1 { get; set; } = 0;
-        public int ID { get; set; }
-        public List<int> SpawnIDs { get; set; } = new List<int>();
-        public int Unknown2 { get; set; } = 0;
-        public List<int> ZoneIDs { get; set; } = new List<int>();
-        
-        public override void Read(BinaryReaderExt r)
+        [ReadOnly(true), Category("Version")]
+        public byte Version { get; internal set; } = 3;
+
+        public List<LVDShape2> Unknown1 { get; set; } = new List<LVDShape2>();
+
+        public List<LVDShape2> Unknown2 { get; set; } = new List<LVDShape2>();
+
+        public List<LVDShape2> Unknown3 { get; set; } = new List<LVDShape2>();
+
+        [Category("ID")]
+        public int Tag { get; set; }
+
+        public List<int> Unknown4 { get; set; } = new List<int>();
+
+        public List<int> Unknown5 { get; set; } = new List<int>();
+
+        public List<int> Unknown6 { get; set; } = new List<int>();
+
+        public override void Read(BinaryReaderExt reader)
         {
-            base.Read(r);
+            Version = reader.ReadByte();
 
-            r.Skip(0x2); //x01 01
-            int spawnCount = r.ReadInt32();
-            for (int i = 0; i < spawnCount; i++)
+            base.Read(reader);
+
+            reader.Skip(1);
+            reader.Skip(1);
+            var unknown1Count = reader.ReadUInt32();
+            for (uint i = 0; i < unknown1Count; i++)
             {
-                r.Skip(1);
-                var shape = new LVDShape();
-                shape.Read(r);
-                Spawns.Add(shape);
+                reader.Skip(1);
+                var shape = new LVDShape2();
+                shape.Read(reader);
+                Unknown1.Add(shape);
             }
 
-            r.Skip(0x2); //x01 01
-            int zoneCount = r.ReadInt32();
-            for (int i = 0; i < zoneCount; i++)
+            reader.Skip(1);
+            reader.Skip(1);
+            var unknown2Count = reader.ReadUInt32();
+            for (uint i = 0; i < unknown2Count; i++)
             {
-                r.Skip(1);
-                var shape = new LVDShape();
-                shape.Read(r);
-                Zones.Add(shape);
+                reader.Skip(1);
+                var shape = new LVDShape2();
+                shape.Read(reader);
+                Unknown2.Add(shape);
             }
 
-            r.Skip(0x2); //x01 01
-            Unknown1 = r.ReadInt32() ; //Only seen as 0
-
-            r.Skip(1); //x01
-            ID = r.ReadInt32();
-
-            r.Skip(1); //x01
-            int spawnIdCount = r.ReadInt32();
-            for (int i = 0; i < spawnIdCount; i++)
+            reader.Skip(1);
+            reader.Skip(1);
+            var unknown3Count = reader.ReadUInt32();
+            for (uint i = 0; i < unknown3Count; i++)
             {
-                r.Skip(1);
-                SpawnIDs.Add(r.ReadInt32());
+                reader.Skip(1);
+                var shape = new LVDShape2();
+                shape.Read(reader);
+                Unknown3.Add(shape);
             }
 
-            r.Skip(1); //x01
-            Unknown2 = r.ReadInt32(); //Only seen as 0
+            reader.Skip(1);
+            Tag = reader.ReadInt32();
 
-            r.Skip(1); //x01
-            int zoneIdCount = r.ReadInt32();
-            for (int i = 0; i < zoneIdCount; i++)
+            if (Version < 2)
             {
-                r.Skip(1);
-                ZoneIDs.Add(r.ReadInt32());
+                return;
+            }
+
+            reader.Skip(1);
+            var unknown4Count = reader.ReadUInt32();
+            for (int i = 0; i < unknown4Count; i++)
+            {
+                reader.Skip(1);
+                Unknown4.Add(reader.ReadInt32());
+            }
+
+            reader.Skip(1);
+            var unknown5Count = reader.ReadUInt32();
+            for (int i = 0; i < unknown5Count; i++)
+            {
+                reader.Skip(1);
+                Unknown5.Add(reader.ReadInt32());
+            }
+
+            if (Version < 3)
+            {
+                return;
+            }
+
+            reader.Skip(1);
+            var unknown6Count = reader.ReadUInt32();
+            for (int i = 0; i < unknown6Count; i++)
+            {
+                reader.Skip(1);
+                Unknown6.Add(reader.ReadInt32());
             }
         }
 
         public override void Write(BinaryWriterExt writer)
         {
+            writer.Write(Version);
+
             base.Write(writer);
 
             writer.Write((byte)1);
             writer.Write((byte)1);
-            writer.Write(Spawns.Count);
-            foreach (var v in Spawns)
+            writer.Write(Unknown1.Count);
+            foreach (var v in Unknown1)
             {
                 writer.Write((byte)1);
                 v.Write(writer);
@@ -79,8 +118,8 @@ namespace StudioSB.Scenes.LVD
 
             writer.Write((byte)1);
             writer.Write((byte)1);
-            writer.Write(Zones.Count);
-            foreach (var v in Zones)
+            writer.Write(Unknown2.Count);
+            foreach (var v in Unknown2)
             {
                 writer.Write((byte)1);
                 v.Write(writer);
@@ -88,25 +127,45 @@ namespace StudioSB.Scenes.LVD
 
             writer.Write((byte)1);
             writer.Write((byte)1);
-            writer.Write(0);
-            
+            writer.Write(Unknown3.Count);
+            foreach (var v in Unknown3)
+            {
+                writer.Write((byte)1);
+                v.Write(writer);
+            }
+
             writer.Write((byte)1);
-            writer.Write(ID);
-            
+            writer.Write(Tag);
+
+            if (Version < 2)
+            {
+                return;
+            }
+
             writer.Write((byte)1);
-            writer.Write(SpawnIDs.Count);
-            foreach (var v in SpawnIDs)
+            writer.Write(Unknown4.Count);
+            foreach (var v in Unknown4)
             {
                 writer.Write((byte)1);
                 writer.Write(v);
             }
 
             writer.Write((byte)1);
-            writer.Write(0);
-            
+            writer.Write(Unknown5.Count);
+            foreach (var v in Unknown5)
+            {
+                writer.Write((byte)1);
+                writer.Write(v);
+            }
+
+            if (Version < 3)
+            {
+                return;
+            }
+
             writer.Write((byte)1);
-            writer.Write(ZoneIDs.Count);
-            foreach (var v in ZoneIDs)
+            writer.Write(Unknown6.Count);
+            foreach (var v in Unknown6)
             {
                 writer.Write((byte)1);
                 writer.Write(v);

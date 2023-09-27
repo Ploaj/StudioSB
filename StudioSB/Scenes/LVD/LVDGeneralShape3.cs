@@ -3,17 +3,16 @@ using System.ComponentModel;
 
 namespace StudioSB.Scenes.LVD
 {
-    public class LVDDamageShape : LVDBase
+    public class LVDGeneralShape3 : LVDBase
     {
         [ReadOnly(true), Category("Version")]
         public byte Version { get; internal set; } = 1;
 
+        [Category("ID")]
+        public int Tag { get; set; }
+
         [Category("Shape"), TypeConverter(typeof(ExpandableObjectConverter))]
-        public LVDShape3 Shape { get; set; } = new LVDShape3();
-
-        public bool IsDamager { get; set; }
-
-        public uint ID { get; set; }
+        public LVDShape3 Shape { get; set; }
 
         public override void Read(BinaryReaderExt reader)
         {
@@ -21,10 +20,11 @@ namespace StudioSB.Scenes.LVD
 
             base.Read(reader);
 
-            Shape.Read(reader);
+            reader.Skip(1);
+            Tag = reader.ReadInt32();
 
-            IsDamager = reader.ReadBoolean();
-            ID = reader.ReadUInt32();
+            Shape = new LVDShape3();
+            Shape.Read(reader);
         }
 
         public override void Write(BinaryWriterExt writer)
@@ -33,10 +33,10 @@ namespace StudioSB.Scenes.LVD
 
             base.Write(writer);
 
-            Shape.Write(writer);
+            writer.Write((byte)1);
+            writer.Write(Tag);
 
-            writer.Write(IsDamager);
-            writer.Write(ID);
+            Shape.Write(writer);
         }
     }
 }

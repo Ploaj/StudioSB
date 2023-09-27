@@ -7,89 +7,107 @@ namespace StudioSB.IO.Formats
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="lvd"></param>
+        /// <param name="levelData"></param>
         /// <param name="filePath"></param>
-        public static void Export(LevelData lvd, string filePath)
+        public static void Export(LevelData levelData, string filePath)
         {
             SSF ssf = new SSF();
 
-            foreach(var v in lvd.Collisions)
+            foreach (var collision in levelData.Collisions)
             {
                 var g = new SSFGroup();
                 ssf.Groups.Add(g);
-                g.Name = v.EntryLabel;
-                g.Bone = v.BoneName;
-                foreach(var x in v.Vertices)
-                    g.Vertices.Add(new SSFVertex() { X = x.X, Y = x.Y });
-                for(int i = 0; i < v.Materials.Count; i++)
+                g.Name = collision.DynamicName;
+                g.JointName = collision.JointName;
+
+                foreach (var v in collision.Vertices)
                 {
-                    g.Lines.Add(new SSFLine() {
+                    g.Vertices.Add(new SSFVertex() { X = v.X, Y = v.Y });
+                }
+
+                for (int i = 0; i < collision.Attributes.Count; i++)
+                {
+                    g.Edges.Add(new SSFEdge() {
                         Vertex1 = i,
                         Vertex2 = i + 1,
-                        Material = v.Materials[i].Physics.ToString(),
-                        Flags = (v.Materials[i].LeftLedge ? SSFLineFlag.LeftLedge : 0) |
-                        (v.Materials[i].RightLedge ? SSFLineFlag.RightLedge : 0) |
-                        (v.PassThrough ? SSFLineFlag.DropThrough : 0)
+                        Material = collision.Attributes[i].Type.ToString(),
+                        Flags = (collision.Attributes[i].Unpaintable ? SSFEdgeFlags.Unpaintable : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].RightWallOverride ? SSFEdgeFlags.RightWallOverride : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].LeftWallOverride ? SSFEdgeFlags.LeftWallOverride : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].CeilingOverride ? SSFEdgeFlags.CeilingOverride : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].FloorOverride ? SSFEdgeFlags.FloorOverride : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].NoWallJump ? SSFEdgeFlags.NoWallJump : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].DropThrough ? SSFEdgeFlags.DropThrough : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].LeftLedge ? SSFEdgeFlags.LeftLedge : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].RightLedge ? SSFEdgeFlags.RightLedge : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].IgnoreLinkFromLeft ? SSFEdgeFlags.IgnoreLinkFromLeft : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].Supersoft ? SSFEdgeFlags.Supersoft : SSFEdgeFlags.None) |
+                                (collision.Attributes[i].IgnoreLinkFromRight ? SSFEdgeFlags.IgnoreLinkFromRight : SSFEdgeFlags.None),
                     });
                 }
             }
 
-            foreach (var v in lvd.BlastZoneBounds)
+            int index = 0;
+
+            foreach (var v in levelData.StartPositions)
             {
                 ssf.Points.Add(new SSFPoint()
                 {
-                    Tag = "BlastStart",
-                    X = v.Left,
-                    Y = v.Top
-                });
-                ssf.Points.Add(new SSFPoint()
-                {
-                    Tag = "BlastEnd",
-                    X = v.Right,
-                    Y = v.Bottom
+                    Tag = "StartPosition" + index++,
+                    X = v.Position.X,
+                    Y = v.Position.Y
                 });
             }
 
-            foreach (var v in lvd.CameraBounds)
+            index = 0;
+
+            foreach (var v in levelData.RestartPositions)
             {
                 ssf.Points.Add(new SSFPoint()
                 {
-                    Tag = "CameraStart",
-                    X = v.Left,
-                    Y = v.Top
-                });
-                ssf.Points.Add(new SSFPoint()
-                {
-                    Tag = "CameraEnd",
-                    X = v.Right,
-                    Y = v.Bottom
+                    Tag = "RestartPosition" + index++,
+                    X = v.Position.X,
+                    Y = v.Position.Y
                 });
             }
 
-            int sIndex = 0;
-            foreach (var v in lvd.Spawns)
+            index = 0;
+
+            foreach (var v in levelData.CameraRegions)
             {
                 ssf.Points.Add(new SSFPoint()
                 {
-                    Tag = "Spawn" + sIndex++,
-                    X = v.X,
-                    Y = v.Y
+                    Tag = "CameraRegionStart" + index++,
+                    X = v.Rectangle.Left,
+                    Y = v.Rectangle.Top
+                });
+                ssf.Points.Add(new SSFPoint()
+                {
+                    Tag = "CameraRegionEnd" + index++,
+                    X = v.Rectangle.Right,
+                    Y = v.Rectangle.Bottom
                 });
             }
-            sIndex = 0;
-            foreach (var v in lvd.Respawns)
+
+            index = 0;
+
+            foreach (var v in levelData.DeathRegions)
             {
                 ssf.Points.Add(new SSFPoint()
                 {
-                    Tag = "Respawn" + sIndex++,
-                    X = v.X,
-                    Y = v.Y
+                    Tag = "DeathRegionStart" + index++,
+                    X = v.Rectangle.Left,
+                    Y = v.Rectangle.Top
+                });
+                ssf.Points.Add(new SSFPoint()
+                {
+                    Tag = "DeathRegionEnd" + index++,
+                    X = v.Rectangle.Right,
+                    Y = v.Rectangle.Bottom
                 });
             }
 
             ssf.Save(filePath);
         }
     }
-
-
 }

@@ -9,51 +9,32 @@ namespace StudioSB.Scenes.LVD
     [Serializable]
     public class LevelData
     {
-        [ReadOnly(true)]
-        public int Heading { get; internal set; } = 0x01;
+        [ReadOnly(true), Category("Header")]
+        public uint Unknown { get; internal set; } = 1;
 
-        [ReadOnly(true)]
-        public byte VersionMinor { get; internal set; } = 0x0D;
+        [ReadOnly(true), Category("Header")]
+        public byte Version { get; internal set; } = 13;
 
-        [ReadOnly(true)]
-        public byte VersionMajor { get; internal set; } = 0x01;
-
-        [ReadOnly(true)]
-        public string Magic { get; internal set; } = "LVD1";
+        [ReadOnly(true), Category("Header")]
+        public string Signature { get; internal set; } = "LVD1";
 
         public List<LVDCollision> Collisions = new List<LVDCollision>();
-
-        public List<LVDSpawn> Spawns = new List<LVDSpawn>();
-
-        public List<LVDSpawn> Respawns = new List<LVDSpawn>();
-
-        public List<LVDBounds> CameraBounds = new List<LVDBounds>();
-
-        public List<LVDBounds> BlastZoneBounds = new List<LVDBounds>();
-
+        public List<LVDPoint> StartPositions = new List<LVDPoint>();
+        public List<LVDPoint> RestartPositions = new List<LVDPoint>();
+        public List<LVDRegion> CameraRegions = new List<LVDRegion>();
+        public List<LVDRegion> DeathRegions = new List<LVDRegion>();
         public List<LVDEnemyGenerator> EnemyGenerators = new List<LVDEnemyGenerator>();
-
-        public List<LVDItemSpawner> ItemSpawners = new List<LVDItemSpawner>();
-
         public List<LVDDamageShape> DamageShapes = new List<LVDDamageShape>();
-
-        public List<LVDGeneralPoint> GeneralPoints = new List<LVDGeneralPoint>();
-
-        public List<LVDGeneralShape> GeneralShapes = new List<LVDGeneralShape>();
-
-        // version > 10 ie Smash Ultimate
-
-        public List<LVDRangeCurve> RangeCurves = new List<LVDRangeCurve>();
-
-        public List<LVDGeneralVector> GeneralVectors = new List<LVDGeneralVector>();
-
-        public List<LVDBounds> ShrunkCameraBounds = new List<LVDBounds>();
-
-        public List<LVDBounds> ShrunkBlastZoneBounds = new List<LVDBounds>();
+        public List<LVDItemPopupRegion> ItemPopupRegions = new List<LVDItemPopupRegion>();
+        public List<LVDPTrainerRange> PTrainerRanges = new List<LVDPTrainerRange>();
+        public List<LVDPTrainerFloatingFloor> PTrainerFloatingFloors = new List<LVDPTrainerFloatingFloor>();
+        public List<LVDGeneralShape2> GeneralShapes2D = new List<LVDGeneralShape2>();
+        public List<LVDGeneralShape3> GeneralShapes3D = new List<LVDGeneralShape3>();
+        public List<LVDRegion> ShrinkedCameraRegions = new List<LVDRegion>();
+        public List<LVDRegion> ShrinkedDeathRegions = new List<LVDRegion>();
 
         public LevelData()
         {
-            //TODO: make defaults?
         }
 
         public LevelData(string FileName)
@@ -65,185 +46,12 @@ namespace StudioSB.Scenes.LVD
         {
             using (BinaryReaderExt stream = new BinaryReaderExt(new FileStream(FileName, FileMode.Open)))
             {
-                stream.BigEndian = true;
+                Read(stream);
 
-                Heading = stream.ReadInt32();
-                VersionMinor = stream.ReadByte();
-                VersionMajor = stream.ReadByte();
-                Magic = new string(stream.ReadChars(4));
-
-                stream.ReadByte();
-                var collisionCount = stream.ReadInt32();
-                for(int i = 0; i < collisionCount; i++)
-                {
-                    LVDCollision col = new LVDCollision();
-                    col.Read(stream, VersionMinor);
-                    Collisions.Add(col);
-                }
-
-                stream.ReadByte();
-                var spawnCount = stream.ReadInt32();
-                for (int i = 0; i < spawnCount; i++)
-                {
-                    LVDSpawn spawn = new LVDSpawn();
-                    spawn.Read(stream);
-                    Spawns.Add(spawn);
-                }
-
-                stream.ReadByte();
-                var respawnCount = stream.ReadInt32();
-                for (int i = 0; i < respawnCount; i++)
-                {
-                    LVDSpawn respawn = new LVDSpawn();
-                    respawn.Read(stream);
-                    Respawns.Add(respawn);
-                }
-                
-                stream.ReadByte();
-                var boundsCount = stream.ReadInt32();
-                for (int i = 0; i < boundsCount; i++)
-                {
-                    LVDBounds bound = new LVDBounds();
-                    bound.Read(stream);
-                    CameraBounds.Add(bound);
-                }
-
-                stream.ReadByte();
-                var blastCount = stream.ReadInt32();
-                for (int i = 0; i < blastCount; i++)
-                {
-                    LVDBounds blast = new LVDBounds();
-                    blast.Read(stream);
-                    BlastZoneBounds.Add(blast);
-                }
-                
-                stream.ReadByte();
-                int enemyGenCount = stream.ReadInt32();
-                for(int i = 0; i < enemyGenCount; i++)
-                {
-                    LVDEnemyGenerator enGen = new LVDEnemyGenerator();
-                    enGen.Read(stream);
-                    EnemyGenerators.Add(enGen);
-                }
-
-                stream.ReadByte();
-                if (stream.ReadInt32() > 0)
-                    throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
-
-                stream.ReadByte();
-                if (stream.ReadInt32() > 0)
-                    throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
-
-                stream.ReadByte();
-                if (stream.ReadInt32() > 0)
-                    throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
-
-                stream.ReadByte();
-                if (stream.ReadInt32() > 0)
-                    throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
-
-                stream.ReadByte();
-                if (stream.ReadInt32() > 0)
-                    throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
-
-                stream.ReadByte();
-                int damageCount = stream.ReadInt32();
-                for (int i = 0; i < damageCount; i++)
-                {
-                    LVDDamageShape shape = new LVDDamageShape();
-                    shape.Read(stream);
-                    DamageShapes.Add(shape);
-                }
-                
-                stream.ReadByte();
-                int itemSpawnCount = stream.ReadInt32();
-                for (int i = 0; i < itemSpawnCount; i++)
-                {
-                    LVDItemSpawner spawn = new LVDItemSpawner();
-                    spawn.Read(stream);
-                    ItemSpawners.Add(spawn);
-                }
-                
-                if (VersionMinor > 0xA)
-                {
-                    stream.ReadByte();
-                    int genCurveCount = stream.ReadInt32();
-                    for (int i = 0; i < genCurveCount; i++)
-                    {
-                        LVDRangeCurve point = new LVDRangeCurve();
-                        point.Read(stream);
-                        RangeCurves.Add(point);
-                    }
-                    
-                    stream.ReadByte();
-                    int genCurveCount2 = stream.ReadInt32();
-                    for (int i = 0; i < genCurveCount2; i++)
-                    {
-                        LVDGeneralVector point = new LVDGeneralVector();
-                        point.Read(stream);
-                        GeneralVectors.Add(point);
-                    }
-                }
-                
-                stream.ReadByte();
-                int genShapeCount = stream.ReadInt32();
-                for (int i = 0; i < genShapeCount; i++)
-                {
-                    LVDGeneralShape shape = new LVDGeneralShape();
-                    shape.Read(stream);
-                    GeneralShapes.Add(shape);
-                }
-                
-                stream.ReadByte();
-                int genPointCount = stream.ReadInt32();
-                for (int i = 0; i < genPointCount; i++)
-                {
-                    LVDGeneralPoint point = new LVDGeneralPoint();
-                    point.Read(stream);
-                    GeneralPoints.Add(point);
-                }
-                
-                stream.ReadByte();
-                if (stream.ReadInt32() > 0)
-                    throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
-
-                stream.ReadByte();
-                if (stream.ReadInt32() > 0)
-                    throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
-
-                stream.ReadByte();
-                if (stream.ReadInt32() > 0)
-                    throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
-
-                stream.ReadByte();
-                if (stream.ReadInt32() > 0)
-                    throw new NotImplementedException("Unknown LVD Section at 0x" + stream.BaseStream.Position.ToString("X"));
-                
-                if(VersionMinor > 0xA)
-                {
-                    stream.ReadByte();
-                    var shrunkboundsCount = stream.ReadInt32();
-                    for (int i = 0; i < shrunkboundsCount; i++)
-                    {
-                        LVDBounds bound = new LVDBounds();
-                        bound.Read(stream);
-                        ShrunkCameraBounds.Add(bound);
-                    }
-
-                    stream.ReadByte();
-                    var shrunkblastCount = stream.ReadInt32();
-                    for (int i = 0; i < shrunkblastCount; i++)
-                    {
-                        LVDBounds blast = new LVDBounds();
-                        blast.Read(stream);
-                        ShrunkBlastZoneBounds.Add(blast);
-                    }
-                }
-
-                if(stream.BaseStream.Length != stream.BaseStream.Position)
+                if (stream.BaseStream.Length != stream.BaseStream.Position)
                 {
                     stream.PrintPosition();
-                    throw new Exception("Error fully parsing LVD " + stream.BaseStream.Position.ToString("X"));
+                    throw new Exception("Error fully parsing LVD file " + stream.BaseStream.Position.ToString("X"));
                 }
             }
         }
@@ -259,121 +67,466 @@ namespace StudioSB.Scenes.LVD
 
             using (BinaryWriterExt writer = new BinaryWriterExt(stream))
             {
-                writer.BigEndian = true;
+                Write(writer);
+            }
 
-                writer.Write(Heading);
-                writer.Write(VersionMinor);
-                writer.Write(VersionMajor);
-                writer.Write(Magic.ToCharArray());
+            byte[] output = stream.ToArray();
+            stream.Close();
+            stream.Dispose();
+            return output;
+        }
 
-                writer.Write((byte)1);
-                writer.Write(Collisions.Count);
-                foreach (var v in Collisions)
-                    v.Write(writer, VersionMinor);
+        public void Read(BinaryReaderExt reader)
+        {
+            reader.BigEndian = true;
 
-                writer.Write((byte)1);
-                writer.Write(Spawns.Count);
-                foreach (var v in Spawns)
-                    v.Write(writer);
+            Unknown = reader.ReadUInt32();
+            Version = reader.ReadByte();
 
-                writer.Write((byte)1);
-                writer.Write(Respawns.Count);
-                foreach (var v in Respawns)
-                    v.Write(writer);
+            reader.ReadByte();
+            Signature = new string(reader.ReadChars(Signature.Length));
 
-                writer.Write((byte)1);
-                writer.Write(CameraBounds.Count);
-                foreach (var v in CameraBounds)
-                    v.Write(writer);
+            reader.ReadByte();
+            uint collisionCount = reader.ReadUInt32();
+            for (uint i = 0; i < collisionCount; i++)
+            {
+                LVDCollision collision = new LVDCollision();
 
-                writer.Write((byte)1);
-                writer.Write(BlastZoneBounds.Count);
-                foreach (var v in BlastZoneBounds)
-                    v.Write(writer);
+                collision.Read(reader);
+                Collisions.Add(collision);
+            }
 
-                writer.Write((byte)1);
-                writer.Write(EnemyGenerators.Count);
-                foreach (var v in EnemyGenerators)
-                    v.Write(writer);
+            reader.ReadByte();
+            uint startPositionCount = reader.ReadUInt32();
+            for (uint i = 0; i < startPositionCount; i++)
+            {
+                LVDPoint startPosition = new LVDPoint();
 
-                writer.Write((byte)1);
-                writer.Write(0);
+                startPosition.Read(reader);
+                StartPositions.Add(startPosition);
+            }
 
-                writer.Write((byte)1);
-                writer.Write(0);
+            reader.ReadByte();
+            uint restartPositionCount = reader.ReadUInt32();
+            for (uint i = 0; i < restartPositionCount; i++)
+            {
+                LVDPoint restartPosition = new LVDPoint();
 
-                writer.Write((byte)1);
-                writer.Write(0);
+                restartPosition.Read(reader);
+                RestartPositions.Add(restartPosition);
+            }
 
-                writer.Write((byte)1);
-                writer.Write(0);
+            reader.ReadByte();
+            uint cameraRegionCount = reader.ReadUInt32();
+            for (uint i = 0; i < cameraRegionCount; i++)
+            {
+                LVDRegion cameraRegion = new LVDRegion();
 
-                writer.Write((byte)1);
-                writer.Write(0);
+                cameraRegion.Read(reader);
+                CameraRegions.Add(cameraRegion);
+            }
 
-                writer.Write((byte)1);
-                writer.Write(DamageShapes.Count);
-                foreach (var v in DamageShapes)
-                    v.Write(writer);
+            reader.ReadByte();
+            uint deathRegionCount = reader.ReadUInt32();
+            for (uint i = 0; i < deathRegionCount; i++)
+            {
+                LVDRegion deathRegion = new LVDRegion();
 
-                writer.Write((byte)1);
-                writer.Write(ItemSpawners.Count);
-                foreach (var v in ItemSpawners)
-                    v.Write(writer);
+                deathRegion.Read(reader);
+                DeathRegions.Add(deathRegion);
+            }
 
-                if (VersionMinor > 0xA)
+            reader.ReadByte();
+            uint enemyGeneratorCount = reader.ReadUInt32();
+            for (uint i = 0; i < enemyGeneratorCount; i++)
+            {
+                LVDEnemyGenerator enemyGenerator = new LVDEnemyGenerator();
+
+                enemyGenerator.Read(reader);
+                EnemyGenerators.Add(enemyGenerator);
+            }
+
+            if (Version < 2)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            if (reader.ReadUInt32() > 0)
+            {
+                throw new NotImplementedException("Unknown LVD Section at 0x" + reader.BaseStream.Position.ToString("X"));
+            }
+
+            if (Version < 3)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            if (reader.ReadUInt32() > 0)
+            {
+                throw new NotImplementedException("Unknown LVD Section at 0x" + reader.BaseStream.Position.ToString("X"));
+            }
+
+            reader.ReadByte();
+            if (reader.ReadUInt32() > 0)
+            {
+                throw new NotImplementedException("Unknown LVD Section at 0x" + reader.BaseStream.Position.ToString("X"));
+            }
+
+            reader.ReadByte();
+            if (reader.ReadUInt32() > 0)
+            {
+                throw new NotImplementedException("Unknown LVD Section at 0x" + reader.BaseStream.Position.ToString("X"));
+            }
+
+            reader.ReadByte();
+            if (reader.ReadUInt32() > 0)
+            {
+                throw new NotImplementedException("Unknown LVD Section at 0x" + reader.BaseStream.Position.ToString("X"));
+            }
+
+            if (Version < 4)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            uint damageShapeCount = reader.ReadUInt32();
+            for (uint i = 0; i < damageShapeCount; i++)
+            {
+                LVDDamageShape damageShape = new LVDDamageShape();
+
+                damageShape.Read(reader);
+                DamageShapes.Add(damageShape);
+            }
+
+            if (Version < 5)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            uint itemPopupRegionCount = reader.ReadUInt32();
+            for (uint i = 0; i < itemPopupRegionCount; i++)
+            {
+                LVDItemPopupRegion itemPopupRegion = new LVDItemPopupRegion();
+
+                itemPopupRegion.Read(reader);
+                ItemPopupRegions.Add(itemPopupRegion);
+            }
+
+            if (Version > 11)
+            {
+                reader.ReadByte();
+                uint ptrainerRangeCount = reader.ReadUInt32();
+                for (uint i = 0; i < ptrainerRangeCount; i++)
                 {
-                    writer.Write((byte)1);
-                    writer.Write(RangeCurves.Count);
-                    foreach (var v in RangeCurves)
-                        v.Write(writer);
-                    
-                    writer.Write((byte)1);
-                    writer.Write(GeneralVectors.Count);
-                    foreach (var v in GeneralVectors)
-                        v.Write(writer);
+                    LVDPTrainerRange ptrainerRange = new LVDPTrainerRange();
+
+                    ptrainerRange.Read(reader);
+                    PTrainerRanges.Add(ptrainerRange);
                 }
 
-                writer.Write((byte)1);
-                writer.Write(GeneralShapes.Count);
-                foreach (var v in GeneralShapes)
-                    v.Write(writer);
-
-                writer.Write((byte)1);
-                writer.Write(GeneralPoints.Count);
-                foreach (var v in GeneralPoints)
-                    v.Write(writer);
-
-                writer.Write((byte)1);
-                writer.Write(0);
-
-                writer.Write((byte)1);
-                writer.Write(0);
-
-                writer.Write((byte)1);
-                writer.Write(0);
-
-                writer.Write((byte)1);
-                writer.Write(0);
-
-                if (VersionMinor > 0xA)
+                if (Version > 12)
                 {
-                    writer.Write((byte)1);
-                    writer.Write(ShrunkCameraBounds.Count);
-                    foreach (var v in ShrunkCameraBounds)
-                        v.Write(writer);
+                    reader.ReadByte();
+                    uint ptrainerFloatingFloorCount = reader.ReadUInt32();
+                    for (uint i = 0; i < ptrainerFloatingFloorCount; i++)
+                    {
+                        LVDPTrainerFloatingFloor ptrainerFloatingFloor = new LVDPTrainerFloatingFloor();
 
-                    writer.Write((byte)1);
-                    writer.Write(ShrunkBlastZoneBounds.Count);
-                    foreach (var v in ShrunkBlastZoneBounds)
-                        v.Write(writer);
+                        ptrainerFloatingFloor.Read(reader);
+                        PTrainerFloatingFloors.Add(ptrainerFloatingFloor);
+                    }
                 }
             }
 
-            byte[] output = stream.ToArray(); ;
-            stream.Close();
-            stream.Dispose();
-            return  output;
+            if (Version < 6)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            uint generalShape2Count = reader.ReadUInt32();
+            for (uint i = 0; i < generalShape2Count; i++)
+            {
+                LVDGeneralShape2 generalShape2 = new LVDGeneralShape2();
+
+                generalShape2.Read(reader);
+                GeneralShapes2D.Add(generalShape2);
+            }
+
+            reader.ReadByte();
+            uint generalShape3Count = reader.ReadUInt32();
+            for (uint i = 0; i < generalShape3Count; i++)
+            {
+                LVDGeneralShape3 generalShape3 = new LVDGeneralShape3();
+
+                generalShape3.Read(reader);
+                GeneralShapes3D.Add(generalShape3);
+            }
+
+            if (Version < 7)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            if (reader.ReadUInt32() > 0)
+            {
+                throw new NotImplementedException("Unknown LVD Section at 0x" + reader.BaseStream.Position.ToString("X"));
+            }
+
+            if (Version < 8)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            if (reader.ReadUInt32() > 0)
+            {
+                throw new NotImplementedException("Unknown LVD Section at 0x" + reader.BaseStream.Position.ToString("X"));
+            }
+
+            if (Version < 9)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            if (reader.ReadUInt32() > 0)
+            {
+                throw new NotImplementedException("Unknown LVD Section at 0x" + reader.BaseStream.Position.ToString("X"));
+            }
+
+            if (Version < 10)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            if (reader.ReadUInt32() > 0)
+            {
+                throw new NotImplementedException("Unknown LVD Section at 0x" + reader.BaseStream.Position.ToString("X"));
+            }
+
+            if (Version < 11)
+            {
+                return;
+            }
+
+            reader.ReadByte();
+            uint shrinkedCameraRegionCount = reader.ReadUInt32();
+            for (uint i = 0; i < shrinkedCameraRegionCount; i++)
+            {
+                LVDRegion shrinkedCameraRegion = new LVDRegion();
+
+                shrinkedCameraRegion.Read(reader);
+                ShrinkedCameraRegions.Add(shrinkedCameraRegion);
+            }
+
+            reader.ReadByte();
+            uint shrinkedDeathRegionCount = reader.ReadUInt32();
+            for (uint i = 0; i < shrinkedDeathRegionCount; i++)
+            {
+                LVDRegion shrinkedDeathRegion = new LVDRegion();
+
+                shrinkedDeathRegion.Read(reader);
+                ShrinkedDeathRegions.Add(shrinkedDeathRegion);
+            }
+        }
+
+        public void Write(BinaryWriterExt writer)
+        {
+            writer.BigEndian = true;
+
+            writer.Write(Unknown);
+            writer.Write(Version);
+
+            writer.Write((byte)1);
+            writer.Write(Signature.ToCharArray());
+
+            writer.Write((byte)1);
+            writer.Write(Collisions.Count);
+            foreach (var v in Collisions)
+            {
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(StartPositions.Count);
+            foreach (var v in StartPositions)
+            {
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(RestartPositions.Count);
+            foreach (var v in RestartPositions)
+            {
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(CameraRegions.Count);
+            foreach (var v in CameraRegions)
+            {
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(DeathRegions.Count);
+            foreach (var v in DeathRegions)
+            {
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(EnemyGenerators.Count);
+            foreach (var v in EnemyGenerators)
+            {
+                v.Write(writer);
+            }
+
+            if (Version < 2)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(0);
+
+            if (Version < 3)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(0);
+
+            writer.Write((byte)1);
+            writer.Write(0);
+
+            writer.Write((byte)1);
+            writer.Write(0);
+
+            writer.Write((byte)1);
+            writer.Write(0);
+
+            if (Version < 4)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(DamageShapes.Count);
+            foreach (var v in DamageShapes)
+            {
+                v.Write(writer);
+            }
+
+            if (Version < 5)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(ItemPopupRegions.Count);
+            foreach (var v in ItemPopupRegions)
+            {
+                v.Write(writer);
+            }
+
+            if (Version > 11)
+            {
+                writer.Write((byte)1);
+                writer.Write(PTrainerRanges.Count);
+                foreach (var v in PTrainerRanges)
+                {
+                    v.Write(writer);
+                }
+
+                if (Version > 12)
+                {
+                    writer.Write((byte)1);
+                    writer.Write(PTrainerFloatingFloors.Count);
+                    foreach (var v in PTrainerFloatingFloors)
+                    {
+                        v.Write(writer);
+                    }
+                }
+            }
+
+            if (Version < 6)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(GeneralShapes2D.Count);
+            foreach (var v in GeneralShapes2D)
+            {
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(GeneralShapes3D.Count);
+            foreach (var v in GeneralShapes3D)
+            {
+                v.Write(writer);
+            }
+
+            if (Version < 7)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(0);
+
+            if (Version < 8)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(0);
+
+            if (Version < 9)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(0);
+
+            if (Version < 10)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(0);
+
+            if (Version < 11)
+            {
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(ShrinkedCameraRegions.Count);
+            foreach (var v in ShrinkedCameraRegions)
+            {
+                v.Write(writer);
+            }
+
+            writer.Write((byte)1);
+            writer.Write(ShrinkedDeathRegions.Count);
+            foreach (var v in ShrinkedDeathRegions)
+            {
+                v.Write(writer);
+            }
         }
     }
 }

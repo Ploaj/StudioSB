@@ -1,75 +1,19 @@
 ﻿using StudioSB.Tools;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace StudioSB.Scenes.LVD
 {
-    public class LVDVector2
+    public class LVDCollision : LVDBase
     {
-        public float X { get; set; }
+        [ReadOnly(true), Category("Version")]
+        public byte Version { get; internal set; } = 4;
 
-        public float Y { get; set; }
+        [Category("CollisionFlags")]
+        public bool Dynamic { get; set; } = false;
 
-        public LVDVector2(float x, float y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public override string ToString()
-        {
-            return $"({X}, {Y})";
-        }
-
-        public LVDVector2 Normalized()
-        {
-            float length = (float)Math.Sqrt(X * X + Y * Y);
-            return new LVDVector2(X / length, Y / length);
-        }
-
-        public static LVDVector2 GenerateNormal(LVDVector2 v1, LVDVector2 v2)
-        {
-            LVDVector2 normal = new LVDVector2(v2.Y - v1.Y, v2.X - v1.X).Normalized();
-            normal.X *= -1;
-            return normal;
-        }
-    }
-
-    public class LVDVector3
-    {
-        public float X { get; set; }
-
-        public float Y { get; set; }
-
-        public float Z { get; set; }
-
-        public LVDVector3(float x, float y, float z)
-        {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
-        public override string ToString()
-        {
-            return $"({X}, {Y}, {Z})";
-        }
-    }
-
-    public class LVDCollision : LVDEntry
-    {
-        [Category("Collision")]
-        public bool Flag1 { get; set; } = false;
-
-        [Category("Collision")]
-        public bool Rigged { get; set; } = false;
-
-        [Category("Collision")]
-        public bool Flag3 { get; set; } = false;
-
-        [Category("Collision")]
-        public bool PassThrough { get; set; } = false;
+        [Category("CollisionFlags")]
+        public bool DropThrough { get; set; } = false;
         
         [Category("Collision")]
         public List<LVDVector2> Vertices { get; set; } = new List<LVDVector2>();
@@ -81,94 +25,120 @@ namespace StudioSB.Scenes.LVD
         public List<LVDCollisionCliff> Cliffs { get; set; } = new List<LVDCollisionCliff>();
 
         [Category("Collision")]
-        public List<LVDCollisionMaterial> Materials { get; set; } = new List<LVDCollisionMaterial>();
-        
+        public List<LVDCollisionAttribute> Attributes { get; set; } = new List<LVDCollisionAttribute>();
+
         [Category("Collision")]
-        public List<LVDCollisionCurve> Curves = new List<LVDCollisionCurve>();
+        public List<LVDCollisionSpiritsFloor> SpiritsFloors { get; set; } = new List<LVDCollisionSpiritsFloor>();
 
-        public void Read(BinaryReaderExt r, int VersionMinor)
+        public override void Read(BinaryReaderExt reader)
         {
-            base.Read(r);
+            Version = reader.ReadByte();
 
-            Flag1 = r.ReadBoolean();
-            Rigged = r.ReadBoolean();
-            Flag3 = r.ReadBoolean();
-            PassThrough = r.ReadBoolean();
-
-            r.ReadByte();
-            int vertCount = r.ReadInt32();
-            for (int i = 0; i < vertCount; i++)
+            if (Version < 2)
             {
-                r.ReadByte();
-                Vertices.Add(new LVDVector2(r.ReadSingle(), r.ReadSingle()));
+                MetaInfo.Read(reader);
             }
-            
-            r.ReadByte();
-            int normalCount = r.ReadInt32();
-            for (int i = 0; i < normalCount; i++)
+            else
             {
-                r.ReadByte();
-                Normals.Add(new LVDVector2(r.ReadSingle(), r.ReadSingle()));
+                base.Read(reader);
             }
 
-            r.ReadByte();
-            int cliffCount = r.ReadInt32();
-            for (int i = 0; i < cliffCount; i++)
+            reader.Skip(1);
+            Dynamic = reader.ReadBoolean();
+            reader.Skip(1);
+            DropThrough = reader.ReadBoolean();
+
+            reader.Skip(1);
+            uint vertexCount = reader.ReadUInt32();
+            for (uint i = 0; i < vertexCount; i++)
             {
-                var cliff = new LVDCollisionCliff();
-                cliff.Read(r);
+                LVDVector2 vertex = new LVDVector2(0.0f, 0.0f);
+
+                vertex.Read(reader);
+                Vertices.Add(vertex);
+            }
+
+            reader.Skip(1);
+            uint normalCount = reader.ReadUInt32();
+            for (uint i = 0; i < normalCount; i++)
+            {
+                LVDVector2 normal = new LVDVector2(0.0f, 0.0f);
+
+                normal.Read(reader);
+                Normals.Add(normal);
+            }
+
+            reader.Skip(1);
+            uint cliffCount = reader.ReadUInt32();
+            for (uint i = 0; i < cliffCount; i++)
+            {
+                LVDCollisionCliff cliff = new LVDCollisionCliff();
+
+                cliff.Read(reader);
                 Cliffs.Add(cliff);
             }
-            
-            r.ReadByte();
-            int materialCount = r.ReadInt32();
-            for (int i = 0; i < materialCount; i++)
+
+            if (Version < 3)
             {
-                var material = new LVDCollisionMaterial();
-                material.Read(r);
-                Materials.Add(material);
+                return;
             }
 
-            // Ultimate Only?
-
-            if(VersionMinor > 10)
+            reader.Skip(1);
+            uint attributeCount = reader.ReadUInt32();
+            for (uint i = 0; i < attributeCount; i++)
             {
-                r.ReadByte();
-                var vecCount = r.ReadInt32();
-                for(int i = 0; i < vecCount; i++)
-                {
-                    var vec = new LVDCollisionCurve();
-                    vec.Read(r);
-                    Curves.Add(vec);
-                }
+                LVDCollisionAttribute attribute = new LVDCollisionAttribute();
+
+                attribute.Read(reader);
+                Attributes.Add(attribute);
+            }
+
+            if (Version < 4)
+            {
+                return;
+            }
+
+            reader.Skip(1);
+            uint spiritsFloorCount = reader.ReadUInt32();
+            for (uint i = 0; i < spiritsFloorCount; i++)
+            {
+                LVDCollisionSpiritsFloor spiritsFloor = new LVDCollisionSpiritsFloor();
+
+                spiritsFloor.Read(reader);
+                SpiritsFloors.Add(spiritsFloor);
             }
         }
 
-        public void Write(BinaryWriterExt writer, int VersionMinor)
+        public override void Write(BinaryWriterExt writer)
         {
-            base.Write(writer);
+            writer.Write(Version);
 
-            writer.Write(Flag1);
-            writer.Write(Rigged);
-            writer.Write(Flag3);
-            writer.Write(PassThrough);
+            if (Version < 2)
+            {
+                MetaInfo.Write(writer);
+            }
+            else
+            {
+                base.Write(writer);
+            }
+
+            writer.Write((byte)0);
+            writer.Write(Dynamic);
+            writer.Write((byte)0);
+            writer.Write(DropThrough);
 
             writer.Write((byte)1);
             writer.Write(Vertices.Count);
-            foreach(var v in Vertices)
+            foreach (var v in Vertices)
             {
-                writer.Write((byte)1);
-                writer.Write(v.X);
-                writer.Write(v.Y);
+                v.Write(writer);
             }
 
             writer.Write((byte)1);
             writer.Write(Normals.Count);
             foreach (var v in Normals)
             {
-                writer.Write((byte)1);
-                writer.Write(v.X);
-                writer.Write(v.Y);
+                v.Write(writer);
             }
             
             writer.Write((byte)1);
@@ -178,21 +148,28 @@ namespace StudioSB.Scenes.LVD
                 v.Write(writer);
             }
 
+            if (Version < 3)
+            {
+                return;
+            }
+
             writer.Write((byte)1);
-            writer.Write(Materials.Count);
-            foreach (var v in Materials)
+            writer.Write(Attributes.Count);
+            foreach (var v in Attributes)
             {
                 v.Write(writer);
             }
-            
-            if (VersionMinor > 10)
+
+            if (Version < 4)
             {
-                writer.Write((byte)1);
-                writer.Write(Curves.Count);
-                foreach (var v in Curves)
-                {
-                    v.Write(writer);
-                }
+                return;
+            }
+
+            writer.Write((byte)1);
+            writer.Write(SpiritsFloors.Count);
+            foreach (var v in SpiritsFloors)
+            {
+                v.Write(writer);
             }
         }
     }
