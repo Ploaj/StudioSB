@@ -6,11 +6,21 @@ using System.Xml.Serialization;
 namespace StudioSB.IO.Formats
 {
     [Flags]
-    public enum SSFLineFlag
+    public enum SSFEdgeFlags
     {
-        RightLedge,
-        LeftLedge,
-        DropThrough
+        None = 0x0,
+        Unpaintable = 0x20,
+        RightWallOverride = 0x100,
+        LeftWallOverride = 0x200,
+        CeilingOverride = 0x400,
+        FloorOverride = 0x800,
+        NoWallJump = 0x1000,
+        DropThrough = 0x2000,
+        LeftLedge = 0x4000,
+        RightLedge = 0x8000,
+        IgnoreLinkFromLeft = 0x10000,
+        Supersoft = 0x20000,
+        IgnoreLinkFromRight = 0x40000,
     }
 
     [Serializable]
@@ -48,17 +58,17 @@ namespace StudioSB.IO.Formats
     public class SSFGroup
     {
         public string Name;
-        public string Bone;
-        public List<SSFLine> Lines = new List<SSFLine>();
+        public string JointName;
         public List<SSFVertex> Vertices = new List<SSFVertex>();
+        public List<SSFEdge> Edges = new List<SSFEdge>();
     }
 
-    public class SSFLine
+    public class SSFEdge
     {
         public int Vertex1;
         public int Vertex2;
         public string Material;
-        public SSFLineFlag Flags;
+        public SSFEdgeFlags Flags = SSFEdgeFlags.None;
         public string Tags;
     }
 

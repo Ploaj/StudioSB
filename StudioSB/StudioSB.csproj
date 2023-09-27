@@ -85,6 +85,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -221,21 +222,25 @@
     <Compile Include="Scenes\ISBMesh.cs" />
     <Compile Include="Scenes\ISBModel.cs" />
     <Compile Include="Scenes\LVD\LevelData.cs" />
-    <Compile Include="Scenes\LVD\LVDBounds.cs" />
+    <Compile Include="Scenes\LVD\LVDBase.cs" />
     <Compile Include="Scenes\LVD\LVDCollision.cs" />
+    <Compile Include="Scenes\LVD\LVDCollisionAttribute.cs" />
     <Compile Include="Scenes\LVD\LVDCollisionCliff.cs" />
-    <Compile Include="Scenes\LVD\LVDCollisionCurve.cs" />
-    <Compile Include="Scenes\LVD\LVDCollisionMaterial.cs" />
+    <Compile Include="Scenes\LVD\LVDCollisionSpiritsFloor.cs" />
     <Compile Include="Scenes\LVD\LVDDamageShape.cs" />
     <Compile Include="Scenes\LVD\LVDEnemyGenerator.cs" />
-    <Compile Include="Scenes\LVD\LVDEntry.cs" />
-    <Compile Include="Scenes\LVD\LVDGeneralPoint.cs" />
-    <Compile Include="Scenes\LVD\LVDGeneralShape.cs" />
-    <Compile Include="Scenes\LVD\LVDGeneralVector.cs" />
-    <Compile Include="Scenes\LVD\LVDItemSpawner.cs" />
-    <Compile Include="Scenes\LVD\LVDRangeCurve.cs" />
-    <Compile Include="Scenes\LVD\LVDShape.cs" />
-    <Compile Include="Scenes\LVD\LVDSpawn.cs" />
+    <Compile Include="Scenes\LVD\LVDGeneralShape2.cs" />
+    <Compile Include="Scenes\LVD\LVDGeneralShape3.cs" />
+    <Compile Include="Scenes\LVD\LVDItemPopupRegion.cs" />
+    <Compile Include="Scenes\LVD\LVDPoint.cs" />
+    <Compile Include="Scenes\LVD\LVDPTrainerFloatingFloor.cs" />
+    <Compile Include="Scenes\LVD\LVDPTrainerRange.cs" />
+    <Compile Include="Scenes\LVD\LVDRect.cs" />
+    <Compile Include="Scenes\LVD\LVDRegion.cs" />
+    <Compile Include="Scenes\LVD\LVDShape2.cs" />
+    <Compile Include="Scenes\LVD\LVDShape3.cs" />
+    <Compile Include="Scenes\LVD\LVDVector2.cs" />
+    <Compile Include="Scenes\LVD\LVDVector3.cs" />
     <Compile Include="Scenes\Melee\GXtoGL.cs" />
     <Compile Include="Scenes\Melee\SBHsdBone.cs" />
     <Compile Include="Scenes\Melee\HSDScene.cs" />

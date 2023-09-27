@@ -1,34 +1,61 @@
 ﻿using StudioSB.Tools;
+using System.ComponentModel;
 
 namespace StudioSB.Scenes.LVD
 {
-    public class LVDCollisionCliff : LVDEntry
+    public class LVDCollisionCliff : LVDBase
     {
-        public LVDVector2 Position { get; set; } = new LVDVector2(0, 0);
+        [ReadOnly(true), Category("Version")]
+        public byte Version { get; internal set; } = 3;
 
-        public float Angle { get; set; } = 0;
+        [Category("Values"), TypeConverter(typeof(ExpandableObjectConverter))]
+        public LVDVector2 Position { get; set; } = new LVDVector2(0.0f, 0.0f);
 
-        public int LineIndex { get; set; } = 0;
+        [Category("Values")]
+        public float Lr { get; set; }
 
-        public override void Read(BinaryReaderExt r)
+        [Category("Values")]
+        public int LineIndex { get; set; }
+
+        public override void Read(BinaryReaderExt reader)
         {
-            base.Read(r);
-            
-            r.Skip(1);
-            Position.X = r.ReadSingle();
-            Position.Y = r.ReadSingle();
-            Angle = r.ReadSingle();
-            LineIndex = r.ReadInt32();
+            Version = reader.ReadByte();
+
+            if (Version > 1)
+            {
+                base.Read(reader);
+            }
+
+            Position.Read(reader);
+
+            Lr = reader.ReadSingle();
+
+            if (Version < 3)
+            {
+                return;
+            }
+
+            LineIndex = reader.ReadInt32();
         }
 
         public override void Write(BinaryWriterExt writer)
         {
-            base.Write(writer);
+            writer.Write(Version);
 
-            writer.Write((byte)1);
-            writer.Write(Position.X);
-            writer.Write(Position.Y);
-            writer.Write(Angle);
+            if (Version > 1)
+            {
+                base.Write(writer);
+            }
+
+            Position.Write(writer);
+
+            writer.Write(Lr);
+
+            if (Version < 3)
+            {
+                return;
+            }
+
             writer.Write(LineIndex);
         }
     }

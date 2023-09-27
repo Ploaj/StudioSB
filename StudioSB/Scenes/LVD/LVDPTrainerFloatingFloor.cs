@@ -3,17 +3,13 @@ using System.ComponentModel;
 
 namespace StudioSB.Scenes.LVD
 {
-    public class LVDDamageShape : LVDBase
+    public class LVDPTrainerFloatingFloor : LVDBase
     {
         [ReadOnly(true), Category("Version")]
         public byte Version { get; internal set; } = 1;
 
-        [Category("Shape"), TypeConverter(typeof(ExpandableObjectConverter))]
-        public LVDShape3 Shape { get; set; } = new LVDShape3();
-
-        public bool IsDamager { get; set; }
-
-        public uint ID { get; set; }
+        [Category("Position"), TypeConverter(typeof(ExpandableObjectConverter))]
+        public LVDVector3 Position { get; set; } = new LVDVector3(0.0f, 0.0f, 0.0f);
 
         public override void Read(BinaryReaderExt reader)
         {
@@ -21,10 +17,7 @@ namespace StudioSB.Scenes.LVD
 
             base.Read(reader);
 
-            Shape.Read(reader);
-
-            IsDamager = reader.ReadBoolean();
-            ID = reader.ReadUInt32();
+            Position.Read(reader);
         }
 
         public override void Write(BinaryWriterExt writer)
@@ -33,10 +26,7 @@ namespace StudioSB.Scenes.LVD
 
             base.Write(writer);
 
-            Shape.Write(writer);
-
-            writer.Write(IsDamager);
-            writer.Write(ID);
+            Position.Write(writer);
         }
     }
 }
